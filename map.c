@@ -366,4 +366,36 @@ int block_fill_middle(struct blockData *dat, float inVal, float outVal){
 }
 
 
-
+/// This function makes a grid of 9 squares each with a different, but similar color to the color input
+// Block is a structure to the blockData struct used for printing
+// color is the starting value for the color
+// return 1 is Block is NULL
+short block_fill_nine_squares(struct blockData *Block, int color) {
+	// if the blockData stucture is null, send an error
+	if(Block == NULL){
+		error("block_fill_nine_squares() was sent NULL blockData pointer. blockData = NULL");
+		return 1;
+	}
+	// variables for indexing through the arrays
+	// z variable is the color starting value which is then multiplied so that it changes
+	int i = 0, j = 0, z = 100;
+	// index through every row and column
+	for(i = 0; i < BLOCK_WIDTH; i++) {
+		for(j = 0; j < BLOCK_HEIGHT; j++) {
+			// if the j variable is below 81 (square one, four, and seven) then print a color
+			if(j <= 81)
+				Block->elevation[i][j] = color;
+			// if the j variable is above 81 and below 162 (square two, five, and eight) then print a color
+			else if(j < 162 && j > 81)
+				Block->elevation[i][j] = color*2;
+			// if the j variable is above 162 (square three, six, and nine) then print the color
+			else if(j >= 162)
+				Block->elevation[i][j] = color*3;
+		}
+		// if the mod of i is 81 (1/3 of the screen) then change the variable and multiply it by two
+		if(i%81 == 0 && i != 0)
+			color*=2;
+	}
+	// success
+	return 0;
+}
