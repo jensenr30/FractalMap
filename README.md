@@ -19,7 +19,9 @@ although, practically, your hard drive would run out of memory before you used e
 
 -	removed
 
-^ ~	updated/tweaked
+^	updated
+
+~	tweaked
 
 %	bug fix
 

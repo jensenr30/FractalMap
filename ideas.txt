@@ -58,3 +58,21 @@ there would be simulated rain particles that would shower a landscape.
 each rain particle would fall down the steepest slope.
 as it falls down slopes, it would take away some of the land that it was just on and place it on the land that it is flowing to (eroding the land, bringing more land downhill).
 this could produce some very interesting patterns.
+
+
+================================================
+== make all graphics in code:
+================================================
+use no pre-made textures.
+generate all game textures in code procedurally.
+generate bugs and animals and trees and things in code with simple shapes.
+they would probably needed to be generated procedurally (like a fractal).
+so the creatures that exist in the fractal map are, themselves, fractals.
+
+maybe make the creatures are 3D? 3d models?
+3D creature fractals?
+YES. That would be really complicated but probably pretty cool.
+The nice thing about the 2D images is that you wouldn't need to constantly render a 3D object.
+Rendering the 2D
+
+
