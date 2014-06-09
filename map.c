@@ -133,7 +133,7 @@ short block_create_children(struct blockData *source){
 // returns 6 if it was asked to clean up and it reached a null previous pointer before blockCount reached 0.
 short block_collector(struct blockData *source, short operation){
 	
-	static long long unsigned int blockCount = 0;
+	static long long int blockCount = 0;
 	static struct blockLink *currentLink = NULL;
 	struct blockLink *tempLink = NULL;
 	
@@ -274,7 +274,7 @@ short map_print(SDL_Surface *dest, struct blockData *source){
 	int i, j;
 	for(i=0; i<BLOCK_WIDTH; i++){
 		for(j=0; j<BLOCK_HEIGHT; j++){
-			set_pixel(dest, i, j, 0xff000000|(int)((8.0*(source->elevation[i][j] + 10))));
+			set_pixel(dest, i, j, 0xff000000|((int)(source->elevation[i][j])));
 		}
 	}
 	
@@ -330,5 +330,40 @@ float block_surrounding_average(struct blockData *source, unsigned int x, unsign
 	// if everything went well, return the average of the surrounding elevations
 	return average/((float)averageCount);
 }
+
+
+/// this function will fill up the middle 9th of the block (from 1/3 to 2/3 of the block in both width and height)
+// the outer ring of 8/9ths of the will be filled with outVal
+// the inner 9th is filled with inVal.
+// returns 1 if dat was NULL.
+int block_fill_middle(struct blockData *dat, float inVal, float outVal){
+	
+	if(dat == NULL){
+		error("block_fill_middle() was sent NULL blockData pointer. dat = NULL");
+		return 1;
+	}
+	
+	int i, j;
+	// index through every row and column
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			
+			// if the value is in the inner 9th,
+			if(i>=81 && i<162 && j>=81 && j<162){
+				// fill it with inVal
+				dat->elevation[i][j] = inVal;
+			}
+			// if  it is in the outer 9th, 
+			else{
+				// fill with outVal
+				dat->elevation[i][j] = outVal;
+			}
+			
+		}
+	}
+	// success
+	return 0;
+}
+
 
 

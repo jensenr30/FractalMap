@@ -77,3 +77,6 @@ SDL_Texture *load_image_to_texture(char *filename){
 	//  if the image loaded correctly, return a pointer to the texture that contains it.
 	return tempTexture;
 }
+
+
+

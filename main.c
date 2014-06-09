@@ -112,15 +112,15 @@ int main(int argc, char *argv[]){
 		if(makeNewMap||smoothMap){
 			// generate new map in origin
 			if(makeNewMap){
-				block_random_fill(&origin, -10, 20);
-				
+				//block_random_fill(&origin, 0, 0xff);
+				block_fill_middle(&origin, 0xff, 0x00);
 			}
 			
 			//block_print_to_file(&origin, "origin.txt");
 			
 			// smooth the map
 			//block_smooth(&origin, 0.5);
-			if(smoothMap) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 1);
+			if(smoothMap) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
 			
 			//clear old surface
 			if(mapSurface != NULL)SDL_FreeSurface(mapSurface);

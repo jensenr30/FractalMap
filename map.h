@@ -35,7 +35,8 @@ struct blockData{
 	
 	// these are pointers to child blocks.
 	// these are pointers to other blocks inside of this main block.
-	// at the moment, each block will be split up into four smaller ones.
+	// each block will be split up into MAP_BLOCK_CHILDREN smaller ones.
+	// these are indexed with 0,1,2,3,4,5,6,7,8.
 	struct blockData *children[MAP_BLOCK_CHILDREN];
 	
 	// these are eight pointers to the eight neighbors on the same level.
@@ -72,3 +73,5 @@ short map_print(SDL_Surface *dest, struct blockData *source);
 
 short block_smooth(struct blockData *source, float smoothFactor);
 float block_surrounding_average(struct blockData *source, unsigned int x, unsigned int y);
+
+int block_fill_middle(struct blockData *dat, float inVal, float outVal);
