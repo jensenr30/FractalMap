@@ -6,6 +6,8 @@
 #define MAP_BLOCK_LINEAR_SCALE_FACTOR	3.0
 #define BLOCK_WIDTH						243
 #define BLOCK_HEIGHT					243
+#define BLOCK_WIDTH_1_3					81
+#define BLOCK_WIDTH_2_3					162
 // each block can have 9 children.
 // each block can have one parent.
 // more children are generated as the player zooms in.

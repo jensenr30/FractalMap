@@ -349,7 +349,7 @@ int block_fill_middle(struct blockData *dat, float inVal, float outVal){
 		for(j=0; j<BLOCK_HEIGHT; j++){
 			
 			// if the value is in the inner 9th,
-			if(i>=81 && i<162 && j>=81 && j<162){
+			if(i>=BLOCK_WIDTH_1_3 && i<BLOCK_WIDTH_2_3 && j>=BLOCK_WIDTH_1_3 && j<BLOCK_WIDTH_2_3){
 				// fill it with inVal
 				dat->elevation[i][j] = inVal;
 			}
@@ -370,6 +370,7 @@ int block_fill_middle(struct blockData *dat, float inVal, float outVal){
 // Block is a structure to the blockData struct used for printing
 // color is the starting value for the color
 // return 1 is Block is NULL
+// return 0 on success
 short block_fill_nine_squares(struct blockData *Block, int color) {
 	// if the blockData stucture is null, send an error
 	if(Block == NULL){
@@ -383,13 +384,13 @@ short block_fill_nine_squares(struct blockData *Block, int color) {
 	for(i = 0; i < BLOCK_WIDTH; i++) {
 		for(j = 0; j < BLOCK_HEIGHT; j++) {
 			// if the j variable is below 81 (square one, four, and seven) then print a color
-			if(j <= 81)
+			if(j < BLOCK_WIDTH_1_3)
 				Block->elevation[i][j] = color;
 			// if the j variable is above 81 and below 162 (square two, five, and eight) then print a color
-			else if(j < 162 && j > 81)
+			else if(j < BLOCK_WIDTH_2_3	&& j >= BLOCK_WIDTH_1_3)
 				Block->elevation[i][j] = color*2;
 			// if the j variable is above 162 (square three, six, and nine) then print the color
-			else if(j >= 162)
+			else if(j >= BLOCK_WIDTH_2_3)
 				Block->elevation[i][j] = color*3;
 		}
 		// if the mod of i is 81 (1/3 of the screen) then change the variable and multiply it by two
