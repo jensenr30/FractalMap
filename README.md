@@ -15,15 +15,15 @@ although, practically, your hard drive would run out of memory before you used e
 
 **commit conventions:**
 
-+	added
+added    +
 
--	removed
+removed   -
 
-^	updated
+updated   ^
 
-~	tweaked
+tweaked   ~
 
-%	bug fix
+bug fix  %
 
 *Collaborators*
 
