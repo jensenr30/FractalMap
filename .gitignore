@@ -1,0 +1,16 @@
+*.layout
+*.depend
+FractalMap.layout
+FractalMap.depend
+
+bin/Debug/FractalMap
+bin/Release/FractalMap
+bin/Debug/FractalMap.exe
+bin/Release/FractalMap.exe
+*.o
+
+*stderr.txt
+*stdout.txt
+*.orig
+Thumbs.db
+*/Thumbs.db
