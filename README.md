@@ -11,6 +11,8 @@ The amount that a user can zoom out will be limited by the data types used (sign
 so on most modern machines that will be plus or minus 9.223372e+18 levels from the origin.
 although, practically, your hard drive would run out of memory before you used even a small fraction of those levels.
 
+Check out the images folder to see some examples of what is currently working.
+
 
 
 **commit conventions:**
@@ -28,5 +30,7 @@ bug fix  %
 *Collaborators*
 
 JensenR30
+JensenR30@Gmail.com
 
 JPisaBrony
+jdpohl789@gmail.com
