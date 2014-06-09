@@ -114,7 +114,8 @@ int main(int argc, char *argv[]){
 			if(makeNewMap){
 				//block_random_fill(&origin, 0, 0xff);
 				//block_fill_middle(&origin, 0xff, 0x00);
-				block_fill_nine_squares(&origin, 100);
+				//block_fill_nine_squares(&origin, 100);
+				block_fill_nine_squares_own_color(&origin, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
 			}
 			
 			//block_print_to_file(&origin, "origin.txt");

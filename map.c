@@ -383,19 +383,139 @@ short block_fill_nine_squares(struct blockData *Block, int color) {
 	// index through every row and column
 	for(i = 0; i < BLOCK_WIDTH; i++) {
 		for(j = 0; j < BLOCK_HEIGHT; j++) {
-			// if the j variable is below 81 (square one, four, and seven) then print a color
+			// if the j variable is below 81 (square one, two, and threee) then print a color
 			if(j < BLOCK_WIDTH_1_3)
 				Block->elevation[i][j] = color;
-			// if the j variable is above 81 and below 162 (square two, five, and eight) then print a color
+			// if the j variable is above 81 and below 162 (square four, five, and six) then print a color
 			else if(j < BLOCK_WIDTH_2_3	&& j >= BLOCK_WIDTH_1_3)
 				Block->elevation[i][j] = color*2;
-			// if the j variable is above 162 (square three, six, and nine) then print the color
+			// if the j variable is above 162 (square four, five, and six) then print a color
 			else if(j >= BLOCK_WIDTH_2_3)
 				Block->elevation[i][j] = color*3;
 		}
 		// if the mod of i is 81 (1/3 of the screen) then change the variable and multiply it by two
 		if(i%81 == 0 && i != 0)
 			color*=2;
+	}
+	// success
+	return 0;
+}
+
+
+/// This function fills in a certain square with a color that are specified
+// accepts the blockData structure so that it knows were to print too
+// accepts nine different color arguments
+// the arguments are mapped to the grid like so:
+// 1 2 3
+// 4 5 6
+// 7 8 9
+// note: prints black if it function didnt fucntion properly
+// return 1 is Block is NULL
+// return 0 on success
+short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine) {
+	// if the blockData stucture is null, send an error
+	if(Block == NULL){
+		error("block_fill_nine_squares() was sent NULL blockData pointer. blockData = NULL");
+		return 1;
+	}
+	// variables for indexing through the arrays
+	// column variable is for keeping track of which block it is in. it starts at the first column
+	int i = 0, j = 0, column = 1;
+	// index through every row and column
+	for(i = 0; i < BLOCK_WIDTH; i++) {
+		for(j = 0; j < BLOCK_HEIGHT; j++) {
+			// if the j variable is below 81 (square one, two, and threee) then print a color
+			if(j < BLOCK_WIDTH_1_3) {
+				//switch between the different blocks in the row
+				switch(column) {
+					//first block
+					case 1:
+						//print color from argument provided
+						Block->elevation[i][j] = one;
+						break;
+					//second block
+					case 2:
+						//print color from argument provided
+						Block->elevation[i][j] = two;
+						break;
+					//third block
+					case 3:
+						//print color from argument provided
+						Block->elevation[i][j] = three;
+						break;
+					//debuging
+					default:
+						// What? how did you get here?
+						// if it gets here, prints black
+						Block->elevation[i][j] = 0;
+						break;
+				}
+			}
+			// if the j variable is above 81 and below 162 (square four, five, and six) then print a color
+			else if(j < BLOCK_WIDTH_2_3	&& j >= BLOCK_WIDTH_1_3) {
+				//switch between the different blocks in the row
+				switch(column) {
+					// fourth block
+					case 1:
+						//print color from argument provided
+						Block->elevation[i][j] = four;
+						break;
+					// fifth block
+					case 2:
+						//print color from argument provided
+						Block->elevation[i][j] = five;
+						break;
+					// sixth block
+					case 3:
+						//print color from argument provided
+						Block->elevation[i][j] = six;
+						break;
+					//debuging
+					default:
+						// What? how did you get here?
+						// if it gets here, prints black
+						Block->elevation[i][j] = 0;
+						break;
+				}
+				
+			}
+			// if the j variable is above 162 (square seven, eight, and nine) then print the color
+			else if(j >= BLOCK_WIDTH_2_3) {
+				//switch between the different blocks in the row
+				switch(column) {
+					// seventh block
+					case 1:
+						//print color from argument provided
+						Block->elevation[i][j] = seven;
+						break;
+					// eighth block
+					case 2:
+						//print color from argument provided
+						Block->elevation[i][j] = eight;
+						break;
+					// ninth block
+					case 3:
+						//print color from argument provided
+						Block->elevation[i][j] = nine;
+						break;
+					//debuging
+					default:
+						// What? how did you get here?
+						// if it gets here, prints black
+						Block->elevation[i][j] = 0;
+						break;
+				}
+			}
+		}
+		// if the mod of i is 81 (1/3 of the screen)
+		// and not equal to 0 since 0%81 is 0 which makes the first squares in the first block the wrong color
+		if(i%81 == 0 && i != 0) {
+			// then update the row so that it goes to the next one
+			column++;
+			// if the row is above 3, then reset it back to one
+			if(column > 3)
+				column = 1;
+		}
 	}
 	// success
 	return 0;
