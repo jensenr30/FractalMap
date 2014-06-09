@@ -1,0 +1,155 @@
+# depslib dependency file v1.0
+1402271696 source:a:\programming\fractile\sdl2_testing\main.c
+	<SDL2/SDL.h>
+	<stdio.h>
+	<stdlib.h>
+	"utilities.h"
+	"graphics.h"
+	"globals.h"
+	"graphics.h"
+	"map.h"
+	"rand.h"
+	"filter.h"
+	<time.h>
+
+1402159465 source:a:\programming\fractile\sdl2_testing\graphics.c
+	"graphics.h"
+	<SDL2/SDL.h>
+	<SDL2/SDL_image.h>
+	<string.h>
+	"globals.h"
+	"utilities.h"
+
+1402159465 a:\programming\fractile\sdl2_testing\graphics.h
+	<SDL2/SDL.h>
+
+1402238991 a:\programming\fractile\sdl2_testing\globals.h
+
+1402238709 a:\programming\fractile\sdl2_testing\utilities.h
+	<SDL2/SDL.h>
+
+1402239954 source:a:\programming\fractile\sdl2_testing\utilities.c
+	<stdio.h>
+	"utilities.h"
+	"globals.h"
+	"map.h"
+
+1402189768 source:a:\programming\fractile\sdl2_testing\map.c
+	"map.h"
+	<stdio.h>
+	<stdlib.h>
+	"utilities.h"
+	<string.h>
+	"rand.h"
+	"graphics.h"
+
+1402271711 a:\programming\fractile\sdl2_testing\map.h
+	<SDL2/SDL.h>
+
+1389564511 source:a:\programming\fractile\sdl2_testing\mt19937int.c
+	<stdio.h>
+
+1389575929 source:a:\programming\fractile\sdl2_testing\rand.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"rand.h"
+	"mt19937int.h"
+
+1402120328 a:\programming\fractile\sdl2_testing\rand.h
+	"mt19937int.h"
+
+1389566203 a:\programming\fractile\sdl2_testing\mt19937int.h
+
+1402240839 source:a:\programming\fractile\sdl2_testing\filters.c
+	"filters.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"utilities.h"
+	"globals.h"
+
+1402239790 a:\programming\fractile\sdl2_testing\filters.h
+
+1402263398 source:a:\programming\fractile\sdl2_testing\filter.c
+	"filter.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"utilities.h"
+	"globals.h"
+
+1402241630 a:\programming\fractile\sdl2_testing\filter.h
+
+1402263398 source:a:\programming\fractalmap\filter.c
+	"filter.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"utilities.h"
+	"globals.h"
+
+1402241630 a:\programming\fractalmap\filter.h
+
+1402238709 a:\programming\fractalmap\utilities.h
+	<SDL2/SDL.h>
+
+1402238991 a:\programming\fractalmap\globals.h
+
+1402159465 source:a:\programming\fractalmap\graphics.c
+	"graphics.h"
+	<SDL2/SDL.h>
+	<SDL2/SDL_image.h>
+	<string.h>
+	"globals.h"
+	"utilities.h"
+
+1402159465 a:\programming\fractalmap\graphics.h
+	<SDL2/SDL.h>
+
+1402189768 source:a:\programming\fractalmap\map.c
+	"map.h"
+	<stdio.h>
+	<stdlib.h>
+	"utilities.h"
+	<string.h>
+	"rand.h"
+	"graphics.h"
+
+1402271711 a:\programming\fractalmap\map.h
+	<SDL2/SDL.h>
+
+1402120328 a:\programming\fractalmap\rand.h
+	"mt19937int.h"
+
+1389566203 a:\programming\fractalmap\mt19937int.h
+
+1389564511 source:a:\programming\fractalmap\mt19937int.c
+	<stdio.h>
+
+1389575929 source:a:\programming\fractalmap\rand.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"rand.h"
+	"mt19937int.h"
+
+1402239954 source:a:\programming\fractalmap\utilities.c
+	<stdio.h>
+	"utilities.h"
+	"globals.h"
+	"map.h"
+
+1402277152 source:a:\programming\fractalmap\main.c
+	<SDL2/SDL.h>
+	<stdio.h>
+	<stdlib.h>
+	"utilities.h"
+	"graphics.h"
+	"globals.h"
+	"graphics.h"
+	"map.h"
+	"rand.h"
+	"filter.h"
+	<time.h>
+
