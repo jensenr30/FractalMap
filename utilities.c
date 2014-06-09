@@ -6,22 +6,31 @@
 
 // this will log an error message to the error file
 void error(char *errstr){
+	// open error log file
 	FILE *fp = fopen(ERROR_FILE, ERROR_FILE_MODE);
+	// write error log to error file
 	fprintf( fp, ERROR_FORMAT, ERROR_TIMESTAMP, errstr );
+	// close error fille
 	fclose(fp);
 }
 
 // this will log an error message and an integer of data to the error file
 void error_d(char *errstr, int data){
+	// open error log file
 	FILE *fp = fopen(ERROR_FILE,ERROR_FILE_MODE);
+	// write error log to error file
 	fprintf( fp, ERROR_FORMAT_D, ERROR_TIMESTAMP, errstr, data );
+	// close error fille
 	fclose(fp);
 }
 
 // this will log an error message and a floating point number to the error file
 void error_f(char *errstr, float data){
+	// open error log file 
 	FILE *fp = fopen(ERROR_FILE,ERROR_FILE_MODE);
+	// write error log to error file
 	fprintf( fp, ERROR_FORMAT_F, ERROR_TIMESTAMP, errstr, data );
+	// close error fille
 	fclose(fp);
 }
 

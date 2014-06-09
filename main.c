@@ -10,8 +10,8 @@
 #include "filter.h"
 #include <time.h>
 
-unsigned int windW = 600;
-unsigned int windH = 600;
+unsigned int windW = BLOCK_WIDTH*3;
+unsigned int windH = BLOCK_HEIGHT*3;
 
 
 int main(int argc, char *argv[]){
@@ -111,13 +111,16 @@ int main(int argc, char *argv[]){
 		
 		if(makeNewMap||smoothMap){
 			// generate new map in origin
-			if(makeNewMap)block_random_fill(&origin, -10, 20);
+			if(makeNewMap){
+				block_random_fill(&origin, -10, 20);
+				
+			}
 			
 			//block_print_to_file(&origin, "origin.txt");
 			
 			// smooth the map
 			//block_smooth(&origin, 0.5);
-			if(smoothMap) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 0.5);
+			if(smoothMap) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 1);
 			
 			//clear old surface
 			if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
