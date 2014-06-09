@@ -14,3 +14,5 @@ bin/Release/FractalMap.exe
 *.orig
 Thumbs.db
 */Thumbs.db
+
+/bin/Debug/error.txt

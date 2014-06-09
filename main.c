@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
 	
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
 	
-	myWindow = SDL_CreateWindow("My Game Window", 100, 100, windW, windH, SDL_WINDOW_RESIZABLE);
+	myWindow = SDL_CreateWindow("My Game Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 	
 	if(myWindow == NULL){
