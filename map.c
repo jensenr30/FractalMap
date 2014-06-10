@@ -214,14 +214,14 @@ short block_collector(struct blockData *source, short operation){
 		for(; blockCount >= 0; blockCount--){
 			
 			// if the current block is valid,
-			if(currentLink->blocks[blockCount] != NULL){
+			if(currentLink->blocks[blockCount%BLOCK_LINK_SIZE] != NULL){
 				
 				// if the just got to the end of a link,
 				if(blockCount%BLOCK_LINK_SIZE == BLOCK_LINK_SIZE - 1){
 					
 					// if the previous link is invalid,
 					if(currentLink->prev == NULL){
-						error_d("block_collector() has NULL previous link pointer before the end of the list. for() loop terminated with un-erased blocks: blockCount = ", blockCount);
+						error_d("block_collector() has NULL previous link pointer before the end of the list. for() loop terminated with un-erased blocks: blockCount =", blockCount);
 						blockCount = 0;
 						currentLink = NULL;
 						return 6;
@@ -245,7 +245,7 @@ short block_collector(struct blockData *source, short operation){
 	}
 	// check for invalid operation
 	else{
-		error_d("block_collector() received invalid operation. operation = ", operation);
+		error_d("block_collector() received invalid operation. operation =", operation);
 		return 2;
 	}
 	
@@ -323,7 +323,7 @@ float block_surrounding_average(struct blockData *source, unsigned int x, unsign
 	if(y<BLOCK_HEIGHT-1)	{average += source->elevation[x][y+1];	averageCount++; }
 	
 	if(averageCount < 1){
-		error_d("block_surrounding_average() had invalid averageCount! averageCount = ", averageCount);
+		error_d("block_surrounding_average() had invalid averageCount! averageCount =", averageCount);
 		return 0.0;
 	}
 	
@@ -524,7 +524,7 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 
 /// creates all three children for the passed blockData, parent
 // this function will allocate memory for all 9 children at once.
-// returns 0 on success
+// returns 0 on success 
 // returns 1 for a NULL parent pointer.
 // returns 2+child 
 short block_generate_children(struct blockData *datParent){
@@ -539,40 +539,50 @@ short block_generate_children(struct blockData *datParent){
 	// allocate space for 9 children
 	for(c=0; c<BLOCK_CHILDREN; c++){
 		
-		// attempt to allocate memory for the child block.
-		datParent->children[c] = (struct blockData *) malloc(sizeof(struct blockData));
-		
-		// check to make sure child block was allocated incorrectly.
-		if(datParent->children[c] == NULL){
-			
-			error_d("block_generate_children() could not allocate memory for children. malloc() returned NULL. child = ",c);
-			return 2 + c;
-			
+		// if a child already exists,
+		if(datParent->children[c] != NULL){
+			// then you should not be trying to generate a different one in its place.
+			error_d("block_generate_children() was asked to re-generate child. child number =", c);
 		}
-		// if the child block was generated correctly,
+		// otherwise, if the child doesn't yet exist, try to make the child.
 		else{
 			
-			// check the child block that was just generated into the block list.
-			// this ensures that we will be able to clean up all the allocated blocks when the program closes.
-			block_collector(datParent->children[c], bc_collect);
+			// attempt to allocate memory for the child block.
+			datParent->children[c] = (struct blockData *) malloc(sizeof(struct blockData));
 			
-			// this records the the parent blocks address
-			(datParent->children[c])->parent = datParent;
-			// record (in the child block) what child it is with respect to its parent.
-			// Is it child_0? child_4 or child_5? This will record that data.
-			(datParent->children[c])->parentView = c;
-			// this sets all pointers to children for the current child to NULL.
-			for(cc=0; cc<BLOCK_CHILDREN; cc++){
-				(datParent->children[c])->children[cc] = NULL;
+			// check to make sure child block was allocated incorrectly.
+			if(datParent->children[c] == NULL){
+				
+				error_d("block_generate_children() could not allocate memory for children. malloc() returned NULL. child =",c);
+				return 2 + c;
+				
 			}
-			// the level of the child is the level of the parent minus 1.
-			(datParent->children[c])->level = datParent->level - 1;
+			// if the child block was generated correctly,
+			else{
+				
+				// check the child block that was just generated into the block list.
+				// this ensures that we will be able to clean up all the allocated blocks when the program closes.
+				block_collector(datParent->children[c], bc_collect);
+				
+				// this records the the parent blocks address
+				(datParent->children[c])->parent = datParent;
+				// record (in the child block) what child it is with respect to its parent.
+				// Is it child_0? child_4 or child_5? This will record that data.
+				(datParent->children[c])->parentView = c;
+				// this sets all pointers to children for the current child to NULL.
+				for(cc=0; cc<BLOCK_CHILDREN; cc++){
+					(datParent->children[c])->children[cc] = NULL;
+				}
+				// the level of the child is the level of the parent minus 1.
+				(datParent->children[c])->level = datParent->level - 1;
+				
+				// calculate the child's neighbors.
+				block_calculate_neighbors(datParent->children[c]);
 			
-			// calculate the child's neighbors.
-			block_calculate_neighbors(datParent->children[c]);
-		
+			}
 		}
 	}
+	// successfully generated children
 	return 0;
 }
 

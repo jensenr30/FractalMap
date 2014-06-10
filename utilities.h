@@ -10,9 +10,9 @@
 // general format
 #define ERROR_FORMAT "Ticks= %7.3f\t %s\n"
 // format with 1 integer type data argument
-#define ERROR_FORMAT_D "Ticks= %7.3f\t %s%d\n"
+#define ERROR_FORMAT_D "Ticks= %7.3f\t %s\t%d\n"
 // format with 1 floating point type data argument
-#define ERROR_FORMAT_F "Ticks= %7.3f\t %s%f\n"
+#define ERROR_FORMAT_F "Ticks= %7.3f\t %s\t%f\n"
 
 
 #include <SDL2/SDL.h>

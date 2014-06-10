@@ -84,10 +84,20 @@ int main(int argc, char *argv[]){
 	byte down = 0;
 	// this keeps track of if the map needs to be smoothed.]
 	byte smoothMap = 0;
-	// this keeps track of what key was pressed (used only inside the event evaluation loop)
-	byte key = 0;
+	const int keysSize = 256;
+	// this array keeps track of what variables were JUST pushed.
+	// A value of 1 will be set to keys that were just stroked.
+	// after an iteration through the loop, all keys are reset to 0.
+	byte keys[keysSize];
+	int i;
 	
 	while(quit == 0){
+		
+		// reset all keystroke values
+		for(i=0; i<keysSize; i++){
+			keys[i] = 0;
+		}
+		
 		while(SDL_PollEvent(&event)){
 			// if there is a mouse button down event,
 			if(event.type == SDL_MOUSEBUTTONDOWN){
@@ -97,21 +107,25 @@ int main(int argc, char *argv[]){
 				down--;
 			}
 			else if(event.type == SDL_KEYDOWN){
-				key = event.key.keysym.sym;
-				if(key == SDLK_s){
-					smoothMap = 1;
-				}
-				if(key == SDLK_ESCAPE) quit = 1;
-				if(key == SDLK_q) makeNewMap = 1;
+				// check if the key is greater than the 'a' character.
+				if(event.key.keysym.sym >= 0)
+					// set that character, number, or letter to 1.
+					keys[(event.key.keysym.sym)%keysSize] = 1;
 			}
 			else if(event.type == SDL_QUIT){
 				quit = 1;
 			}
 		}
+		// if the user pressed the c key
+		if(keys['c']){
+			// generate children blocks
+			block_generate_children(&origin);
+		}
 		
-		if(makeNewMap||smoothMap){
-			// generate new map in origin
-			if(makeNewMap){
+		// if either the s or g keys were just stroked.
+		if(keys['s'] || keys['g']){
+			// generate new map in origin if the g key was pressed
+			if(keys['g']){
 				//block_random_fill(&origin, 0, 0xff);
 				//block_fill_middle(&origin, 0xff, 0x00);
 				//block_fill_nine_squares(&origin, 100);
@@ -122,7 +136,7 @@ int main(int argc, char *argv[]){
 			
 			// smooth the map
 			//block_smooth(&origin, 0.5);
-			if(smoothMap) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
+			if(keys['s']) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
 			
 			//clear old surface
 			if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
@@ -135,8 +149,6 @@ int main(int argc, char *argv[]){
 			if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);
 			// create a texture for the map data
 			mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
-			makeNewMap = 0;
-			smoothMap = 0;
 		}
 		// render the mapTexture to the window
 		SDL_RenderCopy(myRenderer, mapTexture, NULL, NULL);
