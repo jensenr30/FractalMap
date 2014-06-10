@@ -6,7 +6,7 @@ the more uniform noise samples are averaged, the tighter the standard deviation 
 
 
 ================================================
-== 3D terrain generation:
+== 3D terrain generation
 ================================================
 make a 3D generator that builds the world just like the 2D terrain generator did in GridVenture.
 instead of using lines, use planes.
@@ -51,7 +51,7 @@ so each block will be 230 kB with a 243x243 2D array of elevation values.
 
 
 ================================================
-== rain filter:
+== rain filter
 ================================================
 add a rain filter to the game. It will simulate rain and erosion on a landscape.
 there would be simulated rain particles that would shower a landscape.
@@ -61,7 +61,7 @@ this could produce some very interesting patterns.
 
 
 ================================================
-== make all graphics in code:
+== make all graphics in code
 ================================================
 use no pre-made textures.
 generate all game textures in code procedurally.
@@ -76,3 +76,15 @@ The nice thing about the 2D images is that you wouldn't need to constantly rende
 Rendering the 2D
 
 
+================================================
+== bookmark locations on the map
+================================================
+Allow the user to bookmark locations on the map.
+The bookmark would be a camera view relative to some block.
+
+
+================================================
+== create randomly generated elements
+================================================
+each game world would have a different set of elements that are available in that world.
+each element would have a randomly generate english-ish name.
