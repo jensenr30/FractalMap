@@ -77,3 +77,5 @@ short block_smooth(struct blockData *source, float smoothFactor);
 float block_surrounding_average(struct blockData *source, unsigned int x, unsigned int y);
 
 int block_fill_middle(struct blockData *dat, float inVal, float outVal);
+short block_fill_nine_squares(struct blockData *Block, int color);
+short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine);
