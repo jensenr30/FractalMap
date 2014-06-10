@@ -96,7 +96,7 @@ short block_create_children(struct blockData *source){
 	}
 	
 	int child;
-	for(child=0; child<MAP_BLOCK_CHILDREN; child++){
+	for(child=0; child<BLOCK_CHILDREN; child++){
 		
 		// allocate space for the child in memory.
 		source->children[child] = ((struct blockData *)malloc(sizeof(struct blockData)));
@@ -520,3 +520,78 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 	// success
 	return 0;
 }
+
+
+/// creates all three children for the passed blockData, parent
+// this function will allocate memory for all 9 children at once.
+// returns 0 on success
+// returns 1 for a NULL parent pointer.
+// returns 2+child 
+short block_generate_children(struct blockData *datParent){
+	
+	if(datParent == NULL){
+		error("block_generate_children() was sent NULL datParent pointer. datParent = NULL");
+		return 1;
+	}
+	
+	int c;	// this is the child of the parent
+	int cc;	// this is the child of the child of the parent
+	// allocate space for 9 children
+	for(c=0; c<BLOCK_CHILDREN; c++){
+		
+		// attempt to allocate memory for the child block.
+		datParent->children[c] = (struct blockData *) malloc(sizeof(struct blockData));
+		
+		// check to make sure child block was allocated incorrectly.
+		if(datParent->children[c] == NULL){
+			
+			error_d("block_generate_children() could not allocate memory for children. malloc() returned NULL. child = ",c);
+			return 2 + c;
+			
+		}
+		// if the child block was generated correctly,
+		else{
+			
+			// check the child block that was just generated into the block list.
+			// this ensures that we will be able to clean up all the allocated blocks when the program closes.
+			block_collector(datParent->children[c], bc_collect);
+			
+			// this records the the parent blocks address
+			(datParent->children[c])->parent = datParent;
+			// record (in the child block) what child it is with respect to its parent.
+			// Is it child_0? child_4 or child_5? This will record that data.
+			(datParent->children[c])->parentView = c;
+			// this sets all pointers to children for the current child to NULL.
+			for(cc=0; cc<BLOCK_CHILDREN; cc++){
+				(datParent->children[c])->children[cc] = NULL;
+			}
+			// the level of the child is the level of the parent minus 1.
+			(datParent->children[c])->level = datParent->level - 1;
+			
+			// calculate the child's neighbors.
+			block_calculate_neighbors(datParent->children[c]);
+		
+		}
+	}
+	return 0;
+}
+
+
+/// this function will calculate all of the neighboring blocks of the "dat" block sent to the function.
+// returns 0 on success.
+// returns 1 on NULL dat block pointer.
+short block_calculate_neighbors(struct blockData *dat){
+	
+	if(dat == NULL){
+		error("block_calculate_neighbors() was sent NULL blockData pointer. dat = NULL");
+		return 1;
+	}
+	
+	// TODO: write function to find neighbors of a block.
+	
+	return 0;
+}
+
+
+
+

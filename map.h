@@ -1,13 +1,13 @@
 #include <SDL2/SDL.h>
 
 
-#define MAP_BLOCK_CHILDREN				9
-#define MAP_BLOCK_NEIGHBORS				8
-#define MAP_BLOCK_LINEAR_SCALE_FACTOR	3.0
-#define BLOCK_WIDTH						243
-#define BLOCK_HEIGHT					243
-#define BLOCK_WIDTH_1_3					81
-#define BLOCK_WIDTH_2_3					162
+#define BLOCK_CHILDREN				9
+#define BLOCK_NEIGHBORS				8
+#define BLOCK_LINEAR_SCALE_FACTOR	3.0
+#define BLOCK_WIDTH					243
+#define BLOCK_HEIGHT				243
+#define BLOCK_WIDTH_1_3				81
+#define BLOCK_WIDTH_2_3				162
 // each block can have 9 children.
 // each block can have one parent.
 // more children are generated as the player zooms in.
@@ -30,20 +30,20 @@ struct blockData{
 	// if this is NULL, a parent has not been generated yet.
 	struct blockData *parent;
 	// this is how the parent sees the child.
-	// this is a number from 0 to MAP_BLOCK_CHILDREN-1.
+	// this is a number from 0 to BLOCK_CHILDREN-1.
 	// if parentView = 3, then the parent of this block sees this block in its center left position.
 	// if parentView = 8, then the parent of
 	char parentView;
 	
 	// these are pointers to child blocks.
 	// these are pointers to other blocks inside of this main block.
-	// each block will be split up into MAP_BLOCK_CHILDREN smaller ones.
+	// each block will be split up into BLOCK_CHILDREN smaller ones.
 	// these are indexed with 0,1,2,3,4,5,6,7,8.
-	struct blockData *children[MAP_BLOCK_CHILDREN];
+	struct blockData *children[BLOCK_CHILDREN];
 	
 	// these are eight pointers to the eight neighbors on the same level.
 	// if these are NULL, the neighbor could exist, but it just might not be entered in this blocks neighbor's index (some neighbors are friendly than others :P)
-	struct blockData *neighbors[MAP_BLOCK_NEIGHBORS];
+	struct blockData *neighbors[BLOCK_NEIGHBORS];
 };
 
 
@@ -79,3 +79,5 @@ float block_surrounding_average(struct blockData *source, unsigned int x, unsign
 int block_fill_middle(struct blockData *dat, float inVal, float outVal);
 short block_fill_nine_squares(struct blockData *Block, int color);
 short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine);
+
+short block_calculate_neighbors(struct blockData *dat);
