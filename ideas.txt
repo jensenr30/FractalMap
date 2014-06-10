@@ -88,3 +88,34 @@ The bookmark would be a camera view relative to some block.
 ================================================
 each game world would have a different set of elements that are available in that world.
 each element would have a randomly generate english-ish name.
+give each element various parameters:
+	- melting point
+	- boiling point
+	- atomic mass
+	- solubility in liquids? which liquids? all? or just some types? which types?
+	- color
+	- distribution over levels
+	- ore deposits? or will there be standing liquids?
+	- scarcity (somewhat continuous over several levels)
+	- Depending on the temperature of the level, this material will either be found...
+		a. in the atmosphere (evaporated)
+		b. in standing bodies of water
+		c. in flowing bodies of water
+		d. in solid ore deposits.
+
+
+================================================
+== make animals
+================================================
+animals will be able to run genetic algorithms to find the best ways to do things.
+Each animal might have several different types of algorithms that it can do:
+such as path finding, mating, interacting with others in its own species, and interacting with animals outside its own species.
+
+I imagine the animals to be the main fascination in this game.
+The user will be able to interact with the environment around the animals.
+The user might also be able to set "global commands" for the colony of animals.
+But the user will not control each unit individually.
+The units should be fully autonomous.
+They should be able to learn how to do things.
+Also, maybe they will try to do things on their own.
+Like find food?
