@@ -20,6 +20,10 @@
 					<Add option="-Wall" />
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add option="-lSDL2" />
+					<Add option="-lSDL2_image" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/FractalMap" prefix_auto="1" extension_auto="1" />
@@ -38,6 +42,28 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Windows32">
+				<Option output="bin/Debug/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug/" />
+				<Option object_output="obj/Debug/" />
+				<Option type="0" />
+				<Option compiler="windows32" />
+				<Compiler>
+					<Add option="-Wunreachable-code" />
+					<Add option="-Wmissing-include-dirs" />
+					<Add option="-Wswitch-default" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-lmingw32" />
+					<Add option="-lSDL2main" />
+					<Add option="-lSDL2" />
+					<Add option="-lwinmm" />
+					<Add option="-lSDL2_image" />
 				</Linker>
 			</Target>
 		</Build>
