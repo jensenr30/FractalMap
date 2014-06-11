@@ -130,6 +130,11 @@ int main(int argc, char *argv[]){
 			block_generate_children(origin);
 		}
 		
+		// generate parent of origin if the p key is pressed
+		if(keys['p']){
+			block_generate_parent(origin);
+		}
+		
 		// if either the s or g keys were just stroked.
 		if(keys['s'] || keys['g']){
 			// generate new map in origin if the g key was pressed

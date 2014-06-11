@@ -120,138 +120,63 @@ short block_create_children(struct blockData *source){
 
 
 
-/// this creates a list of all of the map blocks that have been created during program run time.
-/// this function will record every new map block that is generated.
-/// before the program closes, this function will need to be called to clean up all of these blocks.
-// if operation = bc_collect, then it will collect.
-// returns 0 on success.
-// returns 1 if sent a null block pointer.
-// returns 2 if invalid operation was sent.
-// returns 3 if the function could not create the first link in the list.
-// returns 4 if it could not create a link in the list OTHER than the first.
-// returns 5 if it was asked to bc_clean_up but there was nothing to clean up.
-// returns 6 if it was asked to clean up and it reached a null previous pointer before blockCount reached 0.
-short block_collector(struct blockData *source, short operation){
+/// this function will generate a parent when given a pointer to a block that is to be taken as the child.
+	// when any parent is generated, all of its children are automatically generated as well.
+	// the reason for this is the following: Every block will either have all of its children or none of its children.
+	// this should simplify things considerably in the future.
+// returns 0 on success
+// returns 1 on NULL oneChild pointer.
+// returns 2 when the parent already exists.
+// returns 3 if the 
+short block_generate_parent(struct blockData *oneChild){
 	
-	static long long int blockCount = 0;
-	static struct blockLink *currentLink = NULL;
-	struct blockLink *tempLink = NULL;
+	// check to see if a NULL pointer was passed.
+	if(oneChild == NULL){
+		error("block_generate_parent() was sent NULL pointer. oneChild = NULL.");
+		return 1;
+	}
 	
-	//check to see what the program was called to do.
-	// if the operation is bc_collect
-	if(operation == bc_collect){
-		
-		// check for source pointer being NULL.
-		if(source == NULL){
-			error("block_collector() could not collect source. source = NULL.");
-			return 1;
-		}
-		// if source is valid,
-		else{
-			
-			// check if you need to create a new link in the list.
-			if(blockCount%BLOCK_LINK_SIZE == 0){
-				
-				// if this is the first block added to the list or if the currentLink pointer is invalid,
-				if(blockCount == 0 || currentLink == NULL){
-					// create the first link
-					currentLink = malloc(sizeof(struct blockLink));
-					
-					// check for pointer being NULL.
-					if(currentLink == NULL){
-						error("block_collector() could not create first link in the list. currentLink = NULL.");
-						return 3;
-					}
-					
-					// make sure the previous pointer points to NULL.
-					currentLink->prev = NULL;
-				}
-				// otherwise, if this is not the first block,
-				else{
-					// add a new link in the list
-					currentLink->next = malloc(sizeof(struct blockLink));
-					
-					// check for pointer being NULL.
-					if(currentLink->next == NULL){
-						error_d("block_collector() could not create link in the list. currentLink-> = NULL. blockCount = ", blockCount);
-						return 4;
-					}
-					
-					// make sure the next link points back at the current link.
-					(currentLink->next)->prev = currentLink;
-					// ascend to the next link in the list.
-					currentLink = currentLink->next;
-				}
-				
-			}
-			
-			// add the block to the list
-			currentLink->blocks[blockCount%BLOCK_LINK_SIZE] = source;
-			// increment the block counter.
-			blockCount++;
-			
-		}
-		
-	}
-	else if(operation == bc_clean_up){
-		
-		// check to see if either no blocks have been written or the currentLink was lost.
-		if(currentLink == NULL || blockCount == 0){
-			// set both variables to the default state
-			currentLink = NULL;
-			blockCount = 0;
-			// report an error
-			error("block_collector() asked to clean up. Nothing to clean up. This is not necessarily an error. It could be an error or just a warning.");
-			// and return an error
-			return 5;
-		}
-		
-		// decrement to the last valid block
-		blockCount--;
-		
-		// loop through all blocks in all links of the list.
-		// free all blocks and free all of the links in the list.
-		for(; blockCount >= 0; blockCount--){
-			
-			// if the current block is valid,
-			if(currentLink->blocks[blockCount%BLOCK_LINK_SIZE] != NULL){
-				
-				// if the just got to the end of a link,
-				if(blockCount%BLOCK_LINK_SIZE == BLOCK_LINK_SIZE - 1){
-					
-					// if the previous link is invalid,
-					if(currentLink->prev == NULL){
-						error_d("block_collector() has NULL previous link pointer before the end of the list. for() loop terminated with un-erased blocks: blockCount =", blockCount);
-						blockCount = 0;
-						currentLink = NULL;
-						return 6;
-					}
-					
-					// temporarily store the pointer to the currentLink
-					tempLink = currentLink;
-					// shift to the previous link in the list.
-					currentLink = currentLink->prev;
-					// erase free the memory tempLink points to
-					if(tempLink != NULL) free(tempLink);
-				}
-				// erase the memory that holds the block.
-				free(currentLink->blocks[blockCount%BLOCK_LINK_SIZE]);
-			}
-		}
-		
-		// free current link. now everything in the list has been erased (both blocks and links).
-		if(currentLink != NULL) free(currentLink);
-		
-	}
-	// check for invalid operation
-	else{
-		error_d("block_collector() received invalid operation. operation =", operation);
+	// check to see if the function is being asked to re-generate parent.
+	if(oneChild->parent != NULL){
+		error("block_generate_parent() was asked to regenerate parent. Child verification will still occur.");
+		block_generate_children((oneChild->parent));
 		return 2;
 	}
+	// otherwise, the parent needs to be generated
+	else{
+		
+		// try to allocate memory for the parent block
+		oneChild->parent = malloc(sizeof(struct blockData));
+		
+		// if the parent was not allocated properly, log an error and return 2
+		if(oneChild->parent == NULL){
+			error("block_generate_parent() cannot allocate data for a parent. oneChild->parent = NULL");
+			return 3;
+		}
+		
+		// set elevation to default
+		int i, j;
+		for(i=0; i<BLOCK_WIDTH; i++){
+			for(j=0; j<BLOCK_HEIGHT; j++){
+				(oneChild->parent)->elevation[i][j] = BLOCK_DEFAULT_ELEVATION;
+			}
+		}
+		// the level of the parent is one above the level of the child.
+		(oneChild->parent)->level = oneChild->level + 1;
+		
+		// this sets the parent of this block to NULL.
+		(oneChild->parent)->parent = NULL;
+		// because of how block generation is performed, when generating a parent, both the child AND the parent AND the parent's parent AND the parent's parent's parent (etc...) will be concentric.
+		// so parentView for all NEW parents and the children that are generating those new parents will be BLOCK_CHILD_CENTER_CENTER.
+		// This property of the block network is explained in some detail in block.h under "RYAN'S BLOCK NETWORK GENERATION PROTOCOL"
+		(oneChild->parent)->parentView = BLOCK_CHILD_CENTER_CENTER;
+		oneChild->parentView = BLOCK_CHILD_CENTER_CENTER;
+	}
 	
-	// all went smoothly. not errors or problems.
+	// successfully generated a parent and verified all children exist or have been created.
 	return 0;
 }
+
 
 
 
@@ -580,7 +505,7 @@ struct blockData *block_create_origin(){
 // this function will allocate memory for all 9 children at once.
 // returns 0 on success 
 // returns 1 for a NULL parent pointer.
-// returns 2+child 
+// returns 2+child for the first child that cannot be allocated in memory
 short block_generate_children(struct blockData *datParent){
 	
 	if(datParent == NULL){
@@ -593,13 +518,8 @@ short block_generate_children(struct blockData *datParent){
 	// allocate space for 9 children
 	for(c=0; c<BLOCK_CHILDREN; c++){
 		
-		// if a child already exists,
-		if(datParent->children[c] != NULL){
-			// then you should not be trying to generate a different one in its place.
-			error_d("block_generate_children() was asked to re-generate child. child number =", c);
-		}
-		// otherwise, if the child doesn't yet exist, try to make the child.
-		else{
+		// only try to generate a child if the child doesn't already exist.
+		if(datParent->children[c] == NULL){
 			
 			// attempt to allocate memory for the child block.
 			datParent->children[c] = (struct blockData *) malloc(sizeof(struct blockData));
@@ -658,4 +578,140 @@ short block_calculate_neighbors(struct blockData *dat){
 
 
 
+
+/// this creates a list of all of the map blocks that have been created during program run time.
+/// this function will record every new map block that is generated.
+/// before the program closes, this function will need to be called to clean up all of these blocks.
+// if operation = bc_collect, then it will collect.
+// returns 0 on success.
+// returns 1 if sent a null block pointer.
+// returns 2 if invalid operation was sent.
+// returns 3 if the function could not create the first link in the list.
+// returns 4 if it could not create a link in the list OTHER than the first.
+// returns 5 if it was asked to bc_clean_up but there was nothing to clean up.
+// returns 6 if it was asked to clean up and it reached a null previous pointer before blockCount reached 0.
+short block_collector(struct blockData *source, short operation){
+	
+	// this tells us how many blocks are allocated in memory
+	static long long int blockCount = 0;
+	// this points to the 
+	static struct blockLink *currentLink = NULL;
+	// used to temporarily store the link pointer
+	struct blockLink *tempLink = NULL;
+	
+	//check to see what the program was called to do.
+	// if the operation is bc_collect
+	if(operation == bc_collect){
+		
+		// check for source pointer being NULL.
+		if(source == NULL){
+			error("block_collector() could not collect source. source = NULL.");
+			return 1;
+		}
+		// if source is valid,
+		else{
+			
+			// check if you need to create a new link in the list.
+			if(blockCount%BLOCK_LINK_SIZE == 0){
+				
+				// if this is the first block added to the list or if the currentLink pointer is invalid,
+				if(blockCount == 0 || currentLink == NULL){
+					// create the first link
+					currentLink = malloc(sizeof(struct blockLink));
+					
+					// check for pointer being NULL.
+					if(currentLink == NULL){
+						error("block_collector() could not create first link in the list. currentLink = NULL.");
+						return 3;
+					}
+					
+					// make sure the previous pointer points to NULL.
+					currentLink->prev = NULL;
+				}
+				// otherwise, if this is not the first block,
+				else{
+					// add a new link in the list
+					currentLink->next = malloc(sizeof(struct blockLink));
+					
+					// check for pointer being NULL.
+					if(currentLink->next == NULL){
+						error_d("block_collector() could not create link in the list. currentLink-> = NULL. blockCount = ", blockCount);
+						return 4;
+					}
+					
+					// make sure the next link points back at the current link.
+					(currentLink->next)->prev = currentLink;
+					// ascend to the next link in the list.
+					currentLink = currentLink->next;
+				}
+				
+			}
+			
+			// add the block to the list
+			currentLink->blocks[blockCount%BLOCK_LINK_SIZE] = source;
+			// increment the block counter.
+			blockCount++;
+			
+		}
+		
+	}
+	else if(operation == bc_clean_up){
+		
+		// check to see if either no blocks have been written or the currentLink was lost.
+		if(currentLink == NULL || blockCount == 0){
+			// set both variables to the default state
+			currentLink = NULL;
+			blockCount = 0;
+			// report an error
+			error("block_collector() asked to clean up. Nothing to clean up. This is not necessarily an error. It could be an error or just a warning.");
+			// and return an error
+			return 5;
+		}
+		
+		// decrement to the last valid block
+		blockCount--;
+		
+		// loop through all blocks in all links of the list.
+		// free all blocks and free all of the links in the list.
+		for(; blockCount >= 0; blockCount--){
+			
+			// if the current block is valid,
+			if(currentLink->blocks[blockCount%BLOCK_LINK_SIZE] != NULL){
+				
+				// if the just got to the end of a link,
+				if(blockCount%BLOCK_LINK_SIZE == BLOCK_LINK_SIZE - 1){
+					
+					// if the previous link is invalid,
+					if(currentLink->prev == NULL){
+						error_d("block_collector() has NULL previous link pointer before the end of the list. for() loop terminated with un-erased blocks: blockCount =", blockCount);
+						blockCount = 0;
+						currentLink = NULL;
+						return 6;
+					}
+					
+					// temporarily store the pointer to the currentLink
+					tempLink = currentLink;
+					// shift to the previous link in the list.
+					currentLink = currentLink->prev;
+					// erase free the memory tempLink points to
+					if(tempLink != NULL) free(tempLink);
+				}
+				// erase the memory that holds the block.
+				free(currentLink->blocks[blockCount%BLOCK_LINK_SIZE]);
+			}
+		}
+		
+		// free current link. now everything in the list has been erased (both blocks and links).
+		if(currentLink != NULL) free(currentLink);
+		
+	}
+	// check for invalid operation
+	else{
+		error_d("block_collector() received invalid operation. operation =", operation);
+		return 2;
+	}
+	
+	// all went smoothly. not errors or problems.
+	return 0;
+}
 
