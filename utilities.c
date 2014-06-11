@@ -8,30 +8,73 @@
 void error(char *errstr){
 	// open error log file
 	FILE *fp = fopen(ERROR_FILE, ERROR_FILE_MODE);
-	// write error log to error file
-	fprintf( fp, ERROR_FORMAT, ERROR_TIMESTAMP, errstr );
-	// close error fille
-	fclose(fp);
+	// if the error file is valid,
+	if(fp != NULL){
+		// write error log to error file
+		fprintf( fp, ERROR_FORMAT, ERROR_TIMESTAMP, errstr );
+		// close error fille
+		fclose(fp);
+	}
 }
 
 // this will log an error message and an integer of data to the error file
 void error_d(char *errstr, int data){
 	// open error log file
 	FILE *fp = fopen(ERROR_FILE,ERROR_FILE_MODE);
-	// write error log to error file
-	fprintf( fp, ERROR_FORMAT_D, ERROR_TIMESTAMP, errstr, data );
-	// close error fille
-	fclose(fp);
+	// if the error file is valid,
+	if(fp != NULL){
+		// write error log to error file
+		fprintf( fp, ERROR_FORMAT_D, ERROR_TIMESTAMP, errstr, data );
+		// close error fille
+		fclose(fp);
+	}
 }
 
 // this will log an error message and a floating point number to the error file
 void error_f(char *errstr, float data){
 	// open error log file 
 	FILE *fp = fopen(ERROR_FILE,ERROR_FILE_MODE);
-	// write error log to error file
-	fprintf( fp, ERROR_FORMAT_F, ERROR_TIMESTAMP, errstr, data );
-	// close error fille
-	fclose(fp);
+	// if the error file is valid,
+	if(fp != NULL){
+		// write error log to error file
+		fprintf( fp, ERROR_FORMAT_F, ERROR_TIMESTAMP, errstr, data );
+		// close error fille
+		fclose(fp);
+	}
+}
+
+
+void gamelog(char *gamestr){
+	FILE *fp = fopen(GAMELOG_FILE, GAMELOG_FILE_MODE);
+	// if the error file is valid,
+	if(fp != NULL){
+		// write error log to error file
+		fprintf( fp, GAMELOG_FORMAT, GAMELOG_TIMESTAMP, gamestr);
+		// close error fille
+		fclose(fp);
+	}
+}
+
+void gamelog_d(char *gamestr, int data){
+	FILE *fp = fopen(GAMELOG_FILE, GAMELOG_FILE_MODE);
+	// if the error file is valid,
+	if(fp != NULL){
+		// write error log to error file
+		fprintf( fp, GAMELOG_FORMAT_D, GAMELOG_TIMESTAMP, gamestr, data);
+		// close error fille
+		fclose(fp);
+	}
+}
+
+void gamelog_f(char *gamestr, float data){
+	FILE *fp = fopen(GAMELOG_FILE, GAMELOG_FILE_MODE);
+	// if the error file is valid,
+	if(fp != NULL){
+		// write error log to error file
+		fprintf( fp, GAMELOG_FORMAT_F, GAMELOG_TIMESTAMP, gamestr, data);
+		// close error fille
+		fclose(fp);
+	}
 }
 
 

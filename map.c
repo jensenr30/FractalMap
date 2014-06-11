@@ -522,6 +522,60 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 }
 
 
+/// this function will create a new origin block in memory and add that origin block to the block list using block_collector.
+// this function will...
+	// set all elevation data to 0.
+	// set all child pointers to NULL.
+	// set parent pointer to NULL.
+	// set parentView to BLOCK_CHILD_CENTER_CENTER (the parent block of the origin will be centered on the origin).
+		// as a side note, the parent of the parent of the origin will be centered on the origin. And so on, and so forth, until the end of fractal space.
+	// set all neighbors to NULL.
+	// set level to 0 (origin level)
+// returns a pointer to the origin on success
+// returns NULL when allocation of memory fails
+struct blockData *block_create_origin(){
+	
+	struct blockData *newOrigin = malloc(sizeof(struct blockData));
+	
+	if(newOrigin == NULL){
+		error("block_create_origin() was sent NULL newOrigin pointer.");
+		return NULL;
+	}
+	
+	// set all children to NULL;
+	int c;
+	for(c=0; c<BLOCK_CHILDREN; c++){
+		newOrigin->children[c] = NULL;
+	}
+	
+	// set all neighbors to NULL.
+	for(c=0; c<BLOCK_NEIGHBORS; c++){
+		newOrigin->neighbors[c] = NULL;
+	}
+	
+	// set parent to NULL;
+	newOrigin->parent = NULL;
+	// set parentView to BLOCK_CHILD_CENTER_CENTER.
+	newOrigin->parentView = BLOCK_CHILD_CENTER_CENTER;
+	
+	// make all elevations equal to the default elevation.
+	int i, j;
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			newOrigin->elevation[i][j] = BLOCK_DEFAULT_ELEVATION;
+		}
+	}
+	
+	// set the level to the default level.
+	newOrigin->level = BLOCK_ORIGIN_LEVEL;
+	
+	// add origin to the block index.
+	block_collector(newOrigin, bc_collect);
+	
+	return newOrigin;
+}
+
+
 /// creates all three children for the passed blockData, parent
 // this function will allocate memory for all 9 children at once.
 // returns 0 on success 

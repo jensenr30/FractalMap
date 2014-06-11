@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 
+/// block definitions
 
 #define BLOCK_CHILDREN				9
 #define BLOCK_NEIGHBORS				8
@@ -8,6 +9,26 @@
 #define BLOCK_HEIGHT				243
 #define BLOCK_WIDTH_1_3				81
 #define BLOCK_WIDTH_2_3				162
+
+#define BLOCK_DEFAULT_ELEVATION		0.0
+#define BLOCK_ORIGIN_LEVEL			0
+
+// block child layout
+#define BLOCK_CHILD_TOP_LEFT		0
+#define BLOCK_CHILD_TOP_CENTER		1
+#define BLOCK_CHILD_TOP_RIGHT		2
+#define BLOCK_CHILD_CENTER_LEFT		3
+#define BLOCK_CHILD_CENTER_CENTER	4
+#define BLOCK_CHILD_CENTER_RIGHT	5
+#define BLOCK_CHILD_BOTTOM_LEFT		6
+#define BLOCK_CHILD_BOTTOM_CENTER	7
+#define BLOCK_CHILD_BOTTOM_RIGHT	8
+
+//	0 1 2
+//	3 4 5
+//	6 7 8
+
+
 // each block can have 9 children.
 // each block can have one parent.
 // more children are generated as the player zooms in.
@@ -69,6 +90,9 @@ short block_random_fill(struct blockData *datBlock, float range_lower, float ran
 // or the function will de-allocate (free) all of the data it has collected so far.
 #define bc_collect		0
 #define bc_clean_up		1
+
+struct blockData *block_create_origin();
+short block_generate_children(struct blockData *datParent);
 
 short block_collector(struct blockData *source, short operation);
 short map_print(SDL_Surface *dest, struct blockData *source);

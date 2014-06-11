@@ -15,6 +15,20 @@ unsigned int windH = BLOCK_HEIGHT*3;
 
 
 int main(int argc, char *argv[]){
+	error("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
+	//--------------------------------------------------
+	// initial gamelog write
+	//--------------------------------------------------
+	gamelog("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
+	gamelog_d("main() was sent argc =", argc);
+	int arg;
+	gamelog("START ARGV ARGUMENT LIST:");
+	// print all arguments
+	for(arg=0; arg<argc; arg++){
+		gamelog(argv[arg]);
+	}
+	gamelog("END ARGV LIST");
+	
 	
 	//--------------------------------------------------
 	// set up surfaces, textures, renderers, windows,
@@ -70,20 +84,14 @@ int main(int argc, char *argv[]){
 	
 	
 	// origin block.
-	struct blockData origin;
-	
+	struct blockData *origin = block_create_origin();
 	
 	//--------------------------------------------------
 	// event handling
 	//--------------------------------------------------
-	// this keeps tack of whether or not a new map should be generated
-	byte makeNewMap = 1;
+	
 	// this records if the user wants to quit
 	byte quit = 0;
-	// this keeps track of if a mouse buttons is held down
-	byte down = 0;
-	// this keeps track of if the map needs to be smoothed.]
-	byte smoothMap = 0;
 	const int keysSize = 256;
 	// this array keeps track of what variables were JUST pushed.
 	// A value of 1 will be set to keys that were just stroked.
@@ -101,10 +109,10 @@ int main(int argc, char *argv[]){
 		while(SDL_PollEvent(&event)){
 			// if there is a mouse button down event,
 			if(event.type == SDL_MOUSEBUTTONDOWN){
-				down++;
+				//down++;
 			}
 			else if(event.type == SDL_MOUSEBUTTONUP){
-				down--;
+				//down--;
 			}
 			else if(event.type == SDL_KEYDOWN){
 				// check if the key is greater than the 'a' character.
@@ -119,31 +127,31 @@ int main(int argc, char *argv[]){
 		// if the user pressed the c key
 		if(keys['c']){
 			// generate children blocks
-			block_generate_children(&origin);
+			block_generate_children(origin);
 		}
 		
 		// if either the s or g keys were just stroked.
 		if(keys['s'] || keys['g']){
 			// generate new map in origin if the g key was pressed
 			if(keys['g']){
-				//block_random_fill(&origin, 0, 0xff);
-				//block_fill_middle(&origin, 0xff, 0x00);
-				//block_fill_nine_squares(&origin, 100);
-				block_fill_nine_squares_own_color(&origin, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
+				//block_random_fill(origin, 0, 0xff);
+				//block_fill_middle(origin, 0xff, 0x00);
+				//block_fill_nine_squares(origin, 100);
+				block_fill_nine_squares_own_color(origin, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
 			}
 			
-			//block_print_to_file(&origin, "origin.txt");
+			//block_print_to_file(origin, "origin.txt");
 			
 			// smooth the map
-			//block_smooth(&origin, 0.5);
-			if(keys['s']) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
+			//block_smooth(origin, 0.5);
+			if(keys['s']) filter_lowpass_2D_f((float *)origin->elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
 			
 			//clear old surface
 			if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
 			// generate image of map
 			mapSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
 			// print map to mapSurface
-			map_print(mapSurface, &origin);
+			map_print(mapSurface, origin);
 			
 			// clear the old texture if it exists
 			if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);
