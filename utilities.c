@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "utilities.h"
 #include "globals.h"
-#include "map.h"
+#include "block.h"
 
 
 // this will log an error message to the error file

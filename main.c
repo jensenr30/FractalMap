@@ -5,7 +5,7 @@
 #include "graphics.h"
 #include "globals.h"
 #include "graphics.h"
-#include "map.h"
+#include "block.h"
 #include "rand.h"
 #include "filter.h"
 #include <time.h>
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]){
 			
 			//block_print_to_file(origin, "origin.txt");
 			
-			// smooth the map
+			// smooth the block elevation data
 			//block_smooth(origin, 0.5);
 			if(keys['s']) filter_lowpass_2D_f((float *)origin->elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
 			
