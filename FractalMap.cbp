@@ -70,6 +70,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="block.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="block.h" />
 		<Unit filename="filter.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -83,10 +87,6 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="map.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="map.h" />
 		<Unit filename="mt19937int.c">
 			<Option compilerVar="CC" />
 		</Unit>
