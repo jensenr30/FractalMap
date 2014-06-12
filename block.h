@@ -1,29 +1,44 @@
 #include <SDL2/SDL.h>
 
 /// block definitions
+// someday I should really clean this up and remove all of the WIDTH/HEIGHT specifications and make everything SIZE.
+// Because x and y are going to be the same scale for everything anyway.
 
-#define BLOCK_CHILDREN				9
-#define BLOCK_NEIGHBORS				8
-#define BLOCK_LINEAR_SCALE_FACTOR	3.0
-#define BLOCK_WIDTH					243
-#define BLOCK_HEIGHT				243
-#define BLOCK_WIDTH_1_3				81
-#define BLOCK_WIDTH_2_3				162
+// block neighbors needs  to be signed because of the "block_neighbor_all" flag
+#define BLOCK_NEIGHBORS					4
+#define BLOCK_NEIGHBOR_ALL				-1
+#define BLOCK_NEIGHBOR_UP				0
+#define BLOCK_NEIGHBOR_DOWN				1
+#define BLOCK_NEIGHBOR_LEFT				2
+#define BLOCK_NEIGHBOR_RIGHT			3
 
-#define BLOCK_DEFAULT_ELEVATION		0.0
-#define BLOCK_ORIGIN_LEVEL			0
+#define BLOCK_LINEAR_SCALE_FACTOR		3.0f
+#define BLOCK_LINEAR_SCALE_FACTOR_INV	(1.0/3.0f)
+#define BLOCK_WIDTH						243
+#define BLOCK_HEIGHT					243
+#define BLOCK_WIDTH_1_2					(BLOCK_WIDTH/2)		// integer division
+#define BLOCK_HEIGHT_1_2				(BLOCK_HEIGHT/2)	// integer division
+#define BLOCK_WIDTH_1_3					81
+#define BLOCK_WIDTH_2_3					162
+#define BLOCK_HEIGHT_1_3				81
+#define BLOCK_HEIGHT_2_3				162
+
+#define BLOCK_DEFAULT_ELEVATION			0.0f
+#define BLOCK_ORIGIN_LEVEL				0
 
 // block child layout
-#define BLOCK_CHILD_TOP_LEFT		0
-#define BLOCK_CHILD_TOP_CENTER		1
-#define BLOCK_CHILD_TOP_RIGHT		2
-#define BLOCK_CHILD_CENTER_LEFT		3
-#define BLOCK_CHILD_CENTER_CENTER	4
-#define BLOCK_CHILD_CENTER_RIGHT	5
-#define BLOCK_CHILD_BOTTOM_LEFT		6
-#define BLOCK_CHILD_BOTTOM_CENTER	7
-#define BLOCK_CHILD_BOTTOM_RIGHT	8
-#define BLOCK_CHILD_INVALID			10
+#define BLOCK_CHILDREN					9
+
+#define BLOCK_CHILD_TOP_LEFT			0
+#define BLOCK_CHILD_TOP_CENTER			1
+#define BLOCK_CHILD_TOP_RIGHT			2
+#define BLOCK_CHILD_CENTER_LEFT			3
+#define BLOCK_CHILD_CENTER_CENTER		4
+#define BLOCK_CHILD_CENTER_RIGHT		5
+#define BLOCK_CHILD_BOTTOM_LEFT			6
+#define BLOCK_CHILD_BOTTOM_CENTER		7
+#define BLOCK_CHILD_BOTTOM_RIGHT		8
+#define BLOCK_CHILD_INVALID				10
 
 //	0 1 2
 //	3 4 5
@@ -63,7 +78,7 @@ struct blockData{
 	// these are indexed with 0,1,2,3,4,5,6,7,8.
 	struct blockData *children[BLOCK_CHILDREN];
 	
-	// these are eight pointers to the eight neighbors on the same level.
+	// these are eight pointers to the four neighbors on the same level (up, down, left, and right
 	// if these are NULL, the neighbor could exist, but it just might not be entered in this blocks neighbor's index (some neighbors are friendly than others :P)
 	struct blockData *neighbors[BLOCK_NEIGHBORS];
 };
@@ -165,4 +180,4 @@ short block_fill_nine_squares(struct blockData *Block, int color);
 short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine);
 
 
-short block_calculate_neighbors(struct blockData *dat);
+short block_calculate_neighbors(struct blockData *dat, short neighbor);

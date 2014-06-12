@@ -119,3 +119,12 @@ The units should be fully autonomous.
 They should be able to learn how to do things.
 Also, maybe they will try to do things on their own.
 Like find food?
+
+================================================
+== HEIGHT vs WIDTH
+================================================
+because the blocks are going to be symmetrical (for ease of programming), the height and width will be the same.
+So why have height and width?
+It would make more sense to have, BLOCK_SIZE, BLOCK_SIZE_1_3.
+There would be less definitions and it would make the code more elegant.
+Implement this sometime.

@@ -551,7 +551,7 @@ short block_generate_children(struct blockData *datParent){
 				(datParent->children[c])->level = datParent->level - 1;
 				
 				// calculate the child's neighbors.
-				block_calculate_neighbors(datParent->children[c]);
+				block_calculate_neighbors(datParent->children[c], BLOCK_NEIGHBOR_ALL);
 			
 			}
 		}
@@ -564,7 +564,7 @@ short block_generate_children(struct blockData *datParent){
 /// this function will calculate all of the neighboring blocks of the "dat" block sent to the function.
 // returns 0 on success.
 // returns 1 on NULL dat block pointer.
-short block_calculate_neighbors(struct blockData *dat){
+short block_calculate_neighbors(struct blockData *dat, short neighbor){
 	
 	if(dat == NULL){
 		error("block_calculate_neighbors() was sent NULL blockData pointer. dat = NULL");
