@@ -9,9 +9,9 @@
 #include "rand.h"
 #include "filter.h"
 #include <time.h>
+#include "sprites.h"
 
-unsigned int windW = BLOCK_WIDTH*3;
-unsigned int windH = BLOCK_HEIGHT*3;
+
 
 
 int main(int argc, char *argv[]){
@@ -29,14 +29,17 @@ int main(int argc, char *argv[]){
 	}
 	gamelog("END ARGV LIST");
 	
-	
+	windW = BLOCK_WIDTH*3;
+	windH = BLOCK_HEIGHT*3;
 	//--------------------------------------------------
 	// set up surfaces, textures, renderers, windows,
 	//--------------------------------------------------
 	// set all surfaces, textures, renderers, and windows to NULL initially to satify if statements that free memory that isn't needed any more.
 	// this prevents the game from crashing at startup.
 	SDL_Surface *mapSurface = NULL;
+	SDL_Surface *spriteSurface = NULL;
 	SDL_Texture *mapTexture = NULL;
+	SDL_Texture *spriteTexture = NULL;
 	myWindow = NULL;
 	myRenderer = NULL;
 	myTexture = NULL;
@@ -155,16 +158,36 @@ int main(int argc, char *argv[]){
 			if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
 			// generate image of map
 			mapSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+
 			// print map to mapSurface
 			map_print(mapSurface, origin);
+			
+			if(spriteSurface != NULL)
+				SDL_FreeSurface(spriteSurface);
+			
+			spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+			
+			draw_line(spriteSurface, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, 1, 0xff00ff00);
+			draw_line(spriteSurface, BLOCK_WIDTH, 0, 0, BLOCK_HEIGHT, 1, 0xff00ff00);
+			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 120, 0xff000000);
+			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 100, 0xffff0000);
+			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 80, 0xff00ff00);
+			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 60, 0xff0000ff);
+			
+			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 40, 0xffffff00);
+			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 20, 0xff00ffff);
+			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 10, 0xffffffff);
 			
 			// clear the old texture if it exists
 			if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);
 			// create a texture for the map data
 			mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
+			
+			spriteTexture = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
 		}
 		// render the mapTexture to the window
 		SDL_RenderCopy(myRenderer, mapTexture, NULL, NULL);
+		SDL_RenderCopy(myRenderer, spriteTexture, NULL, NULL);
 		
 		// display the renderer's result on the screen
 		SDL_RenderPresent(myRenderer);
