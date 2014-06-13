@@ -1,9 +1,12 @@
+#include "block.h"
+#include "camera.h"
 #include "graphics.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <string.h>
 #include "globals.h"
 #include "utilities.h"
+
 
 /// this returns the pixel data of a pixel at a certain point on a surface (color and alpha in an Uint32)
 Uint32 get_pixel(SDL_Surface *surface, int x, int y){
@@ -77,6 +80,5 @@ SDL_Texture *load_image_to_texture(char *filename){
 	//  if the image loaded correctly, return a pointer to the texture that contains it.
 	return tempTexture;
 }
-
 
 

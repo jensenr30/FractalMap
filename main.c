@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "utilities.h"
+#include "block.h"
+#include "camera.h"
 #include "graphics.h"
 #include "globals.h"
 #include "graphics.h"
-#include "block.h"
 #include "rand.h"
 #include "filter.h"
 #include <time.h>
+
 
 unsigned int windW = BLOCK_WIDTH*3;
 unsigned int windH = BLOCK_HEIGHT*3;
@@ -82,9 +84,16 @@ int main(int argc, char *argv[]){
 		return -2;
 	}
 	
+	//--------------------------------------------------
+	// blocks and cameras
+	//--------------------------------------------------
 	
 	// origin block.
-	struct blockData *origin = block_create_origin();
+	struct blockData *origin = block_generate_origin();
+	
+	// this is the user's camera.
+	// this function will set the camera to look at the origin block initially.
+	struct cameraData *camera = camera_create(origin);
 	
 	//--------------------------------------------------
 	// event handling
@@ -113,6 +122,14 @@ int main(int argc, char *argv[]){
 			}
 			else if(event.type == SDL_MOUSEBUTTONUP){
 				//down--;
+			}
+			else if(event.type == SDL_MOUSEWHEEL){
+				// for each time the user scrolls in, increase the zoom by some factor
+				for(i=0; i<abs(event.wheel.y); i++){
+					if(event.wheel.y < 0)	{camera->scale *= 1.129830964f;}
+					else					{camera->scale /= 1.129830964f;}
+					camera_check(camera);
+				}
 			}
 			else if(event.type == SDL_KEYDOWN){
 				// check if the key is greater than the 'a' character.
@@ -145,8 +162,6 @@ int main(int argc, char *argv[]){
 				block_fill_nine_squares_own_color(origin, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
 			}
 			
-			//block_print_to_file(origin, "origin.txt");
-			
 			// smooth the block elevation data
 			//block_smooth(origin, 0.5);
 			if(keys['s']) filter_lowpass_2D_f((float *)origin->elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
@@ -156,7 +171,10 @@ int main(int argc, char *argv[]){
 			// generate image of map
 			mapSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
 			// print map to mapSurface
-			map_print(mapSurface, origin);
+			// map_print(mapSurface, origin);
+			camera_print(mapSurface,camera);
+			// block_print_to_file(origin, "origin.txt");
+			
 			
 			// clear the old texture if it exists
 			if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);

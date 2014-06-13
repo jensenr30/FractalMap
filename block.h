@@ -163,7 +163,7 @@ short block_random_fill(struct blockData *datBlock, float range_lower, float ran
 #define bc_clean_up		1
 short block_collector(struct blockData *source, short operation);
 
-struct blockData *block_create_origin();
+struct blockData *block_generate_origin();
 short block_generate_children(struct blockData *datParent);
 short block_generate_parent(struct blockData *oneChild);
 
@@ -180,4 +180,4 @@ short block_fill_nine_squares(struct blockData *Block, int color);
 short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine);
 
 
-short block_calculate_neighbors(struct blockData *dat, short neighbor);
+short block_calculate_neighbor(struct blockData *dat, short neighbor);

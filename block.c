@@ -1,4 +1,5 @@
 #include "block.h"
+#include "camera.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "utilities.h"
@@ -83,40 +84,6 @@ short block_random_fill(struct blockData *datBlock, float range_low, float range
 }
 
 
-
-
-// returns 0 on success
-// returns -1 when datBlock == NULL
-short block_create_children(struct blockData *source){
-	
-	// check for source pointer being NULL.
-	if(source == NULL){
-		error("block_create_children() could not create children. source = NULL.");
-		return -1;
-	}
-	
-	int child;
-	for(child=0; child<BLOCK_CHILDREN; child++){
-		
-		// allocate space for the child in memory.
-		source->children[child] = ((struct blockData *)malloc(sizeof(struct blockData)));
-		
-		// check for NULL pointer (make sure the child was not stillborn)
-		if(source->children[child] == NULL){
-			error("block_create_children() could not create child. malloc returned NULL pointer. Out of memory?");
-			return child;
-		}
-		// if the child pointer was created correctly
-		else{
-			// make the child point to its parent.
-			(source->children[child])->parent = source;
-			// record the block in the block collection index.
-			block_collector(source->children[child], bc_collect);
-		}
-	}
-	// generated children successfully.
-	return 0;
-}
 
 
 
@@ -458,12 +425,12 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 	// set level to 0 (origin level)
 // returns a pointer to the origin on success
 // returns NULL when allocation of memory fails
-struct blockData *block_create_origin(){
+struct blockData *block_generate_origin(){
 	
 	struct blockData *newOrigin = malloc(sizeof(struct blockData));
 	
 	if(newOrigin == NULL){
-		error("block_create_origin() was sent NULL newOrigin pointer.");
+		error("block_generate_origin() was sent NULL newOrigin pointer.");
 		return NULL;
 	}
 	
@@ -551,7 +518,7 @@ short block_generate_children(struct blockData *datParent){
 				(datParent->children[c])->level = datParent->level - 1;
 				
 				// calculate the child's neighbors.
-				block_calculate_neighbors(datParent->children[c], BLOCK_NEIGHBOR_ALL);
+				block_calculate_neighbor(datParent->children[c], BLOCK_NEIGHBOR_ALL);
 			
 			}
 		}
@@ -561,13 +528,13 @@ short block_generate_children(struct blockData *datParent){
 }
 
 
-/// this function will calculate all of the neighboring blocks of the "dat" block sent to the function.
+/// this function will calculate neighbor block(s) of the "dat" block sent to the function.
 // returns 0 on success.
 // returns 1 on NULL dat block pointer.
-short block_calculate_neighbors(struct blockData *dat, short neighbor){
+short block_calculate_neighbor(struct blockData *dat, short neighbor){
 	
 	if(dat == NULL){
-		error("block_calculate_neighbors() was sent NULL blockData pointer. dat = NULL");
+		error("block_calculate_neighbor() was sent NULL blockData pointer. dat = NULL");
 		return 1;
 	}
 	

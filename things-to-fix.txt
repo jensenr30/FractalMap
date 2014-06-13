@@ -1,0 +1,7 @@
+why in the hell do I have
+"block_generate_children"
+and
+"block_create_children"
+?
+I need to do some serious naming renovation in that section.
+all names should be changed to generate.
