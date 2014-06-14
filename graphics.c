@@ -79,4 +79,277 @@ SDL_Texture *load_image_to_texture(char *filename){
 }
 
 
+/// intersect_p is for when you know some point on each line <x,y> and the slopes of each line.
+// returns 1 (1)	 if there is a single intersection
+// returns 0 (0) if the lines are parallel but they are not the same line
+// returns 2		 if the lines are parallel and they are the same line (have all points in common)
 
+// point <x1,y1> is a point on the first line
+// point <x2,y2> is a point on the second line
+// slope1 is the slope of the first line  (change-in-y/change-in-x)
+// slope2 is the slope of the second line (change-in-y/change-in-x)
+// point <xr,yr> is the resulting point where the two lines intersect.
+// xr and yr are pointers to variables outside of this function.
+
+int intersect_p(float x1, float y1, float slope1, float x2, float y2, float slope2, float *xr, float *yr){
+	
+	//------------------------------------------------------------
+	// check to see if the lines are parallel and handle special cases
+	//------------------------------------------------------------
+	if(slope1 == slope2 || slope1 == -slope2){				// if the two lines share the same slope,
+		if(x1==x2){											// if the two x points are the same,
+			if(y1==y2){										// if the two y points are the same,
+				return 2;									// the two lines share an infinite number of points
+			}												//otherwise,
+			return 0;										// the lines are parallel but not the same line. they share no points.
+		}
+		float connSlope = (y2-y1)/(x2-x1);					// calculate the slope of a third line that connects the two given data points.
+		if(connSlope == slope1 || connSlope == -slope1){	// if the slope between the two points given in the same magnitude as the slopes of the lines,
+			return 2;										// there are an infinite number of intersection points
+		}
+		else{												// otherwise,
+			return 0;										// there are no intersection points
+		}
+	}
+	//------------------------------------------------------------
+	// calculate where the intersect point is
+	//------------------------------------------------------------
+	
+	//calculate y intercepts
+	float b1 = y1 - x1*slope1;
+	float b2 = y2 - x2*slope2;
+	
+	// calculate the intersection coordinates <xr,yr>
+	*xr = (b2-b1)/(slope1-slope2);
+	*yr = slope1*(*xr) + b1;
+	
+	// a single intersection point is found.
+	return 1; 
+}
+
+/// RYAN PLEASE TODO:
+void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float thickness, unsigned int lineColor){
+	
+	//-------------------------------------------------------------------------------
+	// setting up variables
+	//-------------------------------------------------------------------------------
+	// these are the differences in x and y.
+	float xdiff = x2-x1;
+	float ydiff = y2-y1;
+	
+	// these are the slopes of x and y. This describes how fast they change with respect to a unit step in the line parameter, t.
+	float xslope;
+	float yslope;
+	
+	// this is the maximum difference (either the difference in y or the difference in y, depending on which is bigger.)
+	float bigdiff;
+	
+	if(fabs(ydiff) > abs(xdiff)){			// the difference in y is greater than the difference in x
+		bigdiff = ydiff;
+		xslope = xdiff/bigdiff;
+		yslope = 1.0;
+	}
+	else{						// the difference in x is greater than the difference in y
+		bigdiff = xdiff;
+		xslope = 1;
+		yslope = ydiff/bigdiff;
+	}
+	if(xslope == 0){				// make sure xslope is not zero. we need to divide by that!
+		xslope = 1/VERTICAL;		// make xslope insanely tiny (so that y can change a lot and x will change change a VERY small amount.
+	}
+	//-------------------------------------------------------------------------------
+	// check to see if BOTH points are out of bounds
+	//-------------------------------------------------------------------------------
+	if(!within_screen(x1,y1) && !within_screen(x2,y2)){
+		
+		// a temporary solution (this doesn't allow lines that have points outside the screen to be drawn THROUGH the screen)
+		return;															
+			
+		// used to collect the resulting intersection points with the screen.
+		float xr, yr, xr1=-1, yr1=-1, xr2=-1, yr2=-1;
+		char foundOne = 0;
+		
+		// check top screen bound intersection
+		if( intersect_p(x1,y1,yslope/xslope, 0,0,HORIZONTAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if(foundOne==0){
+					xr1=xr;
+					yr1=yr;
+				}
+				else{
+					xr2=xr;
+					yr2=yr;
+				}
+				foundOne = 1;
+			}
+		}
+		// check bottom screen bound intersection
+		if( intersect_p(x1,y1,yslope/xslope, 0,windH-1,HORIZONTAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if(foundOne==0){
+					xr1=xr;
+					yr1=yr;
+				}
+				else{
+					xr2=xr;
+					yr2=yr;
+				}
+				foundOne = 1;
+			}
+		}
+		// check left screen bound intersection
+		if( intersect_p(x1,y1,yslope/xslope, 0,0,VERTICAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if(foundOne==0){
+					xr1=xr;
+					yr1=yr;
+				}
+				else{
+					xr2=xr;
+					yr2=yr;
+				}
+				foundOne = 1;
+			}
+		}
+		// check right bound intersection
+		if( intersect_p(x1,y1,yslope/xslope, windW-1,0,VERTICAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if(foundOne==0){
+					xr1=xr;
+					yr1=yr;
+				}
+				else{
+					xr2=xr;
+					yr2=yr;
+				}
+				foundOne = 1;
+			}
+		}
+		// if you found two spots where the line intersects (an entry and exit point)
+		if(xr2 != -1 && yr2 != -1){
+			// draw a line between those points (now, no part of the line is outside the screen)
+			draw_line(dest, xr1, yr1, xr2, yr2, thickness, lineColor);
+			return;
+		}
+	}
+	//-------------------------------------------------------------------------------
+	// check to see if ONE of the points is out of bounds
+	//-------------------------------------------------------------------------------
+	else if(!within_screen(x1,y1) || !within_screen(x2,y2)){
+		
+		// used to collect the resulting intersection points with the screen.
+		float xr, yr, xr1=-1, yr1=-1;
+		
+		char foundOne = 0;
+		
+		float xin, yin; // these are the coordinates of the inside point
+		float xout, yout; // these are the coordinates of the outside point
+		// store the inside points in xin and yin floating point variables.
+		if(within_screen(x1,y1)){
+			xin = x1;
+			yin = y1;
+			xout = x2;
+			yout = y2;
+		}
+		else{
+			xin = x2;
+			yin = y2;
+			xout = x1;
+			yout = y1;
+		}
+		
+		// this records the direction that x travels when going from inside the screen to outside it. (1 or -1)
+		//float xSignChange = (xin-xout);
+		
+		
+		
+		// check top screen bound intersection
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,0,HORIZONTAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if((yin-yr)*(yin-yout) >=0){
+					xr1=xr;
+					yr1=yr;
+					foundOne = 1;
+				}
+			}
+		}
+		// check bottom screen bound intersection
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,windH-1,HORIZONTAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if((yin-yr)*(yin-yout) >=0){
+					xr1=xr;
+					yr1=yr;
+					foundOne = 1;
+				}
+			}
+		}
+		// check left screen bound intersection
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,0,VERTICAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if((xin-xr)*(xin-xout) >=0){
+					xr1=xr;
+					yr1=yr;
+					foundOne = 1;
+				}
+			}
+		}
+		// check right bound intersection
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, windW-1,0,VERTICAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if((xin-xr)*(xin-xout) >=0){
+					xr1=xr;
+					yr1=yr;
+					foundOne = 1;
+				}
+			}
+		}
+		// if you found the exit point of the line,
+		if(foundOne){
+			// draw a line between that exit point and the one valid point inside the screen. now no part of the line is outside the screen.
+			if(within_screen(x1,y1))
+				draw_line(dest, x1, y1, xr1, yr1, thickness, lineColor);
+			else
+				draw_line(dest, x2, y2, xr1, yr1, thickness, lineColor);
+		}
+		return;
+	}
+	//-------------------------------------------------------------------------------
+	// drawing valid in-bounds line
+	//-------------------------------------------------------------------------------
+	// this is the arbitrary parameter than will step through the line's pixels
+	
+	//swap the x's if necessary to correct the sign of bigdiff.
+	if(bigdiff<0){
+		bigdiff*=-1.0;
+		x1=x2;
+		y1=y2;
+	}
+	float t;
+	for(t=0; t<=bigdiff; t=t+1.0){
+		set_pixel(dest, (int)(x1 + xslope*t), (int)(y1 + yslope*t), lineColor);
+	}
+	
+}
+
+/// RYAN TODO:
+/// ADD DOCUMENETAION
+/// ADD SOME 0.5 NUMBERS
+// this draws a circle with radius and color at point (x,y)
+void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color){
+	if(dest == NULL) return;
+	
+	float xLowBound = x - radius;
+	float xHighBound= x + radius;
+	float yLowBound = y - radius;
+	float yHighBound= y + radius;
+	int i,j;
+	float dist;
+	for(i=(int)xLowBound; i<=(int)(xHighBound+1); i++){
+		for(j=(int)yLowBound; j<=(int)(yHighBound+1); j++){
+			dist = sqrtf((i-x)*(i-x) + (j-y)*(j-y) );
+			if(dist <= radius && i>=0 && j>=0 && i<windW && j<windW)
+				set_pixel(dest, i, j, color);
+		}
+	}
+	
+}
