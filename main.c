@@ -143,6 +143,14 @@ int main(int argc, char *argv[]){
 					// set that character, number, or letter to 1.
 					keys[(event.key.keysym.sym)%keysSize] = 1;
 			}
+			// check for window events
+			else if(event.type == SDL_WINDOWEVENT ){
+				// if the window was resized, the new window width and height need to be recorded.
+				if( event.window.event == SDL_WINDOWEVENT_RESIZED){
+					windW = event.window.data1;
+					windH = event.window.data2;
+				}
+			}
 			else if(event.type == SDL_QUIT){
 				quit = 1;
 			}
@@ -174,7 +182,14 @@ int main(int argc, char *argv[]){
 			}
 			
 			// smooth the block elevation data
-			//if(keys['s']) block_smooth(camera->target, 1); // using the averaging function
+			
+			/*if(keys['s']){
+				block_smooth(camera->target, 1); // using the averaging function
+				FILE *bs = fopen("blockSmooth iterations.txt", "a");
+				fprintf(bs,"smooth'd");
+				fclose(bs);
+			}
+			*/
 			if(keys['s']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 10); // using the low-pass filter
 		}
 		
@@ -187,7 +202,7 @@ int main(int argc, char *argv[]){
 		camera_print(mapSurface,camera);
 		//block_print_to_file(camera->target, "camera-target.txt");
 		// this test the frame-rate of the window by printing a single pixel under the mouse pointer tip
-		set_pixel(mapSurface, x, y, 0xffffffff);
+		set_pixel(mapSurface, mapSurface->w*(x/(float)windW), mapSurface->h*(y/(float)windH), 0xffffffff);
 		
 		// clear the old texture if it exists
 		if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);

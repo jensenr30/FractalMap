@@ -1,0 +1,16 @@
+This folder contains different techniques used to filter the image
+
+
+local averaging
+	slower (requires exponentially more evaluations as the desired cut-off frequency increasees linearly.
+	iterations run: held down mouse for at least 10 seconds on full smoothing (passing an argument of 1 to the function).
+	
+
+filter_lowpass_2D_f - cutoff=11.5, iterations=9
+	This image was created using the filter_lowpass_2D_f() function.
+	the cutoff frequency was set to 11.5 pixels.
+	the function only went through 9 iterations.
+	The function only needs to go through two or three iterations to get nice smooth filtering.
+	A single low pass will usually not provide smooth enough results.
+	It is better to lower your cutoff frequency and filter twice or three times.
+	This method is much faster than the local averaging function

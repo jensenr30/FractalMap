@@ -12,8 +12,7 @@
 #define BLOCK_NEIGHBOR_LEFT				2
 #define BLOCK_NEIGHBOR_RIGHT			3
 
-#define BLOCK_LINEAR_SCALE_FACTOR		((double)3.0f)
-#define BLOCK_LINEAR_SCALE_FACTOR_INV	(1.0/3.0f)
+#define BLOCK_LINEAR_SCALE_FACTOR		3.0f
 #define BLOCK_WIDTH						243
 #define BLOCK_HEIGHT					243
 #define BLOCK_WIDTH_1_2					(BLOCK_WIDTH/2)		// integer division

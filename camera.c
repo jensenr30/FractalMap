@@ -372,7 +372,7 @@ short camera_print(SDL_Surface *dest, struct cameraData *cam){
 			jElevation = (int)(cam->y + j*jScale);
 			// make sure the elevation index is in between
 			if(iElevation>=0 && iElevation<BLOCK_WIDTH && jElevation >= 0 && jElevation < BLOCK_HEIGHT){
-				set_pixel(dest, i, j, 0xff000000|(int)(cam->target->elevation[iElevation][jElevation]));
+				set_pixel(dest, i, j, (0xff000000|(int)(cam->target->elevation[iElevation][jElevation]))&(0xff00f000) );
 			}
 		}
 	}
