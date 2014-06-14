@@ -6,6 +6,7 @@
 #include <string.h>
 #include "globals.h"
 #include "utilities.h"
+#include <math.h>
 
 
 /// this returns the pixel data of a pixel at a certain point on a surface (color and alpha in an Uint32)
@@ -43,6 +44,23 @@ Uint32 get_pixel(SDL_Surface *surface, int x, int y){
 void set_pixel(SDL_Surface *surf, int x, int y, Uint32 pixel){
     Uint32 *p = (Uint32 *)( surf->pixels + (surf->pitch * y) + x*surf->format->BytesPerPixel );
 	*p = pixel;
+}
+
+/// this function will mix two colors (according to their respective weight) and return the resulting color.
+// everything is Uint32, 32 bits unsigned integer
+Uint32 color_mix_weighted(Uint32 color1, Uint32 color2, Uint32 weight1, Uint32 weight2){
+	
+	// calculate total weight
+	Uint32 weight = weight1 + weight2;
+	
+	// calculate individual values for all three color bytes (and the alpha byte)
+	Uint32 alpha =		( ((color1>>24)&0xff)*weight1 + ((color2>>24)&0xff)*weight2 ) / (weight);
+	Uint32 red =		( ((color1>>16)&0xff)*weight1 + ((color2>>16)&0xff)*weight2 ) / (weight);
+	Uint32 green =		( ((color1>>8 )&0xff)*weight1 + ((color2>>8 )&0xff)*weight2 ) / (weight);
+	Uint32 blue =		( ((color1    )&0xff)*weight1 + ((color2    )&0xff)*weight2 ) / (weight);
+	
+	// return the weighted, mixed color.
+	return (alpha<<24) | (red<<16) | (green<<8) | blue;
 }
 
 
@@ -87,7 +105,7 @@ short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickne
 	for(i=istart; i<istop; i++){
 		for(j=jstart; j<jstop; j++){
 			// at every i,j index, figure out if that pixel is part of the border.
-			if(abs(i-x) < borderThickness || abs((x+w)-i) < borderThickness || abs(j-y) < borderThickness || abs((y+h)-j) < borderThickness){
+			if(abs(i-x) < borderThickness || abs((x+w)-i) <= borderThickness || abs(j-y) < borderThickness || abs((y+h)-j) <= borderThickness){
 				// if it is, set it to the color of the border.
 				set_pixel(dest, i, j, colorBorder);
 			}

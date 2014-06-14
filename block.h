@@ -186,7 +186,7 @@ short block_collector(struct blockData *source, short operation);
 
 struct blockData *block_generate_origin();
 short block_generate_children(struct blockData *datParent);
-short block_generate_parent(struct blockData *oneChild);
+short block_generate_parent(struct blockData *centerChild);
 short block_generate_neighbor(struct blockData *dat, short neighbor);
 
 
@@ -195,12 +195,18 @@ short block_print_to_file(struct blockData *datBlock, char *fileName);
 
 /// PNH stands for "Print Network Hierarchy"
 // this is the size of the squares that represent the blocks.
-#define BLOCK_PRH_SIZE 9
+#define BLOCK_PNH_SIZE 9
+// this is the thickness of the borderes
+#define BLOCK_PNH_BORDER 2
 // this is the color of the block that is the focus of the camera.
-#define B_PNH_COLOR_FOCUS 0xff00ff00
+#define BLOCK_PNH_COLOR_FOCUS 0xff00ff00
 // this is the color of all blocks that are NOT the focus of the camera
-#define B_PNH_COLOR_NOT_FOCUS 0xff007f7f
-short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, float zoom);
+#define BLOCK_PNH_COLOR_NOT_FOCUS 0xff0000ff
+// this is the color of the borders of the blocks
+#define BLOCK_PNH_COLOR_BORDER color_mix(BLOCK_PNH_COLOR_FOCUS,BLOCK_PNH_COLOR_NOT_FOCUS)
+
+
+short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, unsigned int childLevelsOrig, unsigned int childLevels, int x, int y, int size, Uint32 colorTop, Uint32 colorBot);
 
 
 short block_smooth(struct blockData *source, float smoothFactor);

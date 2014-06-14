@@ -94,6 +94,8 @@ int main(int argc, char *argv[]){
 	// this is the user's camera.
 	// this function will set the camera to look at the origin block initially.
 	struct cameraData *camera = camera_create(origin);
+	block_generate_parent(origin);
+	block_generate_parent(origin->parent);
 	
 	//--------------------------------------------------
 	// event handling
@@ -111,7 +113,7 @@ int main(int argc, char *argv[]){
 	int x, y;
 	
 	// these keep track of whether or not the user wants to draw a rectangle
-	int drawRect=0;
+	int printNetwork=0;
 	
 	while(quit == 0){
 		
@@ -206,10 +208,16 @@ int main(int argc, char *argv[]){
 		// map_print(mapSurface, camera->target);
 		camera_print(mapSurface,camera);
 		
-		if(keys[SDLK_u] || drawRect){
-			draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix(0xff00ff00,0xff0000ff), 0, 0);
+		if(keys[SDLK_u]){
+			if(printNetwork) printNetwork = 0;
+			else printNetwork = 1;
+		}
+		
+		if(printNetwork){
+			//draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix_weighted(0xff00ff00,0xff0000ff,1,1), 0, 0);
 			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
-			drawRect=1;
+			block_print_network_hierarchy(mapSurface, origin->parent->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
+			printNetwork=1;
 		}
 		
 		//block_print_to_file(camera->target, "camera-target.txt");
