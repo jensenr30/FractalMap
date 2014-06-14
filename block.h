@@ -5,6 +5,7 @@
 // Because x and y are going to be the same scale for everything anyway.
 
 // block neighbors needs  to be signed because of the "block_neighbor_all" flag
+// BLOCK_NEIGHBOR definitions are NOT COMPATABILE with BLOCK_CHILD definitions.
 #define BLOCK_NEIGHBORS					4
 #define BLOCK_NEIGHBOR_ALL				-1
 #define BLOCK_NEIGHBOR_UP				0
@@ -12,7 +13,10 @@
 #define BLOCK_NEIGHBOR_LEFT				2
 #define BLOCK_NEIGHBOR_RIGHT			3
 
+// this describes how much a line is scaled when you go from one level to another.
+// this is a LINEAR scale factor, meaning, the same distance looks three times as long when you zoom in once.
 #define BLOCK_LINEAR_SCALE_FACTOR		3.0f
+// this describes the size of each block (the size of the elevation[][] array)
 #define BLOCK_WIDTH						243
 #define BLOCK_HEIGHT					243
 #define BLOCK_WIDTH_1_2					(BLOCK_WIDTH/2)		// integer division
@@ -22,12 +26,18 @@
 #define BLOCK_HEIGHT_1_3				81
 #define BLOCK_HEIGHT_2_3				162
 
+// this is the default elevation for all blocks. This shouldn't even be necessary. Eventually, every block will be generated with terrain specific to its zoom level and position on the map.
 #define BLOCK_DEFAULT_ELEVATION			0.0f
+// this is the starting level of the world (the origin block starts at level = 0.
+// the children of the origin have levels -1. The children of the children of the origin have levels -2. (etc...)
+// the parent of the origin has a level of 1. The parent  of the parent  of the origin has a level of 2. (etc...)
 #define BLOCK_ORIGIN_LEVEL				0
 
-// block child layout
+// this is how many children each block will have.
+// these are arranged into a square layout (3x3)
 #define BLOCK_CHILDREN					9
 
+// these describe various child locations
 #define BLOCK_CHILD_TOP_LEFT			0
 #define BLOCK_CHILD_TOP_CENTER			1
 #define BLOCK_CHILD_TOP_RIGHT			2
@@ -37,6 +47,7 @@
 #define BLOCK_CHILD_BOTTOM_LEFT			6
 #define BLOCK_CHILD_BOTTOM_CENTER		7
 #define BLOCK_CHILD_BOTTOM_RIGHT		8
+// I don't know when I will ever use this
 #define BLOCK_CHILD_INVALID				10
 
 //	0 1 2
@@ -151,8 +162,17 @@ struct blockLink{
 };
 
 
-short block_print_to_file(struct blockData *datBlock, char *fileName);
-short block_random_fill(struct blockData *datBlock, float range_lower, float range_higher);
+#define BLOCK_STEP_SIZE 256
+/// this is a linked list of steps taken when ascending the network.
+// this is mainly used when generating/verifying neighbors.
+// although this is just a list of links that contain arrays of characters.
+// it can be used for anything really, but it is intended to be used for recording the steps taken when going from child to parent.
+// this allow the program to know how to get back down from parent to child.
+struct blockStep{
+	struct blockStep *prev;
+	char steps[BLOCK_STEP_SIZE];
+	struct blockStep *next;
+};
 
 
 /// these are definitions for the block_collector program.
@@ -165,20 +185,23 @@ short block_collector(struct blockData *source, short operation);
 struct blockData *block_generate_origin();
 short block_generate_children(struct blockData *datParent);
 short block_generate_parent(struct blockData *oneChild);
+short block_generate_neighbor(struct blockData *dat, short neighbor);
 
 
 short map_print(SDL_Surface *dest, struct blockData *source);
+short block_print_to_file(struct blockData *datBlock, char *fileName);
 
 
 short block_smooth(struct blockData *source, float smoothFactor);
 float block_surrounding_average(struct blockData *source, unsigned int x, unsigned int y);
 
 
+short block_random_fill(struct blockData *datBlock, float range_lower, float range_higher);
 int block_fill_middle(struct blockData *dat, float inVal, float outVal);
 short block_fill_nine_squares(struct blockData *Block, int color);
 short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine);
 short block_fill_half_vert(struct blockData *block, float elevationLeft, float elevationRight);
 
-short block_calculate_neighbor(struct blockData *dat, short neighbor);
+
 
 

@@ -543,7 +543,7 @@ short block_generate_children(struct blockData *datParent){
 				(datParent->children[c])->level = datParent->level - 1;
 				
 				// calculate the child's neighbors.
-				block_calculate_neighbor(datParent->children[c], BLOCK_NEIGHBOR_ALL);
+				block_generate_neighbor(datParent->children[c], BLOCK_NEIGHBOR_ALL);
 			
 			}
 		}
@@ -554,17 +554,173 @@ short block_generate_children(struct blockData *datParent){
 
 
 /// this function will calculate neighbor block(s) of the "dat" block sent to the function.
+// this function IS ONLY GUARANTEED TO WORK FOR A 3x3 BLOCK CHILDREN LAYOUT.
 // returns 0 on success.
 // returns 1 on NULL dat block pointer.
-short block_calculate_neighbor(struct blockData *dat, short neighbor){
+// returns 2 when it cannot allocate memory for the first stepLink.
+// returns 3 when it cannot allocate memory for the second, third, fourth, (etc...) stepLink in the list.
+// returns 4 if, when counting down, stepLink->prev is null BEFORE ascend = 0.
+short block_generate_neighbor(struct blockData *dat, short neighbor){
 	
 	if(dat == NULL){
-		error("block_calculate_neighbor() was sent NULL blockData pointer. dat = NULL");
+		error("block_generate_neighbor() was sent NULL blockData pointer. dat = NULL");
 		return 1;
 	}
 	
-	// TODO: write function to find neighbors of a block.
+	// this is a pointer than we will use to navigate the block matrix.
+	// it will be used as a sort of probe.
+	// it starts out pointing to the original block that is sent.
+	struct blockData *probe = dat;
+	// this keeps track of how many ascensions from child to parent were made (and therefore, how many should be made from parent back down to child)
+	// this tells you what level you are currently on relative to the original block (dat)
+	int ascend = 0;
 	
+	// allocate a chunk of block steps.
+	struct blockStep *stepLink = malloc(sizeof(struct blockStep));
+	// verify that stepLink was allocated properly.
+	if(stepLink == NULL){
+		error("block_generate_neighbor() could not allocate memory for stepLink. stepLink = NULL");
+		return 2;
+	}
+	// this indicates that there is no stepLink before this one. This is the beginning of the linked list of blockSteps.
+	stepLink->prev = NULL;
+	
+	// this variable is used to calculate what the last step was. (this is a number that indicates the relationship between the current block (probe) and the previous probe (one of current probe's children)
+	char lastStep;
+	
+	
+	// the way this checks if the parent has its neighbors is through
+	switch(neighbor){
+		
+		case BLOCK_NEIGHBOR_UP:
+			
+			// exiting the loop is done inside the loop
+			while(1){
+				// record the child's relation to the parent so that we can know how to get back down to it when we reach the highest nevessary parent.
+				lastStep = stepLink->steps[ascend%BLOCK_STEP_SIZE] = probe->parentView;
+				// make sure the parent is generated first
+				block_generate_parent(probe);
+				// move up a level to the next parent
+				probe = probe->parent;
+				
+				// increment the counter
+				ascend++;
+				
+				// if we just filled up the current stepLink, then we need to allocate memory for the next
+				if(ascend%BLOCK_STEP_SIZE == 0 && ascend != 0){
+					// allocate more memory to hold more steps
+					stepLink->next = malloc(sizeof(struct blockStep));
+					// check if the memory allocated incorrectly.
+					if(stepLink->next == NULL){
+						// if the memory did not allocate right, report an error.
+						error_d("block_generate_neighbor() could not allocate memory for new stepLink->next. stepLink = NULL. ascend =",ascend);
+						// and return an error.
+						return 3;
+					}
+					// otherwise, we will assume the memory was allocated correctly.
+					// record that the previous stepLink (from the next stepLink's point of view) is just the current stepLink.
+					(stepLink->next)->prev = stepLink;
+					// switch to the next stepLink
+					stepLink = stepLink->next;
+				}
+				
+				// check to see if the last step taken will allow us to zoom into a block that is above target.
+				// if we can start zooming back in now, exit the loop
+				if(lastStep >= 3){
+					break;	// break out of the while(1) loop.
+				}
+			}
+			
+			// we are now at a block that has a parent that contains the neighbor of the original block
+			// we may now zoom to the neighbor of the original block.
+			
+			// decrement ascend once at the beginning (to get back to the last step that was taken)
+			ascend--;
+			// check to see if you need to step down to the previous stepLink
+			if(ascend%BLOCK_STEP_SIZE == BLOCK_STEP_SIZE-1){
+				// check to make sure the previous stepLink is valid.
+				// this should never EVER be
+				if(stepLink->prev != NULL){
+					// This shouldn't happen because ascend should run to 0, and then exit before any stepLink->prev can be NULL. Nevertheless, it has somehow happened. 
+					error_d("block_generate_neighbor() somehow has a NULL stepLink->prev. THIS SHOULD NEVER HAPPEN. ascend =",ascend);
+					return 4;
+				}
+				// if the previous stepLink is valid (as it should be) then switch to it.
+				stepLink = stepLink->prev;
+				// free the "next" step link (the one that we just came from).
+				// This is like closing the door on the way out of a building.
+				// If you enter a house, then the bathroom, you close the bathroom door on your way out of the bathroom, then you close the house door on your way out of the house.
+				// everything is reverse on the way out.
+				if(stepLink->next != NULL) free(stepLink->next);
+			}
+			// zoom in once from the highest-level parent to child of that highest-level parent.
+			// the first step of descending is a special case. all the steps after this one are the same.
+			probe = probe->children[stepLink->steps[ascend%BLOCK_STEP_SIZE]-3];
+			
+			// go all the way back down to the upward neighbor of the original block.
+			for(ascend--;ascend>=0; ascend--){
+				
+				// check to see if you need to switch to the previous stepLink
+				if(ascend%BLOCK_STEP_SIZE == BLOCK_STEP_SIZE-1){
+					// check to make sure the previous stepLink is valid.
+					// this should never EVER be
+					if(stepLink->prev != NULL){
+						// This shouldn't happen because ascend should run to 0, and then exit before any stepLink->prev can be NULL. Nevertheless, it has somehow happened. 
+						error_d("block_generate_neighbor() somehow has a NULL stepLink->prev. THIS SHOULD NEVER HAPPEN. ascend =",ascend);
+						return 4;
+					}
+					// if the previous stepLink is valid (as it should be) then switch to it.
+					stepLink = stepLink->prev;
+					// free the "next" step link (the one that we just came from).
+					// This is like closing the door on the way out of a building.
+					// If you enter a house, then the bathroom, you close the bathroom door on your way out of the bathroom, then you close the house door on your way out of the house.
+					// everything is reverse on the way out.
+					if(stepLink->next != NULL) free(stepLink->next);
+				}
+				
+				// make sure all children of the current probe block exist
+				block_generate_children(probe);
+				// then move to the right child
+				probe = probe->children[stepLink->steps[ascend] + 6];
+			}
+			
+			// store the pointer to the right block in the neighbor pointer array of the block that we initially wanted to know the upwards neighbor of.
+			dat->neighbors[BLOCK_NEIGHBOR_UP] = probe;
+			// our work here is done. whew!
+			break;
+		
+		case BLOCK_NEIGHBOR_DOWN:
+			
+			/// TODO: write find neighbor down
+			
+			break;
+		
+		case BLOCK_NEIGHBOR_LEFT:
+			
+			/// TODO: write find neighbor left
+			
+			break;
+		
+		case BLOCK_NEIGHBOR_RIGHT:
+			
+			/// TODO: write find neighbor right
+			
+			break;
+		
+		case BLOCK_NEIGHBOR_ALL:
+		default:
+			
+			// calculate all four neighbors.
+			block_generate_neighbor(dat, BLOCK_NEIGHBOR_UP);
+			block_generate_neighbor(dat, BLOCK_NEIGHBOR_DOWN);
+			block_generate_neighbor(dat, BLOCK_NEIGHBOR_LEFT);
+			block_generate_neighbor(dat, BLOCK_NEIGHBOR_RIGHT);
+			
+			break;
+		
+	}
+	
+	// successfully generated/verified all neighbors.
 	return 0;
 }
 

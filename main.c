@@ -193,6 +193,10 @@ int main(int argc, char *argv[]){
 			if(keys['s']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 10); // using the low-pass filter
 		}
 		
+		if(keys[SDLK_u]){
+			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
+		}
+		
 		//clear old surface
 		if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
 		// generate image of map

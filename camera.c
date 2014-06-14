@@ -274,22 +274,22 @@ short camera_pan(struct cameraData *cam, short panDir){
 	switch(panDir){
 		case CAMERA_PAN_UP:
 			// verify that THE neighbor exists. If it doesn't exist, this function will create it.
-			block_calculate_neighbor(cam->target, BLOCK_NEIGHBOR_UP);
+			block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_UP);
 			/// TODO: write pan down
 			break;
 		case CAMERA_PAN_DOWN:
 			// verify that THE neighbor exists. If it doesn't exist, this function will create it.
-			block_calculate_neighbor(cam->target, BLOCK_NEIGHBOR_DOWN);
+			block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_DOWN);
 			/// TODO: write pan down
 			break;
 		case CAMERA_PAN_LEFT:
 			// verify that THE neighbor exists. If it doesn't exist, this function will create it.
-			block_calculate_neighbor(cam->target, BLOCK_NEIGHBOR_LEFT);
+			block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_LEFT);
 			/// TODO: write pan left
 			break;
 		case CAMERA_PAN_RIGHT:
 			// verify that THE neighbor exists. If it doesn't exist, this function will create it.
-			block_calculate_neighbor(cam->target, BLOCK_NEIGHBOR_RIGHT);
+			block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_RIGHT);
 			/// TODO: write pan right
 			break;
 		default:
