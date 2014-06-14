@@ -92,23 +92,6 @@ short camera_check(struct cameraData *cam){
 		check = 0;
 		
 		//--------------------------------------------------
-		// check for scale being too large
-		//--------------------------------------------------
-		if(cam->scale >= BLOCK_LINEAR_SCALE_FACTOR){
-			// zoom out once
-			camera_zoom_out(cam);
-			// record that a single check was made
-			check = 1;
-		}
-		// check for scale being too small
-		if(cam->scale <= BLOCK_LINEAR_SCALE_FACTOR_INV){
-			// zoom in once
-			camera_zoom_in(cam);
-			// record that a single check was made.
-			check = 1;
-		}
-		
-		//--------------------------------------------------
 		// check to see if x is out of the bounds of the target block
 		//--------------------------------------------------
 		if(cam->x < 0){
@@ -140,6 +123,29 @@ short camera_check(struct cameraData *cam){
 			check = 1;
 		}
 		
+		
+		//--------------------------------------------------
+		// check for scale being too large
+		//--------------------------------------------------
+		if(cam->scale >= BLOCK_LINEAR_SCALE_FACTOR){
+			// zoom out once
+			camera_zoom_out(cam);
+			// record that a single check was made
+			check = 1;
+		}
+		
+		//--------------------------------------------------
+		// check for scale being too small
+		//--------------------------------------------------
+		if(cam->scale <= 1/BLOCK_LINEAR_SCALE_FACTOR){
+			// zoom in once
+			camera_zoom_in(cam);
+			// record that a single check was made.
+			check = 1;
+		}
+		
+		
+		
 	}while(check);	// loop again if a modification was made to the camera
 	
 	
@@ -156,6 +162,10 @@ short camera_check(struct cameraData *cam){
 // this function will adjust the target, scale, and x, y variables of the camera.
 // returns 0 on success
 // returns 1 on invalid cameraData pointer
+// returns 2 when xcenter is out of bounds and too far left.
+// returns 3 when xcenter is out of bounds and too far right.
+// returns 4 when ycenter is out of bounds and too far up.
+// returns 5 when ycenter is out of bounds and too far down.
 short camera_zoom_in(struct cameraData *cam){
 	
 	// check for camera pointer being NULL
@@ -167,6 +177,40 @@ short camera_zoom_in(struct cameraData *cam){
 	/// TODO: write zoom in function.
 	// you will need to figure out which child you need to zoom to (this should be extremely easy)
 	// and you will need to figure out the (x,y) coordinate transformations between the current and the particular child.
+	
+	
+	
+	/// quick and dirty way to zoom in
+	
+	// verify that the children exist. If they don't already, this function will make them.
+	block_generate_children(cam->target);
+	// calculate which child to zoom in to.
+	// this calculates where the center of the camera is on the target block
+	int xcenter = cam->x + (BLOCK_WIDTH/2)*cam->scale + 0.5;
+	int ycenter = cam->y + (BLOCK_HEIGHT/2)*cam->scale + 0.5;
+	
+	// test error conditions
+	if(xcenter < 0){
+		error_d("camera_zoom_in() calculated that xcenter is out of bounds. xcenter too far left. xcenter =", xcenter);
+		return 2;
+	}
+	else if(xcenter >= BLOCK_WIDTH){
+		error_d("camera_zoom_in() calculated that xcenter is out of bounds. xcenter too far right. xcenter =", xcenter);
+		return 3;
+	}
+	if(ycenter < 0){
+		error_d("camera_zoom_in() calculated that ycenter is out of bounds. ycenter too far up. ycenter =", ycenter);
+		return 4;
+	}
+	else if(ycenter >= BLOCK_HEIGHT){
+		error_d("camera_zoom_in() calculated that ycenter is out of bounds. ycenter too far down. ycenter =", ycenter);
+		return 5;
+	}
+	
+	// update target to proper child
+	cam->target = cam->target->children[xcenter/BLOCK_WIDTH_1_3 + 3*(ycenter/BLOCK_WIDTH_1_3)];
+	// update the scale of the camera now that it is pointing at the child of the previous block
+	cam->scale *= BLOCK_LINEAR_SCALE_FACTOR;
 	
 	// success
 	return 0;
@@ -202,7 +246,7 @@ short camera_zoom_out(struct cameraData *cam){
 	cam->target = cam->target->parent;
 	block_random_fill(cam->target, 0,0xffffff);
 	// reset scale.
-	cam->scale *= 1/BLOCK_LINEAR_SCALE_FACTOR;
+	cam->scale /= BLOCK_LINEAR_SCALE_FACTOR;
 	
 	// success
 	return 0;
@@ -282,23 +326,23 @@ short camera_print(SDL_Surface *dest, struct cameraData *cam){
 		return 2;
 	}
 	
-	
+	/*
 	int i, istart, iend, j, jstart, jend;
 	
 	// if the camera is looking on the left side of the block,
 	if(cam->x < 0){
 		istart = -cam->x;
-		iend = BLOCK_WIDTH-1;
+		iend = BLOCK_WIDTH;
 	}
 	// otherwise, if the camera is centered or on the right side of the block,
 	else{
 		istart = 0;
-		iend = BLOCK_WIDTH-1 - cam->x;
+		iend = BLOCK_WIDTH - cam->x;
 	}
 	// if the camera is looking at the upper half of the block,
 	if(cam->y < 0){
 		jstart = -cam->y;
-		jend = BLOCK_HEIGHT-1;
+		jend = BLOCK_HEIGHT;
 	}
 	// otherwise, if the camera is centered or on the upper side of the block,
 	else{
@@ -308,7 +352,28 @@ short camera_print(SDL_Surface *dest, struct cameraData *cam){
 	
 	for(i=istart; i<iend; i++){
 		for(j=jstart; j<jend; j++){
-			set_pixel( dest, (int)((i-istart)*cam->scale + 0.5), (int)((j-jstart)*cam->scale + 0.5), 0xff000000|(int)(cam->target->elevation[i][j]));
+			set_pixel( dest, (int)((i-istart)/cam->scale + 0.5), (int)((j-jstart)/cam->scale + 0.5), 0xff000000|(int)(cam->target->elevation[i][j]));
+		}
+	}
+	*/
+	
+	// i and j index into the surface pixel array.
+	// iElevation and jElevation index into the blockData's elevation array.
+	int i, j, iElevation, jElevation;
+	// these store the constant scaling factors used to scale the i and j variables into the iElevation and jElevation variables.
+	float iScale = cam->scale*BLOCK_WIDTH /(float)dest->w;
+	float jScale = cam->scale*BLOCK_HEIGHT/(float)dest->h;
+	
+	// calculate the color for every pixel on the destination surface
+	for(i=0; i<dest->w; i++){
+		for(j=0; j<dest->h; j++){
+			// calculate the x and y indexes for the elevation array
+			iElevation = (int)(cam->x + i*iScale);
+			jElevation = (int)(cam->y + j*jScale);
+			// make sure the elevation index is in between
+			if(iElevation>=0 && iElevation<BLOCK_WIDTH && jElevation >= 0 && jElevation < BLOCK_HEIGHT){
+				set_pixel(dest, i, j, 0xff000000|(int)(cam->target->elevation[iElevation][jElevation]));
+			}
 		}
 	}
 	

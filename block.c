@@ -414,6 +414,31 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 }
 
 
+/// this function will fill up the left half of the blockData with elevationLeft, and the right half of the blockData with elevationRight 
+short block_fill_half_vert(struct blockData *block, float elevationLeft, float elevationRight){
+	
+	if(block == NULL){
+		error("block_fill_half_vert() was sent NULL block pointer.");
+		return 1;
+	}
+	
+	int i,j;
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			if(i <BLOCK_WIDTH/2){
+				block->elevation[i][j] = elevationLeft;
+			}
+			else{
+				block->elevation[i][j] = elevationRight;
+			}
+		}
+	}
+	
+	return 0;
+}
+
+
+
 /// this function will create a new origin block in memory and add that origin block to the block list using block_collector.
 // this function will...
 	// set all elevation data to 0.

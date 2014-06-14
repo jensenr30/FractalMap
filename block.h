@@ -12,7 +12,7 @@
 #define BLOCK_NEIGHBOR_LEFT				2
 #define BLOCK_NEIGHBOR_RIGHT			3
 
-#define BLOCK_LINEAR_SCALE_FACTOR		3.0f
+#define BLOCK_LINEAR_SCALE_FACTOR		((double)3.0f)
 #define BLOCK_LINEAR_SCALE_FACTOR_INV	(1.0/3.0f)
 #define BLOCK_WIDTH						243
 #define BLOCK_HEIGHT					243
@@ -178,6 +178,8 @@ float block_surrounding_average(struct blockData *source, unsigned int x, unsign
 int block_fill_middle(struct blockData *dat, float inVal, float outVal);
 short block_fill_nine_squares(struct blockData *Block, int color);
 short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine);
-
+short block_fill_half_vert(struct blockData *block, float elevationLeft, float elevationRight);
 
 short block_calculate_neighbor(struct blockData *dat, short neighbor);
+
+
