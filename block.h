@@ -182,6 +182,8 @@ struct blockStep{
 #define bc_clean_up		1
 short block_collector(struct blockData *source, short operation);
 
+
+
 struct blockData *block_generate_origin();
 short block_generate_children(struct blockData *datParent);
 short block_generate_parent(struct blockData *oneChild);
@@ -190,6 +192,15 @@ short block_generate_neighbor(struct blockData *dat, short neighbor);
 
 short map_print(SDL_Surface *dest, struct blockData *source);
 short block_print_to_file(struct blockData *datBlock, char *fileName);
+
+/// PNH stands for "Print Network Hierarchy"
+// this is the size of the squares that represent the blocks.
+#define BLOCK_PRH_SIZE 9
+// this is the color of the block that is the focus of the camera.
+#define B_PNH_COLOR_FOCUS 0xff00ff00
+// this is the color of all blocks that are NOT the focus of the camera
+#define B_PNH_COLOR_NOT_FOCUS 0xff007f7f
+short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, float zoom);
 
 
 short block_smooth(struct blockData *source, float smoothFactor);

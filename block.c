@@ -7,48 +7,6 @@
 #include "rand.h"
 #include "graphics.h"
 
-/// print a blockData
-// returns 1 on successful print to file
-// this function is to print the data from a map in a readable format.
-// THIS IS NOT FOR SAVING MAP DATA
-short block_print_to_file(struct blockData *datBlock, char *fileName){
-	
-	// open a text file to write to and append (appending should never really happen though).
-	FILE *fp = fopen(fileName, "a");
-	
-	if(fp == NULL){
-		// create an error message to write to file.
-		char message[512];
-		strcpy(message, "block_print_to_file() could not open file \"");
-		strcat(message, fileName);
-		strcat(message, "\"");
-		error(message);
-		// return that the map_block_print_to_file() didn't get the job done.
-		return 0;
-	}
-	
-	if(datBlock == NULL){
-		error("block_random_fill() could not fill datBlock. datBlock = NULL.");
-		return 0;
-	}
-	
-	
-	// write all elevation data
-	int j, i;
-	for(j=0; j<BLOCK_HEIGHT; j++){
-		for(i=0; i<BLOCK_WIDTH; i++){
-			fprintf(fp, "%10.10f\t", datBlock->elevation[i][j]);
-		}
-		// new line
-		fprintf(fp, "\n");
-	}
-	
-	// wrote datBlock to file successfully.
-	return 1;
-}
-
-
-
 
 /// throws random data into blockData
 // returns 0 on success
@@ -147,6 +105,47 @@ short block_generate_parent(struct blockData *oneChild){
 
 
 
+/// print a blockData
+// returns 1 on successful print to file
+// this function is to print the data from a map in a readable format.
+// THIS IS NOT FOR SAVING MAP DATA
+short block_print_to_file(struct blockData *datBlock, char *fileName){
+	
+	// open a text file to write to and append (appending should never really happen though).
+	FILE *fp = fopen(fileName, "a");
+	
+	if(fp == NULL){
+		// create an error message to write to file.
+		char message[512];
+		strcpy(message, "block_print_to_file() could not open file \"");
+		strcat(message, fileName);
+		strcat(message, "\"");
+		error(message);
+		// return that the map_block_print_to_file() didn't get the job done.
+		return 0;
+	}
+	
+	if(datBlock == NULL){
+		error("block_random_fill() could not fill datBlock. datBlock = NULL.");
+		return 0;
+	}
+	
+	
+	// write all elevation data
+	int j, i;
+	for(j=0; j<BLOCK_HEIGHT; j++){
+		for(i=0; i<BLOCK_WIDTH; i++){
+			fprintf(fp, "%10.10f\t", datBlock->elevation[i][j]);
+		}
+		// new line
+		fprintf(fp, "\n");
+	}
+	
+	// wrote datBlock to file successfully.
+	return 1;
+}
+
+
 
 /// this will print an image of a mapblock to a surface BLOCK_WIDTH x BLOCK_HEIGHT pixels
 // returns 0 on success
@@ -174,6 +173,17 @@ short map_print(SDL_Surface *dest, struct blockData *source){
 }
 
 
+
+short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, float zoom){
+	
+	
+	
+	
+	return 0;
+}
+
+
+
 /// this function will smooth out a block (just the block it will not smooth with respect to its adjacent blocks).
 // smoothFactor is from 0 to 1. it describes how much averaging the function will perform.
 // smoothFactor = 1 => the smoothing will replace each element with the average of those around it.
@@ -187,6 +197,7 @@ short block_smooth(struct blockData *source, float smoothFactor){
 	}
 	return 0;
 }
+
 
 
 // this calculates the average of the elevation values around some index (x,y) into the block data.
@@ -224,6 +235,9 @@ float block_surrounding_average(struct blockData *source, unsigned int x, unsign
 }
 
 
+
+
+
 /// this function will fill up the middle 9th of the block (from 1/3 to 2/3 of the block in both width and height)
 // the outer ring of 8/9ths of the will be filled with outVal
 // the inner 9th is filled with inVal.
@@ -256,6 +270,7 @@ int block_fill_middle(struct blockData *dat, float inVal, float outVal){
 	// success
 	return 0;
 }
+
 
 
 /// This function makes a grid of 9 squares each with a different, but similar color to the color input
@@ -292,6 +307,7 @@ short block_fill_nine_squares(struct blockData *Block, int color) {
 	// success
 	return 0;
 }
+
 
 
 /// This function fills in a certain square with a color that are specified
@@ -414,6 +430,7 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 }
 
 
+
 /// this function will fill up the left half of the blockData with elevationLeft, and the right half of the blockData with elevationRight 
 short block_fill_half_vert(struct blockData *block, float elevationLeft, float elevationRight){
 	
@@ -436,6 +453,8 @@ short block_fill_half_vert(struct blockData *block, float elevationLeft, float e
 	
 	return 0;
 }
+
+
 
 
 
@@ -491,6 +510,7 @@ struct blockData *block_generate_origin(){
 	
 	return newOrigin;
 }
+
 
 
 /// creates all three children for the passed blockData, parent
@@ -551,6 +571,7 @@ short block_generate_children(struct blockData *datParent){
 	// successfully generated children
 	return 0;
 }
+
 
 
 /// this function will calculate neighbor block(s) of the "dat" block sent to the function.
@@ -723,6 +744,7 @@ short block_generate_neighbor(struct blockData *dat, short neighbor){
 	// successfully generated/verified all neighbors.
 	return 0;
 }
+
 
 
 

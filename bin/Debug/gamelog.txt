@@ -1,0 +1,169 @@
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   0.001	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.001	main() was sent argc =	1
+Seconds =   0.001	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.002	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.000	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.000	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.000	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.000	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.000	END ARGV LIST

@@ -110,6 +110,9 @@ int main(int argc, char *argv[]){
 	// these keep track of where the mouse is/
 	int x, y;
 	
+	// these keep track of whether or not the user wants to draw a rectangle
+	int drawRect=0;
+	
 	while(quit == 0){
 		
 		// reset all keystroke values
@@ -193,9 +196,7 @@ int main(int argc, char *argv[]){
 			if(keys['s']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 10); // using the low-pass filter
 		}
 		
-		if(keys[SDLK_u]){
-			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
-		}
+		
 		
 		//clear old surface
 		if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
@@ -204,6 +205,13 @@ int main(int argc, char *argv[]){
 		// print map to mapSurface
 		// map_print(mapSurface, camera->target);
 		camera_print(mapSurface,camera);
+		
+		if(keys[SDLK_u] || drawRect){
+			draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix(0xff00ff00,0xff0000ff), 0, 0);
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
+			drawRect=1;
+		}
+		
 		//block_print_to_file(camera->target, "camera-target.txt");
 		// this test the frame-rate of the window by printing a single pixel under the mouse pointer tip
 		set_pixel(mapSurface, mapSurface->w*(x/(float)windW), mapSurface->h*(y/(float)windH), 0xffffffff);

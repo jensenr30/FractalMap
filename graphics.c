@@ -46,6 +46,60 @@ void set_pixel(SDL_Surface *surf, int x, int y, Uint32 pixel){
 }
 
 
+/// this function will draw a rectangle at (x,y) with width, w, and height, h.
+// this function is bounded (meaning it will not accidentally draw outside of the surface).
+// This function should not crash the program due to segmentation fault errors.
+// dest is the destination SDL_Surface that the image will be printed to.
+// colorBorder is the color of the border of the rectangle (inside the bounds of x,y w,h)
+// colorFill is the color of the rectangle inside the border.
+// if doFill is 0, then this function will only print the border
+// returns 0 success.
+// returns 1 on invalid dest
+short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickness, Uint32 colorBorder, Uint32 colorFill, char doFill){
+	
+	// check for a NULL destination surface pointer.
+	if(dest == NULL){
+		error("draw_rect() was passed an invalid dest pointer. dest = NULL");
+		return 1;
+	}
+	
+	// calculate starting/stopping positions
+	int i, j, istart = x, jstart = y, istop = x+w, jstop = y+h, temp;
+	// swap istart and istop if istop is less than istart
+	if(istop < istart){
+		temp = istop;
+		istop = istart;
+		istart = temp;
+	}
+	// swap jstart and jstop if jstop is less than jstart
+	if(jstop < jstart){
+		temp = jstop;
+		jstop = jstart;
+		jstart = temp;
+	}
+	// bound the 
+	if(istart < 0) istart = 0;
+	if(istop > dest->w) istop = dest->w;
+	if(jstart < 0) jstart = 0;
+	if(jstop > dest->h) jstop = dest->h;
+	
+	// draw the rectangle
+	for(i=istart; i<istop; i++){
+		for(j=jstart; j<jstop; j++){
+			// at every i,j index, figure out if that pixel is part of the border.
+			if(abs(i-x) < borderThickness || abs((x+w)-i) < borderThickness || abs(j-y) < borderThickness || abs((y+h)-j) < borderThickness){
+				// if it is, set it to the color of the border.
+				set_pixel(dest, i, j, colorBorder);
+			}
+			else{
+				// otherwise, set it to the fill color, but only if we are supposed to do so.
+				if(doFill)set_pixel(dest, i, j, colorFill);
+			}
+		}
+	}
+	return 0;
+}
+
 
 
 /// returns a pointer to the loaded texture.
