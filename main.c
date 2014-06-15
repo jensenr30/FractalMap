@@ -216,7 +216,7 @@ int main(int argc, char *argv[]){
 		if(printNetwork){
 			//draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix_weighted(0xff00ff00,0xff0000ff,1,1), 0, 0);
 			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
-			block_print_network_hierarchy(mapSurface, origin->parent->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
+			block_print_network_hierarchy(mapSurface, origin->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
 			printNetwork=1;
 		}
 		

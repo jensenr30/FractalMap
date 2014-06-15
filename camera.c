@@ -242,9 +242,10 @@ short camera_zoom_out(struct cameraData *cam){
 	
 	// this will verify that a parent has been added.
 	block_generate_parent(cam->target);
+	
 	// move to the parent
 	cam->target = cam->target->parent;
-	block_random_fill(cam->target, 0,0xffffff);
+	
 	// reset scale.
 	cam->scale /= BLOCK_LINEAR_SCALE_FACTOR;
 	

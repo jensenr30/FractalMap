@@ -45,82 +45,6 @@ short block_random_fill(struct blockData *datBlock, float range_low, float range
 
 
 
-/// this function will generate a parent when given a pointer to a block that is to be taken as the child.
-	// when any parent is generated, all of its children are automatically generated as well.
-	// the reason for this is the following: Every block will either have all of its children or none of its children.
-	// this should simplify things considerably in the future.
-// returns 0 on success
-// returns 1 on NULL centerChild pointer.
-// returns 2 when the parent already exists.
-// returns 3 if the 
-short block_generate_parent(struct blockData *centerChild){
-	
-	// check to see if a NULL pointer was passed.
-	if(centerChild == NULL){
-		error("block_generate_parent() was sent NULL pointer. centerChild = NULL.");
-		return 1;
-	}
-	
-	// check to see if the function is being asked to re-generate parent.
-	if(centerChild->parent != NULL){
-		error("block_generate_parent() was asked to regenerate parent. Child verification will still occur.");
-		block_generate_children(centerChild->parent);
-		return 2;
-	}
-	// otherwise, the parent needs to be generated
-	else{
-		
-		// try to allocate memory for the parent block
-		centerChild->parent = malloc(sizeof(struct blockData));
-		
-		// if the parent was not allocated properly, log an error and return 2
-		if(centerChild->parent == NULL){
-			error("block_generate_parent() cannot allocate data for a parent. centerChild->parent = NULL");
-			return 3;
-		}
-		
-		// set elevation to default
-		int i, j;
-		for(i=0; i<BLOCK_WIDTH; i++){
-			for(j=0; j<BLOCK_HEIGHT; j++){
-				(centerChild->parent)->elevation[i][j] = BLOCK_DEFAULT_ELEVATION;
-			}
-		}
-		
-		// make all of the children (other than the one that initiated this parent generation (which is the center one, child 4))
-		int c;
-		for(c=0; c<BLOCK_CHILDREN; c++){
-			if(c==4){
-				(centerChild->parent)->children[4] = centerChild;
-			}
-			else{
-				// make all other children NULL initially.
-				(centerChild->parent)->children[c] = NULL;
-			}
-		}
-		
-		// create any children that have not been generated already.
-		block_generate_children(centerChild->parent);
-		
-		// the level of the parent is one above the level of the child.
-		(centerChild->parent)->level = centerChild->level + 1;
-		
-		// this sets the parent of this block to NULL.
-		(centerChild->parent)->parent = NULL;
-		// because of how block generation is performed, when generating a parent, both the child AND the parent AND the parent's parent AND the parent's parent's parent (etc...) will be concentric.
-		// so parentView for all NEW parents and the children that are generating those new parents will be BLOCK_CHILD_CENTER_CENTER.
-		// This property of the block network is explained in some detail in block.h under "RYAN'S BLOCK NETWORK GENERATION PROTOCOL"
-		(centerChild->parent)->parentView = BLOCK_CHILD_CENTER_CENTER;
-		centerChild->parentView = BLOCK_CHILD_CENTER_CENTER;
-	}
-	
-	// successfully generated a parent and verified all children exist or have been created.
-	return 0;
-}
-
-
-
-
 /// print a blockData
 // returns 1 on successful print to file
 // this function is to print the data from a map in a readable format.
@@ -550,6 +474,84 @@ struct blockData *block_generate_origin(){
 
 
 
+/// this function will generate a parent when given a pointer to a block that is to be taken as the child.
+	// when any parent is generated, all of its children are automatically generated as well.
+	// the reason for this is the following: Every block will either have all of its children or none of its children.
+	// this should simplify things considerably in the future.
+// returns 0 on success
+// returns 1 on NULL centerChild pointer.
+// returns 2 when the parent already exists.
+// returns 3 if the 
+short block_generate_parent(struct blockData *centerChild){
+	
+	// check to see if a NULL pointer was passed.
+	if(centerChild == NULL){
+		error("block_generate_parent() was sent NULL pointer. centerChild = NULL.");
+		return 1;
+	}
+	
+	// check to see if the function is being asked to re-generate parent.
+	if(centerChild->parent != NULL){
+		error("block_generate_parent() was asked to regenerate parent.");
+		return 2;
+	}
+	// otherwise, the parent needs to be generated
+	else{
+		
+		// try to allocate memory for the parent block
+		centerChild->parent = malloc(sizeof(struct blockData));
+		
+		// if the parent was not allocated properly, log an error and return 2
+		if(centerChild->parent == NULL){
+			error("block_generate_parent() cannot allocate data for a parent. centerChild->parent = NULL");
+			return 3;
+		}
+		
+		// because the parent was successfully added to memory, we will add it to the block collector's list.
+		block_collector(centerChild->parent, bc_collect);
+		
+		// set elevation to default
+		/*
+		int i, j;
+		for(i=0; i<BLOCK_WIDTH; i++){
+			for(j=0; j<BLOCK_HEIGHT; j++){
+				(centerChild->parent)->elevation[i][j] = BLOCK_DEFAULT_ELEVATION;
+			}
+		}
+		*/
+		block_random_fill(centerChild->parent, 0,0xffffff);
+		
+		// make all of the children NULL
+		int c;
+		for(c=0; c<BLOCK_CHILDREN; c++){
+				(centerChild->parent)->children[c] = NULL;
+		}
+		// make the middle child of the parent point to the centerChild pointer
+		(centerChild->parent)->children[BLOCK_CHILD_CENTER_CENTER] = centerChild;
+		
+		// create any children that have not been generated already.
+		block_generate_children(centerChild->parent);
+		
+		// the level of the parent is one above the level of the child.
+		(centerChild->parent)->level = centerChild->level + 1;
+		
+		// this sets the parent of this block to NULL.
+		(centerChild->parent)->parent = NULL;
+		// because of how block generation is performed, when generating a parent, both the child AND the parent AND the parent's parent AND the parent's parent's parent (etc...) will be concentric.
+		// so parentView for all NEW parents and the children that are generating those new parents will be BLOCK_CHILD_CENTER_CENTER.
+		// This property of the block network is explained in some detail in block.h under "RYAN'S BLOCK NETWORK GENERATION PROTOCOL"
+		(centerChild->parent)->parentView = BLOCK_CHILD_CENTER_CENTER;
+		centerChild->parentView = BLOCK_CHILD_CENTER_CENTER;
+		
+		
+	}
+	
+	// successfully generated a parent and verified all children exist or have been created.
+	return 0;
+}
+
+
+
 /// creates all three children for the passed blockData, parent
 // this function will allocate memory for all 9 children at once.
 // returns 0 on success 
@@ -599,11 +601,9 @@ short block_generate_children(struct blockData *datParent){
 				// the level of the child is the level of the parent minus 1.
 				(datParent->children[c])->level = datParent->level - 1;
 				
-				// calculate the child's neighbors.
-				/// TODO: Decide if you should be generating block's neighbors whenever you generate a child.
-				// I don't think this is a good idea because this will lead to an infinite amount of children needing neighbors which will in turn generate more children...
-				//block_generate_neighbor(datParent->children[c], BLOCK_NEIGHBOR_ALL);
-			
+				// this is the child's default elevation data
+				block_random_fill(datParent->children[c], 0,0xffffff);
+				
 			}
 		}
 	}
@@ -876,6 +876,8 @@ short block_collector(struct blockData *source, short operation){
 			// and return an error
 			return 5;
 		}
+		
+		gamelog_d("block_collector() cleaning up blocks. blockCount =", blockCount);
 		
 		// decrement to the last valid block
 		blockCount--;
