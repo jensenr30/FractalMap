@@ -1,0 +1,265 @@
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.001	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds = 288.936	block_collector() cleaning up blocks. blockCount =	235
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =  81.151	block_collector() cleaning up blocks. blockCount =	64
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.002	END ARGV LIST
+Seconds = 131.677	block_collector() cleaning up blocks. blockCount =	46
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   1.102	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   8.318	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =  73.320	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =  10.507	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   9.788	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.000	END ARGV LIST
+Seconds =   3.388	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =  18.168	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.000	END ARGV LIST
+Seconds =   4.797	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.001	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =  30.823	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   9.037	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds = 243.981	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =  84.969	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   5.570	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.000	END ARGV LIST
+Seconds =   3.334	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =  21.502	block_collector() cleaning up blocks. blockCount =	64

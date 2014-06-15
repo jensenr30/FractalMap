@@ -17,6 +17,8 @@ unsigned int windH = BLOCK_HEIGHT*3;
 
 
 int main(int argc, char *argv[]){
+	
+	
 	error("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
 	//--------------------------------------------------
 	// initial gamelog write
@@ -43,13 +45,17 @@ int main(int argc, char *argv[]){
 	myRenderer = NULL;
 	myTexture = NULL;
 	
+	SDL_Window *networkWindow = NULL;
+	SDL_Renderer *networkRenderer = NULL;
+	SDL_Texture *networkTexture = NULL;
+	SDL_Surface *networkSurface = NULL;
 	
 	sgenrand(time(NULL));
 	
 	
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
 	
-	myWindow = SDL_CreateWindow("My Game Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
+	myWindow = SDL_CreateWindow("FractalMap - Map", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 	
 	if(myWindow == NULL){
@@ -61,7 +67,22 @@ int main(int argc, char *argv[]){
 		return -2;
 	}
 	
+	// set network window
+	networkWindow = SDL_CreateWindow("FractalMap - Network Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
+	networkRenderer = SDL_CreateRenderer(networkWindow, -1, 0);
 	
+	if(networkWindow == NULL){
+		error("main() could not create networkWindow using SDL_CreateWindow");
+		return -1;
+	}
+	if(networkRenderer == NULL){
+		error("main() could not create networkRenderer using SDL_CreateRenderer");
+		return -2;
+	}
+	
+	SDL_SetRenderDrawColor(networkRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(networkRenderer);
+	SDL_RenderPresent(networkRenderer);
 	
 	SDL_SetRenderDrawColor(myRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(myRenderer);
@@ -150,6 +171,10 @@ int main(int argc, char *argv[]){
 			}
 			// check for window events
 			else if(event.type == SDL_WINDOWEVENT ){
+				if(event.window.event == SDL_WINDOWEVENT_CLOSE){
+					quit = 1;
+				}
+				
 				// if the window was resized, the new window width and height need to be recorded.
 				if( event.window.event == SDL_WINDOWEVENT_RESIZED){
 					windW = event.window.data1;
@@ -195,8 +220,10 @@ int main(int argc, char *argv[]){
 				fclose(bs);
 			}
 			*/
-			if(keys['s']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 10); // using the low-pass filter
+			if(keys['s']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3); // using the low-pass filter
 		}
+		
+		
 		
 		
 		
@@ -213,28 +240,42 @@ int main(int argc, char *argv[]){
 			else printNetwork = 1;
 		}
 		
-		if(printNetwork){
-			//draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix_weighted(0xff00ff00,0xff0000ff,1,1), 0, 0);
-			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
-			block_print_network_hierarchy(mapSurface, origin->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
-			printNetwork=1;
-		}
+		//draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix_weighted(0xff00ff00,0xff0000ff,1,1), 0, 0);
+		//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
 		
 		//block_print_to_file(camera->target, "camera-target.txt");
 		// this test the frame-rate of the window by printing a single pixel under the mouse pointer tip
 		set_pixel(mapSurface, mapSurface->w*(x/(float)windW), mapSurface->h*(y/(float)windH), 0xffffffff);
 		
-		// clear the old texture if it exists
-		if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);
 		// create a texture for the map data
 		mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
 		
+		
+		
+		
+		
+		// clear the old texture if it exists
+		if(networkSurface != NULL)SDL_DestroyTexture(networkSurface);
+		
+		networkSurface = create_surface(windW, windH);
+		
+		// generate the network hierarchy
+		block_print_network_hierarchy(networkSurface, origin->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
+		// generate texture for the block network
+		networkTexture = SDL_CreateTextureFromSurface(networkRenderer, networkSurface);
+		
 		// render the mapTexture to the window
 		SDL_RenderCopy(myRenderer, mapTexture, NULL, NULL);
+		// render the networkSurface to the networkWindow
+		SDL_RenderCopy(networkRenderer, networkTexture, NULL, NULL);
 		
-		// display the renderer's result on the screen
+		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
+		// display the renderer's result on the screen and clear it when done
+		SDL_RenderPresent(networkRenderer);
+		SDL_RenderClear(networkRenderer);
+		
 	}
 	
 	
