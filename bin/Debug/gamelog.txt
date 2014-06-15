@@ -1,0 +1,23 @@
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.001	main() was sent argc =	10
+Seconds =   0.001	START ARGV ARGUMENT LIST:
+Seconds =   0.002	A:\Programming\FractalMap\bin\Debug\FractalMap.exe
+Seconds =   0.002	A:\Programming\FractalMap\bin\Debug\libfreetype-6.dll
+Seconds =   0.003	A:\Programming\FractalMap\bin\Debug\libjpeg-9.dll
+Seconds =   0.003	A:\Programming\FractalMap\bin\Debug\libpng16-16.dll
+Seconds =   0.004	A:\Programming\FractalMap\bin\Debug\libtiff-5.dll
+Seconds =   0.004	A:\Programming\FractalMap\bin\Debug\libwebp-4.dll
+Seconds =   0.005	A:\Programming\FractalMap\bin\Debug\SDL2.dll
+Seconds =   0.005	A:\Programming\FractalMap\bin\Debug\SDL2_image.dll
+Seconds =   0.006	A:\Programming\FractalMap\bin\Debug\SDL2_ttf.dll
+Seconds =   0.006	A:\Programming\FractalMap\bin\Debug\zlib1.dll
+Seconds =   0.007	END ARGV LIST
+Seconds =   2.384	block_collector() cleaning up blocks. blockCount =	19
