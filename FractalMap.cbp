@@ -70,6 +70,9 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lwinmm -lSDL2_image" />
+		</Linker>
 		<Unit filename="block.c">
 			<Option compilerVar="CC" />
 		</Unit>
