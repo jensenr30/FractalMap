@@ -1,0 +1,13 @@
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.001	main() was sent argc =	1
+Seconds =   0.001	START ARGV ARGUMENT LIST:
+Seconds =   0.001	Z:\mnt\D\Windows\Desktop\GitHub\FractalMap\bin\DebugCrossWin32\FractalMap
+Seconds =   0.002	END ARGV LIST
