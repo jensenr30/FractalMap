@@ -1,0 +1,26 @@
+Seconds=   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds=  14.340	block_generate_parent() was asked to regenerate parent.
+Seconds=  14.341	block_generate_parent() was asked to regenerate parent.
+Seconds=  14.372	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.573	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.573	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.629	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.629	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.630	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.685	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.685	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.686	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.744	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.744	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.798	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.798	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.798	block_generate_parent() was asked to regenerate parent.
+Seconds=  15.878	block_generate_parent() was asked to regenerate parent.

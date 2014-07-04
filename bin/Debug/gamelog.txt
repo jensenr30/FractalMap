@@ -1,0 +1,291 @@
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds = 236.675	block_collector() cleaning up blocks. blockCount =	30961
+Seconds =   0.023	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.023	main() was sent argc =	1
+Seconds =   0.023	START ARGV ARGUMENT LIST:
+Seconds =   0.024	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.024	END ARGV LIST
+Seconds =  52.433	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.001	main() was sent argc =	1
+Seconds =   0.018	START ARGV ARGUMENT LIST:
+Seconds =   0.019	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.020	END ARGV LIST
+Seconds = 143.323	block_collector() cleaning up blocks. blockCount =	28
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =   4.869	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =  17.363	block_collector() cleaning up blocks. blockCount =	28
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =   4.468	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds = 117.965	block_collector() cleaning up blocks. blockCount =	4663
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =  54.842	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =   7.107	block_collector() cleaning up blocks. blockCount =	28
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.001	END ARGV LIST
+Seconds =  10.425	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.001	END ARGV LIST
+Seconds =  74.562	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =  20.939	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.001	END ARGV LIST
+Seconds =  14.721	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.001	END ARGV LIST
+Seconds =  21.794	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =  27.862	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.012	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.025	main() was sent argc =	1
+Seconds =   0.025	START ARGV ARGUMENT LIST:
+Seconds =   0.025	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.025	END ARGV LIST
+Seconds =  27.324	block_collector() cleaning up blocks. blockCount =	1396
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =   3.530	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	/mnt/D/Copy/Programing/GitHub/FractalMap/bin/Debug/FractalMap
+Seconds =   0.000	END ARGV LIST
+Seconds =   4.808	block_collector() cleaning up blocks. blockCount =	19
