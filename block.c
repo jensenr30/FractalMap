@@ -10,12 +10,12 @@
 
 /// throws random data into blockData
 // returns 0 on success
-// returns 1 when the datBlock is a NULL pointer.
-short block_random_fill(struct blockData *datBlock, float range_low, float range_high){
+// returns 1 when the block is a NULL pointer.
+short block_random_fill(struct blockData *block, float range_low, float range_high){
 	
-	// check for datBlock pointer being NULL.
-	if(datBlock == NULL){
-		error("block_random_fill() could not fill datBlock. datBlock = NULL.");
+	// check for block pointer being NULL.
+	if(block == NULL){
+		error("block_random_fill() could not fill block. block = NULL.");
 		return 1;
 	}
 	
@@ -33,11 +33,13 @@ short block_random_fill(struct blockData *datBlock, float range_low, float range
 	for(i=0; i<BLOCK_WIDTH; i++){
 		for(j=0; j<BLOCK_HEIGHT; j++){
 			// generate a random number between range_low and range_high.
-			datBlock->elevation[i][j] = ((genrand()%100001)/100000.0)*(range_high-range_low) + range_low;//((rand()%100001)/100000.0)*(range_higher-range_lower)-((range_higher+range_lower)/2);
+			block->elevation[i][j] = ((genrand()%100001)/100000.0)*(range_high-range_low) + range_low;//((rand()%100001)/100000.0)*(range_higher-range_lower)-((range_higher+range_lower)/2);
 		}
 	}
 	
-	// generated random data in datBlock successfully.
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
+	// generated random data in block successfully.
 	return 0;
 }
 
@@ -49,7 +51,7 @@ short block_random_fill(struct blockData *datBlock, float range_low, float range
 // returns 1 on successful print to file
 // this function is to print the data from a map in a readable format.
 // THIS IS NOT FOR SAVING MAP DATA
-short block_print_to_file(struct blockData *datBlock, char *fileName){
+short block_print_to_file(struct blockData *block, char *fileName){
 	
 	// open a text file to write to and append (appending should never really happen though).
 	FILE *fp = fopen(fileName, "a");
@@ -65,8 +67,8 @@ short block_print_to_file(struct blockData *datBlock, char *fileName){
 		return 0;
 	}
 	
-	if(datBlock == NULL){
-		error("block_random_fill() could not fill datBlock. datBlock = NULL.");
+	if(block == NULL){
+		error("block_random_fill() could not fill block. block = NULL.");
 		return 0;
 	}
 	
@@ -75,18 +77,64 @@ short block_print_to_file(struct blockData *datBlock, char *fileName){
 	int j, i;
 	for(j=0; j<BLOCK_HEIGHT; j++){
 		for(i=0; i<BLOCK_WIDTH; i++){
-			fprintf(fp, "%10.10f\t", datBlock->elevation[i][j]);
+			fprintf(fp, "%10.10f\t", block->elevation[i][j]);
 		}
 		// new line
 		fprintf(fp, "\n");
 	}
 	
-	// wrote datBlock to file successfully.
+	// wrote block to file successfully.
 	return 1;
 }
 
 
+/// this will render a block and store a pointer to the rendered texture in the blockData itself.
+// this is useful when you don't want to render a block every time you print the screen.
+// this can be used to only re-render the block when a change in the block elevation occurs.
+// returns 0 on success
+// returns 1 on invalid block
+// returns 2 if blockRenderer is NULL
+short block_render(struct blockData *block, SDL_Renderer *blockRenderer){
+	
+	// quit and report error if you were given a bad block.
+	if(block == NULL){
+		error("block_render() was sent NULL block.");
+		return 1;
+	}
+	// quit and report error if you were given a bad block.
+	if(blockRenderer == NULL){
+		error("block_render() was sent invalid blockRenderer. blockRenderer = NULL");
+		return 2;
+	}
+	
+	// this is a pointer to where surface data is stored.
+	// the data will stay here (we can use the same surface data over and over again to render any block, because the surface is only needed temporarily.
+	static SDL_Surface *blockSurface;
+	static int firstTimeThrough = 1;
+	if(firstTimeThrough) {
+		blockSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+		firstTimeThrough = 0;
+	}
+	
+	// if the block texture is valid, destroy it. This frees up the memory that was used to render the last texture. We no longer need it.
+	if(block->texture != NULL) SDL_DestroyTexture(block->texture);
+	
+	int i, j;
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			set_pixel(blockSurface, i, j, ((int)(block->elevation[i][j])) | 0xff000000);
+		}
+	}
+	
+	// copy surface to texture
+	block->texture = SDL_CreateTextureFromSurface(blockRenderer, blockSurface);
+	
+	// success!
+	return 0;
+}
 
+
+/* OLD PRINTING FUNCTION
 /// this will print an image of a mapblock to a surface BLOCK_WIDTH x BLOCK_HEIGHT pixels
 // returns 0 on success
 // returns 1 on NULL dest surface
@@ -94,11 +142,11 @@ short block_print_to_file(struct blockData *datBlock, char *fileName){
 short map_print(SDL_Surface *dest, struct blockData *source){
 	
 	if(dest == NULL){
-		error("block_collector() could not print to dest. dest = NULL.");
+		error("map_print() could not print to dest. dest = NULL.");
 		return 1;
 	}
 	if(source == NULL){
-		error("block_collector() could not print source. source = NULL.");
+		error("map_print() could not print source. source = NULL.");
 		return 2;
 	}
 	
@@ -112,7 +160,7 @@ short map_print(SDL_Surface *dest, struct blockData *source){
 	return 0;
 }
 
-
+*/
 
 
 
@@ -149,13 +197,17 @@ short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, 
 // smoothFactor is from 0 to 1. it describes how much averaging the function will perform.
 // smoothFactor = 1 => the smoothing will replace each element with the average of those around it.
 // smoothFactor = 0.5 => the smoothing will replace each elevation with the average of itself and the aaverage of those around it.
-short block_smooth(struct blockData *source, float smoothFactor){
+short block_smooth(struct blockData *block, float smoothFactor){
 	int i, j;
 	for(i=0; i<BLOCK_WIDTH; i++){
 		for(j=0; j<BLOCK_HEIGHT; j++){
-			source->elevation[i][j] = (1.0-smoothFactor)*source->elevation[i][j] + smoothFactor*block_surrounding_average(source, i, j);
+			block->elevation[i][j] = (1.0-smoothFactor)*block->elevation[i][j] + smoothFactor*block_surrounding_average(block, i, j);
 		}
 	}
+	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
+	// success
 	return 0;
 }
 
@@ -164,10 +216,10 @@ short block_smooth(struct blockData *source, float smoothFactor){
 // this calculates the average of the elevation values around some index (x,y) into the block data.
 // returns average in floating point number form
 // returns a floating point value of 0.0 if there is any problem computing the error.
-float block_surrounding_average(struct blockData *source, unsigned int x, unsigned int y){
+float block_surrounding_average(struct blockData *block, unsigned int x, unsigned int y){
 	
-	if(source == NULL){
-		error("block_surrounding_average() could not open source. source = NULL.");
+	if(block == NULL){
+		error("block_surrounding_average() could not open block. block = NULL.");
 		return 0.0;
 	}
 	
@@ -175,22 +227,26 @@ float block_surrounding_average(struct blockData *source, unsigned int x, unsign
 	int averageCount = 0;
 	
 	// add diagonal elevations to average
-	if(x>0 && y>0)							{average += source->elevation[x-1][y-1];	averageCount++;}
-	if(x>0 && y<BLOCK_HEIGHT-1)				{average += source->elevation[x-1][y+1];	averageCount++;}
-	if(x<BLOCK_WIDTH-1 && y>0)				{average += source->elevation[x+1][y-1];	averageCount++;}
-	if(x<BLOCK_WIDTH-1 && y<BLOCK_HEIGHT-1)	{average += source->elevation[x+1][y+1];	averageCount++;}
+	if(x>0 && y>0)							{average += block->elevation[x-1][y-1];	averageCount++;}
+	if(x>0 && y<BLOCK_HEIGHT-1)				{average += block->elevation[x-1][y+1];	averageCount++;}
+	if(x<BLOCK_WIDTH-1 && y>0)				{average += block->elevation[x+1][y-1];	averageCount++;}
+	if(x<BLOCK_WIDTH-1 && y<BLOCK_HEIGHT-1)	{average += 
+	block->elevation[x+1][y+1];	averageCount++;}
 	
 	// add adjacent elevations
-	if(x>0)					{average += source->elevation[x-1][y];	averageCount++; }
-	if(x<BLOCK_WIDTH-1)		{average += source->elevation[x+1][y];	averageCount++; }
-	if(y>0)					{average += source->elevation[x][y-1];	averageCount++; }
-	if(y<BLOCK_HEIGHT-1)	{average += source->elevation[x][y+1];	averageCount++; }
+	if(x>0)					{average += block->elevation[x-1][y];	averageCount++; }
+	if(x<BLOCK_WIDTH-1)		{average += 
+	block->elevation[x+1][y];	averageCount++; }
+	if(y>0)					{average += block->elevation[x][y-1];	averageCount++; }
+	if(y<BLOCK_HEIGHT-1)	{average += block->elevation[x][y+1];	averageCount++; }
 	
 	if(averageCount < 1){
 		error_d("block_surrounding_average() had invalid averageCount! averageCount =", averageCount);
 		return 0.0;
 	}
 	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
 	// if everything went well, return the average of the surrounding elevations
 	return average/((float)averageCount);
 }
@@ -202,11 +258,11 @@ float block_surrounding_average(struct blockData *source, unsigned int x, unsign
 /// this function will fill up the middle 9th of the block (from 1/3 to 2/3 of the block in both width and height)
 // the outer ring of 8/9ths of the will be filled with outVal
 // the inner 9th is filled with inVal.
-// returns 1 if dat was NULL.
-int block_fill_middle(struct blockData *dat, float inVal, float outVal){
+// returns 1 if block was NULL.
+int block_fill_middle(struct blockData *block, float inVal, float outVal){
 	
-	if(dat == NULL){
-		error("block_fill_middle() was sent NULL blockData pointer. dat = NULL");
+	if(block == NULL){
+		error("block_fill_middle() was sent NULL blockData pointer. block = NULL");
 		return 1;
 	}
 	
@@ -218,16 +274,19 @@ int block_fill_middle(struct blockData *dat, float inVal, float outVal){
 			// if the value is in the inner 9th,
 			if(i>=BLOCK_WIDTH_1_3 && i<BLOCK_WIDTH_2_3 && j>=BLOCK_WIDTH_1_3 && j<BLOCK_WIDTH_2_3){
 				// fill it with inVal
-				dat->elevation[i][j] = inVal;
+				block->elevation[i][j] = inVal;
 			}
 			// if  it is in the outer 9th, 
 			else{
 				// fill with outVal
-				dat->elevation[i][j] = outVal;
+				block->elevation[i][j] = outVal;
 			}
 			
 		}
 	}
+	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
 	// success
 	return 0;
 }
@@ -265,6 +324,8 @@ short block_fill_nine_squares(struct blockData *Block, int color) {
 		if(i%81 == 0 && i != 0)
 			color*=2;
 	}
+	// render the block next time it needs to be printed
+	Block->renderMe = 1;
 	// success
 	return 0;
 }
@@ -386,6 +447,9 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 				column = 1;
 		}
 	}
+	
+	// render the block next time it needs to be printed
+	Block->renderMe = 1;
 	// success
 	return 0;
 }
@@ -412,6 +476,8 @@ short block_fill_half_vert(struct blockData *block, float elevationLeft, float e
 		}
 	}
 	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
 	return 0;
 }
 
@@ -452,19 +518,22 @@ struct blockData *block_generate_origin(){
 	
 	// set parent to NULL;
 	newOrigin->parent = NULL;
-	// set parentView to BLOCK_CHILD_CENTER_CENTER.
-	newOrigin->parentView = BLOCK_CHILD_CENTER_CENTER;
-	
-	// make all elevations equal to the default elevation.
-	int i, j;
-	for(i=0; i<BLOCK_WIDTH; i++){
-		for(j=0; j<BLOCK_HEIGHT; j++){
-			newOrigin->elevation[i][j] = BLOCK_DEFAULT_ELEVATION;
-		}
-	}
+	// set the texture to NULL
+	newOrigin->texture = NULL;
+	// render the new origin the next time through the graphics functions.
+	newOrigin->renderMe = 1;
 	
 	// set the level to the default level.
 	newOrigin->level = BLOCK_ORIGIN_LEVEL;
+	
+	// set parentView to BLOCK_CHILD_CENTER_CENTER.
+	newOrigin->parentView = BLOCK_CHILD_CENTER_CENTER;
+	
+	// randomize the origin
+	block_random_fill(newOrigin, 0x00000000, 0xffffffff);
+	
+	
+	
 	
 	// add origin to the block index.
 	block_collector(newOrigin, bc_collect);
@@ -535,6 +604,11 @@ short block_generate_parent(struct blockData *centerChild){
 		// the level of the parent is one above the level of the child.
 		(centerChild->parent)->level = centerChild->level + 1;
 		
+		// the parent has not been rendered yet.
+		centerChild->parent->texture = NULL;
+		// render the parent next time through the graphics functions.
+		centerChild->parent->renderMe = 1;
+		
 		// this sets the parent of this block to NULL.
 		(centerChild->parent)->parent = NULL;
 		// because of how block generation is performed, when generating a parent, both the child AND the parent AND the parent's parent AND the parent's parent's parent (etc...) will be concentric.
@@ -542,7 +616,6 @@ short block_generate_parent(struct blockData *centerChild){
 		// This property of the block network is explained in some detail in block.h under "RYAN'S BLOCK NETWORK GENERATION PROTOCOL"
 		(centerChild->parent)->parentView = BLOCK_CHILD_CENTER_CENTER;
 		centerChild->parentView = BLOCK_CHILD_CENTER_CENTER;
-		
 		
 	}
 	
@@ -598,11 +671,17 @@ short block_generate_children(struct blockData *datParent){
 				for(cc=0; cc<BLOCK_CHILDREN; cc++){
 					(datParent->children[c])->children[cc] = NULL;
 				}
+				// the child has not been rendered yet
+				(datParent->children[c])->texture = NULL;
+				// render the child next time through the graphics functions.
+				(datParent->children[c])->renderMe = 1;
 				// the level of the child is the level of the parent minus 1.
 				(datParent->children[c])->level = datParent->level - 1;
 				
 				// this is the child's default elevation data
 				block_random_fill(datParent->children[c], 0,0xffffff);
+				
+				
 				
 			}
 		}

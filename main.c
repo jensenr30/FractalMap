@@ -16,6 +16,7 @@ unsigned int windW = BLOCK_WIDTH*3;
 unsigned int windH = BLOCK_HEIGHT*3;
 
 
+
 int main(int argc, char *argv[]){
 	
 	
@@ -185,6 +186,13 @@ int main(int argc, char *argv[]){
 				quit = 1;
 			}
 		}
+		
+		// if the user pressed the r key
+		if(keys['r']){
+			// generate random noise in the block
+			block_random_fill(camera->target, 0, 0xffffff);
+		}
+		
 		// if the user pressed the c key
 		if(keys['c']){
 			// generate children blocks
@@ -193,7 +201,7 @@ int main(int argc, char *argv[]){
 		
 		// fill up the left half of the screen with a color
 		if(keys['v']){
-			block_fill_half_vert(camera->target, 0xff, 0);
+			block_fill_half_vert(camera->target, 0xffffffff, 0);
 		}
 		
 		// generate parent of camera->target if the p key is pressed
@@ -227,13 +235,13 @@ int main(int argc, char *argv[]){
 		
 		
 		
-		//clear old surface
-		if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
+		// clear old surface
+		//if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
 		// generate image of map
-		mapSurface = create_surface(windW, windH);
+		//mapSurface = create_surface(windW, windH);
 		// print map to mapSurface
 		// map_print(mapSurface, camera->target);
-		camera_print(mapSurface,camera);
+		
 		
 		if(keys[SDLK_u]){
 			if(printNetwork) printNetwork = 0;
@@ -241,21 +249,18 @@ int main(int argc, char *argv[]){
 		}
 		
 		//draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix_weighted(0xff00ff00,0xff0000ff,1,1), 0, 0);
-		//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
+		// block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
 		
 		//block_print_to_file(camera->target, "camera-target.txt");
 		// this test the frame-rate of the window by printing a single pixel under the mouse pointer tip
-		set_pixel(mapSurface, mapSurface->w*(x/(float)windW), mapSurface->h*(y/(float)windH), 0xffffffff);
-		
-		// create a texture for the map data
-		mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
+		//set_pixel(mapSurface, mapSurface->w*((x%windW)/(float)windW), mapSurface->h*((y%windH)/(float)windH), 0xffffffff);
 		
 		
 		
 		
 		
 		// clear the old texture if it exists
-		if(networkSurface != NULL)SDL_DestroyTexture(networkSurface);
+		if(networkSurface != NULL)SDL_FreeSurface(networkSurface);
 		
 		networkSurface = create_surface(windW, windH);
 		
@@ -263,18 +268,22 @@ int main(int argc, char *argv[]){
 		block_print_network_hierarchy(networkSurface, origin->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
 		// generate texture for the block network
 		networkTexture = SDL_CreateTextureFromSurface(networkRenderer, networkSurface);
-		
-		// render the mapTexture to the window
-		SDL_RenderCopy(myRenderer, mapTexture, NULL, NULL);
 		// render the networkSurface to the networkWindow
 		SDL_RenderCopy(networkRenderer, networkTexture, NULL, NULL);
+		if(networkTexture != NULL)SDL_DestroyTexture(networkTexture);
+		
+		// display the renderer's result on the screen and clear it when done
+		SDL_RenderPresent(networkRenderer);
+		SDL_RenderClear(networkRenderer);
+		
+		
+		
+		// print the camera to screen
+		camera_render(myRenderer,camera);
 		
 		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
-		// display the renderer's result on the screen and clear it when done
-		SDL_RenderPresent(networkRenderer);
-		SDL_RenderClear(networkRenderer);
 		
 	}
 	
@@ -283,7 +292,8 @@ int main(int argc, char *argv[]){
 	// clean up
 	//--------------------------------------------------
 	SDL_FreeSurface(mapSurface);
-	SDL_DestroyTexture(mapTexture);
+	if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);
+	if(networkTexture != NULL)SDL_DestroyTexture(networkTexture);
 	// clean up all SDL subsystems and other non-SDL systems and global memory.
 	clean_up();
 	
