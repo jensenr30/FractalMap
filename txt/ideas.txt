@@ -144,6 +144,12 @@ This same technique could be applied to animals/creatures.
 They could all be rendered in some base resolution, then when the time comes to print them to the screen, the textures could be applied by the graphics card.
 This would be much faster than the alternative of making the CPU render each animal every single frame (which would be really taxing on the processor)
 
+>>>>>>>>>> UPDATE <<<<<<<<<<<<<<<
+
+this has now been implemented, however, there is one crucial thing that needs to be considered:
+How many textures do I want to have floating around?
+maybe once the game reaches a certain number of textures floating around, it will just delete all of them (or maybe half of them).
+it should delete the oldest half of the textures (not all of them).
 
 
 

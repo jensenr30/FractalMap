@@ -308,16 +308,16 @@ short camera_pan(struct cameraData *cam, short panDir){
 
 
 
-/// this will print the "cam" cameraData to the "dest" surface.
-// returns 0 on successful print to surface
+/// this will render the "cam" cameraData to the "dest" renderer.
+// returns 0 on successful rendering
 // returns 1 if the dest pointer is NULL
 // returns 2 if the cam pointer is NULL
-short camera_print(SDL_Surface *dest, struct cameraData *cam){
+short camera_render(SDL_Renderer *dest, struct cameraData *cam){
 	
 	// check to see if dest is invalid
 	if(dest == NULL){
 		//report the error
-		error("print_camera_view() was sent an invalid dest value. dest = NULL");
+		error("print_camera_view() was sent an invalid renderer. dest = NULL");
 		return 1;
 	}
 	// check to see if cam is invalid
@@ -327,37 +327,7 @@ short camera_print(SDL_Surface *dest, struct cameraData *cam){
 		return 2;
 	}
 	
-	/*
-	int i, istart, iend, j, jstart, jend;
-	
-	// if the camera is looking on the left side of the block,
-	if(cam->x < 0){
-		istart = -cam->x;
-		iend = BLOCK_WIDTH;
-	}
-	// otherwise, if the camera is centered or on the right side of the block,
-	else{
-		istart = 0;
-		iend = BLOCK_WIDTH - cam->x;
-	}
-	// if the camera is looking at the upper half of the block,
-	if(cam->y < 0){
-		jstart = -cam->y;
-		jend = BLOCK_HEIGHT;
-	}
-	// otherwise, if the camera is centered or on the upper side of the block,
-	else{
-		jstart = 0;
-		jend = BLOCK_HEIGHT - cam->y;
-	}
-	
-	for(i=istart; i<iend; i++){
-		for(j=jstart; j<jend; j++){
-			set_pixel( dest, (int)((i-istart)/cam->scale + 0.5), (int)((j-jstart)/cam->scale + 0.5), 0xff000000|(int)(cam->target->elevation[i][j]));
-		}
-	}
-	*/
-	
+	/* OLD PRINTING CODE
 	// i and j index into the surface pixel array.
 	// iElevation and jElevation index into the blockData's elevation array.
 	int i, j, iElevation, jElevation;
@@ -377,6 +347,15 @@ short camera_print(SDL_Surface *dest, struct cameraData *cam){
 			}
 		}
 	}
+	*/
+	
+	
+	// if the target block has not been rendered, render it now.
+	if(cam->target->texture == NULL || cam->target->renderMe)
+	block_render(cam->target, dest);
+	
+	SDL_RenderCopy(dest, cam->target->texture, NULL, NULL);
+	
 	
 	
 	// successful print.

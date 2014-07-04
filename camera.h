@@ -60,7 +60,7 @@ short camera_zoom_in(struct cameraData *cam);
 // this zooms the camera in.
 short camera_zoom_out(struct cameraData *cam);
 
-// this will print the camera to an SDL_Surface
-short camera_print(SDL_Surface *dest, struct cameraData *cam);
+// this will render the camera to an SDL_Renderer
+short camera_render(SDL_Renderer *dest, struct cameraData *cam);
 
 

@@ -68,10 +68,10 @@
 /// this structure contains all the information that one block needs. The map is made up of a fractal arrangement of these blocks.
 struct blockData{
 	
+	// this is the level that the block is on. origin is on level 0.
+	// the parent of the origin will have a level 1 higher than the origin (1).
+	// the child of the origin will have a level 1 less than the origin (-1).
 	signed long long level;
-	
-	// this is the two dimensional array of elevation values for each block.
-	float elevation[BLOCK_WIDTH][BLOCK_HEIGHT];
 	
 	// this points to the block that this block is inside.
 	// if this is NULL, a parent has not been generated yet.
@@ -91,6 +91,25 @@ struct blockData{
 	// these are eight pointers to the four neighbors on the same level (up, down, left, and right
 	// if these are NULL, the neighbor could exist, but it just might not be entered in this blocks neighbor's index (some neighbors are friendly than others :P)
 	struct blockData *neighbors[BLOCK_NEIGHBORS];
+	
+	// this NEEDS to be set to NULL when you create a new block.
+	// this is an image of the block elevation data.
+	// it is rendered at 1 pixel per element in the elevation array. (so it is BLOCK_WIDTH by BLOCK_HEIGHT).
+	// this is used to store rendered images of the texture's elevation.
+	SDL_Texture *texture;
+	
+	// this is a flag that tells the graphics functions when they need to re-render the block.
+	/// THIS NEEDS TO BE SET TO 1 TO TELL THE GRAPHICS FUNCTION TO RE RENDER IF YOU CHANGE ANYTHING IN THE ELEVATION DATA YOU GODDAMN BITCH.
+	// also set this to 1 when you create a new block (so that it can be rendered for the first time).
+	// when this is set to 1, the graphics functions will re-render the block's texture.
+	// Said graphics functions will reset this flag to 0 when they have rendered it (so rendering is minimized and only done when needed).
+	// the program does not need to render the same thing over and over each frame of the game.
+	// just render it once, and let the hardware do the rest.
+	char renderMe;
+	
+	// this is the two dimensional array of elevation values for each block.
+	float elevation[BLOCK_WIDTH][BLOCK_HEIGHT];
+	
 };
 
 
@@ -180,7 +199,7 @@ struct blockStep{
 // or the function will de-allocate (free) all of the data it has collected so far.
 #define bc_collect		0
 #define bc_clean_up		1
-short block_collector(struct blockData *source, short operation);
+short block_collector(struct blockData *block, short operation);
 
 
 
@@ -190,31 +209,31 @@ short block_generate_parent(struct blockData *centerChild);
 short block_generate_neighbor(struct blockData *dat, short neighbor);
 
 
-short map_print(SDL_Surface *dest, struct blockData *source);
-short block_print_to_file(struct blockData *datBlock, char *fileName);
+short map_print(SDL_Surface *dest, struct blockData *block);
+short block_print_to_file(struct blockData *block, char *fileName);
 
 /// PNH stands for "Print Network Hierarchy"
 // this is the size of the squares that represent the blocks.
 #define BLOCK_PNH_SIZE 9
-// this is the thickness of the borderes
+// this is the thickness of the borders
 #define BLOCK_PNH_BORDER 2
 // this is the color of the block that is the focus of the camera.
 #define BLOCK_PNH_COLOR_FOCUS 0xff00ff00
 // this is the color of all blocks that are NOT the focus of the camera
 #define BLOCK_PNH_COLOR_NOT_FOCUS 0xff0000ff
 // this is the color of the borders of the blocks
-#define BLOCK_PNH_COLOR_BORDER color_mix(BLOCK_PNH_COLOR_FOCUS,BLOCK_PNH_COLOR_NOT_FOCUS)
+#define BLOCK_PNH_COLOR_BORDER 0x00000000
 
 
 short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, unsigned int childLevelsOrig, unsigned int childLevels, int x, int y, int size, Uint32 colorTop, Uint32 colorBot);
+short block_render(struct blockData *block, SDL_Renderer *blockRenderer);
+
+short block_smooth(struct blockData *block, float smoothFactor);
+float block_surrounding_average(struct blockData *block, unsigned int x, unsigned int y);
 
 
-short block_smooth(struct blockData *source, float smoothFactor);
-float block_surrounding_average(struct blockData *source, unsigned int x, unsigned int y);
-
-
-short block_random_fill(struct blockData *datBlock, float range_lower, float range_higher);
-int block_fill_middle(struct blockData *dat, float inVal, float outVal);
+short block_random_fill(struct blockData *block, float range_lower, float range_higher);
+int block_fill_middle(struct blockData *block, float inVal, float outVal);
 short block_fill_nine_squares(struct blockData *Block, int color);
 short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine);
 short block_fill_half_vert(struct blockData *block, float elevationLeft, float elevationRight);

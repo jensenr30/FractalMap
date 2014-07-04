@@ -1,0 +1,13 @@
+why in the hell do I have
+"block_generate_children"
+and
+"block_create_children"
+?
+I need to do some serious naming renovation in that section.
+all names should be changed to generate.
+
+
+
+
+block_generate_neighbor() needs to be completed AND tested.
+So far, I think it has only been partially written. And I don't think it has been tested at all.
