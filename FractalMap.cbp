@@ -45,9 +45,9 @@
 				</Linker>
 			</Target>
 			<Target title="Windows32">
-				<Option output="bin/Debug/FractalMap" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin/Debug/" />
-				<Option object_output="obj/Debug/" />
+				<Option output="bin/DebugCrossWin32/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/DebugCrossWin32/" />
+				<Option object_output="obj/DebugCrossWin32/" />
 				<Option type="0" />
 				<Option compiler="windows32" />
 				<Compiler>
@@ -66,13 +66,47 @@
 					<Add option="-lSDL2_image" />
 				</Linker>
 			</Target>
+			<Target title="Dubug Linux">
+				<Option output="bin/DebugLinux/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/DebugLinux/" />
+				<Option object_output="obj/DebugLinux/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wunreachable-code" />
+					<Add option="-Wmissing-include-dirs" />
+					<Add option="-Wswitch-default" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-lSDL2" />
+					<Add option="-lSDL2_image" />
+				</Linker>
+			</Target>
+			<Target title="Release Linux">
+				<Option output="bin/ReleaseLinux/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/ReleaseLinux/" />
+				<Option object_output="obj/ReleaseLinux/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lSDL2" />
+					<Add option="-lSDL2_image" />
+				</Linker>
+			</Target>
 		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-		</Compiler>
-		<Linker>
-			<Add option="-lmingw32 -lSDL2main -lSDL2 -lwinmm -lSDL2_image" />
-		</Linker>
 		<Unit filename="block.c">
 			<Option compilerVar="CC" />
 		</Unit>
