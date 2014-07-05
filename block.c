@@ -847,6 +847,8 @@ short block_generate_neighbor(struct blockData *dat, short neighbor){
 	case BLOCK_NEIGHBOR_RIGHT:
 		probe = probe->children[stepLink->steps[ascend%BLOCK_STEP_SIZE]+1];
 		break;
+	default:
+		return -1; // something seriously fucked up has just happened
 	}
 	
 	// go all the way back down to the upward neighbor of the original block.
@@ -886,12 +888,28 @@ short block_generate_neighbor(struct blockData *dat, short neighbor){
 		case BLOCK_NEIGHBOR_RIGHT:
 			probe = probe->children[stepLink->steps[ascend] - 2];
 			break;
+		default:
+			return -1; // something seriously fucked up has just happened
 		}
 	}
 	
 	// store the pointer to the right block in the neighbor pointer array of the block that we initially wanted to know the upwards neighbor of.
-	dat->neighbors[BLOCK_NEIGHBOR_UP] = probe;
-	
+	switch(neighbor){
+	case BLOCK_NEIGHBOR_UP:
+		dat->neighbors[BLOCK_NEIGHBOR_UP] = probe;
+		break;
+	case BLOCK_NEIGHBOR_DOWN:
+		dat->neighbors[BLOCK_NEIGHBOR_DOWN] = probe;
+		break;
+	case BLOCK_NEIGHBOR_LEFT:
+		dat->neighbors[BLOCK_NEIGHBOR_LEFT] = probe;
+		break;
+	case BLOCK_NEIGHBOR_RIGHT:
+		dat->neighbors[BLOCK_NEIGHBOR_RIGHT] = probe;
+		break;
+	default:
+		return -1; // something seriously fucked up has just happened
+	}
 	// our work here is done. whew!
 	
 	

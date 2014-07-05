@@ -137,8 +137,6 @@ int main(int argc, char *argv[]){
 	// these keep track of where the mouse is
 	int x, y;
 	
-	// these keep track of whether or not the user wants to draw a rectangle
-	int printNetwork=0;
 	
 	while(quit == 0){
 		
@@ -192,16 +190,20 @@ int main(int argc, char *argv[]){
 		
 		// the wasd keys are used currently for testing the generation of neighbors.
 		if(keys['w']){
-			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
-		}
-		if(keys['a']){
-			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_LEFT);
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
+			camera_pan(camera, CAMERA_PAN_UP);
 		}
 		if(keys['s']){
-			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_DOWN);
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_DOWN);
+			camera_pan(camera, CAMERA_PAN_DOWN);
+		}
+		if(keys['a']){
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_LEFT);
+			camera_pan(camera, CAMERA_PAN_LEFT);
 		}
 		if(keys['d']){
-			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_RIGHT);
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_RIGHT);
+			camera_pan(camera, CAMERA_PAN_RIGHT);
 		}
 		
 		// if the user pressed the r key
