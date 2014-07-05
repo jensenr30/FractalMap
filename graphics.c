@@ -1,9 +1,13 @@
+#include "block.h"
+#include "camera.h"
 #include "graphics.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <string.h>
 #include "globals.h"
 #include "utilities.h"
+#include <math.h>
+
 
 /// this returns the pixel data of a pixel at a certain point on a surface (color and alpha in an Uint32)
 Uint32 get_pixel(SDL_Surface *surface, int x, int y){
@@ -42,6 +46,77 @@ void set_pixel(SDL_Surface *surf, int x, int y, Uint32 pixel){
 	*p = pixel;
 }
 
+/// this function will mix two colors (according to their respective weight) and return the resulting color.
+// everything is Uint32, 32 bits unsigned integer
+Uint32 color_mix_weighted(Uint32 color1, Uint32 color2, Uint32 weight1, Uint32 weight2){
+	
+	// calculate total weight
+	Uint32 weight = weight1 + weight2;
+	
+	// calculate individual values for all three color bytes (and the alpha byte)
+	Uint32 alpha =		( ((color1>>24)&0xff)*weight1 + ((color2>>24)&0xff)*weight2 ) / (weight);
+	Uint32 red =		( ((color1>>16)&0xff)*weight1 + ((color2>>16)&0xff)*weight2 ) / (weight);
+	Uint32 green =		( ((color1>>8 )&0xff)*weight1 + ((color2>>8 )&0xff)*weight2 ) / (weight);
+	Uint32 blue =		( ((color1    )&0xff)*weight1 + ((color2    )&0xff)*weight2 ) / (weight);
+	
+	// return the weighted, mixed color.
+	return (alpha<<24) | (red<<16) | (green<<8) | blue;
+}
+
+
+/// this function will draw a rectangle at (x,y) with width, w, and height, h.
+// this function is bounded (meaning it will not accidentally draw outside of the surface).
+// This function should not crash the program due to segmentation fault errors.
+// dest is the destination SDL_Surface that the image will be printed to.
+// colorBorder is the color of the border of the rectangle (inside the bounds of x,y w,h)
+// colorFill is the color of the rectangle inside the border.
+// if doFill is 0, then this function will only print the border
+// returns 0 success.
+// returns 1 on invalid dest
+short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickness, Uint32 colorBorder, Uint32 colorFill, char doFill){
+	
+	// check for a NULL destination surface pointer.
+	if(dest == NULL){
+		error("draw_rect() was passed an invalid dest pointer. dest = NULL");
+		return 1;
+	}
+	
+	// calculate starting/stopping positions
+	int i, j, istart = x, jstart = y, istop = x+w, jstop = y+h, temp;
+	// swap istart and istop if istop is less than istart
+	if(istop < istart){
+		temp = istop;
+		istop = istart;
+		istart = temp;
+	}
+	// swap jstart and jstop if jstop is less than jstart
+	if(jstop < jstart){
+		temp = jstop;
+		jstop = jstart;
+		jstart = temp;
+	}
+	// bound the 
+	if(istart < 0) istart = 0;
+	if(istop > dest->w) istop = dest->w;
+	if(jstart < 0) jstart = 0;
+	if(jstop > dest->h) jstop = dest->h;
+	
+	// draw the rectangle
+	for(i=istart; i<istop; i++){
+		for(j=jstart; j<jstop; j++){
+			// at every i,j index, figure out if that pixel is part of the border.
+			if(fabs(i-x) < borderThickness || fabs((x+w)-i) <= borderThickness || fabs(j-y) < borderThickness || fabs((y+h)-j) <= borderThickness){
+				// if it is, set it to the color of the border.
+				set_pixel(dest, i, j, colorBorder);
+			}
+			else{
+				// otherwise, set it to the fill color, but only if we are supposed to do so.
+				if(doFill)set_pixel(dest, i, j, colorFill);
+			}
+		}
+	}
+	return 0;
+}
 
 
 
@@ -144,7 +219,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 	// this is the maximum difference (either the difference in y or the difference in y, depending on which is bigger.)
 	float bigdiff;
 	
-	if(fabs(ydiff) > abs(xdiff)){			// the difference in y is greater than the difference in x
+	if(fabs(ydiff) > fabs(xdiff)){			// the difference in y is greater than the difference in x
 		bigdiff = ydiff;
 		xslope = xdiff/bigdiff;
 		yslope = 1.0;
@@ -347,7 +422,7 @@ void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color
 	for(i=(int)xLowBound; i<=(int)(xHighBound+1); i++){
 		for(j=(int)yLowBound; j<=(int)(yHighBound+1); j++){
 			dist = sqrtf((i-x)*(i-x) + (j-y)*(j-y) );
-			if(dist <= radius && i>=0 && j>=0 && i<windW && j<windW)
+			if(dist <= radius && i>=0 && j>=0 && i<dest->h && j<dest->w)
 				set_pixel(dest, i, j, color);
 		}
 	}

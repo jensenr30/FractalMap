@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "utilities.h"
+#include "block.h"
+#include "camera.h"
 #include "graphics.h"
 #include "globals.h"
 #include "graphics.h"
-#include "block.h"
 #include "rand.h"
 #include "filter.h"
 #include <time.h>
@@ -14,7 +15,11 @@
 
 
 
+
+
 int main(int argc, char *argv[]){
+	
+	
 	error("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
 	//--------------------------------------------------
 	// initial gamelog write
@@ -44,13 +49,17 @@ int main(int argc, char *argv[]){
 	myRenderer = NULL;
 	myTexture = NULL;
 	
+	SDL_Window *networkWindow = NULL;
+	SDL_Renderer *networkRenderer = NULL;
+	SDL_Texture *networkTexture = NULL;
+	SDL_Surface *networkSurface = NULL;
 	
 	sgenrand(time(NULL));
 	
 	
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
 	
-	myWindow = SDL_CreateWindow("My Game Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
+	myWindow = SDL_CreateWindow("FractalMap - Map", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 	
 	if(myWindow == NULL){
@@ -62,7 +71,22 @@ int main(int argc, char *argv[]){
 		return -2;
 	}
 	
+	// set network window
+	networkWindow = SDL_CreateWindow("FractalMap - Network Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
+	networkRenderer = SDL_CreateRenderer(networkWindow, -1, 0);
 	
+	if(networkWindow == NULL){
+		error("main() could not create networkWindow using SDL_CreateWindow");
+		return -1;
+	}
+	if(networkRenderer == NULL){
+		error("main() could not create networkRenderer using SDL_CreateRenderer");
+		return -2;
+	}
+	
+	SDL_SetRenderDrawColor(networkRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(networkRenderer);
+	SDL_RenderPresent(networkRenderer);
 	
 	SDL_SetRenderDrawColor(myRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(myRenderer);
@@ -85,9 +109,18 @@ int main(int argc, char *argv[]){
 		return -2;
 	}
 	
+	//--------------------------------------------------
+	// blocks and cameras
+	//--------------------------------------------------
 	
 	// origin block.
-	struct blockData *origin = block_create_origin();
+	struct blockData *origin = block_generate_origin();
+	
+	// this is the user's camera.
+	// this function will set the camera to look at the origin block initially.
+	struct cameraData *camera = camera_create(origin);
+	block_generate_parent(origin);
+	block_generate_parent(origin->parent);
 	
 	//--------------------------------------------------
 	// event handling
@@ -101,6 +134,11 @@ int main(int argc, char *argv[]){
 	// after an iteration through the loop, all keys are reset to 0.
 	byte keys[keysSize];
 	int i;
+	// these keep track of where the mouse is
+	int x, y;
+	
+	// these keep track of whether or not the user wants to draw a rectangle
+	int printNetwork=0;
 	
 	while(quit == 0){
 		
@@ -117,55 +155,94 @@ int main(int argc, char *argv[]){
 			else if(event.type == SDL_MOUSEBUTTONUP){
 				//down--;
 			}
+			else if(event.type == SDL_MOUSEWHEEL){
+				// for each time the user scrolls in, increase the zoom by some factor
+				for(i=0; i<abs(event.wheel.y); i++){
+					if(event.wheel.y < 0)	{camera->scale *= 1.129830964f;}	// the user is moving the mouse wheel "down" or towards himself/herself.
+					else					{camera->scale /= 1.129830964f;}	// the user is rotating the mouse wheel "up" or away from himself/herself.
+					camera_check(camera);
+				}
+			}
+			else if(event.type == SDL_MOUSEMOTION){
+				x = event.motion.x;
+				y = event.motion.y;
+			}
 			else if(event.type == SDL_KEYDOWN){
 				// check if the key is greater than the 'a' character.
 				if(event.key.keysym.sym >= 0)
 					// set that character, number, or letter to 1.
 					keys[(event.key.keysym.sym)%keysSize] = 1;
 			}
+			// check for window events
+			else if(event.type == SDL_WINDOWEVENT ){
+				if(event.window.event == SDL_WINDOWEVENT_CLOSE){
+					quit = 1;
+				}
+				
+				// if the window was resized, the new window width and height need to be recorded.
+				if( event.window.event == SDL_WINDOWEVENT_RESIZED){
+					windW = event.window.data1;
+					windH = event.window.data2;
+				}
+			}
 			else if(event.type == SDL_QUIT){
 				quit = 1;
 			}
 		}
+		
+		// if the user pressed the r key
+		if(keys['r']){
+			// generate random noise in the block
+			block_random_fill(camera->target, 0, 0xffffff);
+		}
+		
 		// if the user pressed the c key
 		if(keys['c']){
 			// generate children blocks
-			block_generate_children(origin);
+			block_generate_children(camera->target);
 		}
 		
-		// generate parent of origin if the p key is pressed
+		// fill up the left half of the screen with a color
+		if(keys['v']){
+			block_fill_half_vert(camera->target, 0xffffffff, 0);
+		}
+		
+		// generate parent of camera->target if the p key is pressed
 		if(keys['p']){
-			block_generate_parent(origin);
+			block_generate_parent(camera->target);
 		}
 		
 		// if either the s or g keys were just stroked.
 		if(keys['s'] || keys['g']){
-			// generate new map in origin if the g key was pressed
+			// generate new map in camera->target if the g key was pressed
 			if(keys['g']){
-				//block_random_fill(origin, 0, 0xff);
-				//block_fill_middle(origin, 0xff, 0x00);
-				//block_fill_nine_squares(origin, 100);
-				block_fill_nine_squares_own_color(origin, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
+				//block_random_fill(camera->target, 0, 0xff);
+				//block_fill_middle(camera->target, 0xff, 0x00);
+				//block_fill_nine_squares(camera->target, 100);
+				block_fill_nine_squares_own_color(camera->target, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
 			}
 			
-			//block_print_to_file(origin, "origin.txt");
-			
-			// smooth the block elevation data
-			//block_smooth(origin, 0.5);
-			if(keys['s']) filter_lowpass_2D_f((float *)origin->elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
-			
-			//clear old surface
-			if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
-			// generate image of map
-			mapSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+			if(keys['s']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3); // using the low-pass filter
+		}
+		
+		
+		
+		
+		
+		// clear old surface
+		//if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
+		// generate image of map
+		//mapSurface = create_surface(windW, windH);
 
-			// print map to mapSurface
-			map_print(mapSurface, origin);
+		// print map to mapSurface
+		// map_print(mapSurface, camera->target);
+		
+		if(spriteSurface != NULL)
+			SDL_FreeSurface(spriteSurface);
 			
-			if(spriteSurface != NULL)
-				SDL_FreeSurface(spriteSurface);
-			
-			spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+		spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+		
+		if(keys['u']){
 			
 			draw_line(spriteSurface, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, 1, 0xff00ff00);
 			draw_line(spriteSurface, BLOCK_WIDTH, 0, 0, BLOCK_HEIGHT, 1, 0xff00ff00);
@@ -178,27 +255,59 @@ int main(int argc, char *argv[]){
 			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 20, 0xff00ffff);
 			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 10, 0xffffffff);
 			
-			// clear the old texture if it exists
-			if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);
-			// create a texture for the map data
-			mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
 			
 			spriteTexture = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
 		}
-		// render the mapTexture to the window
-		SDL_RenderCopy(myRenderer, mapTexture, NULL, NULL);
+		
+		
+		//draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix_weighted(0xff00ff00,0xff0000ff,1,1), 0, 0);
+		// block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
+		
+		//block_print_to_file(camera->target, "camera-target.txt");
+		// this test the frame-rate of the window by printing a single pixel under the mouse pointer tip
+		//set_pixel(mapSurface, mapSurface->w*((x%windW)/(float)windW), mapSurface->h*((y%windH)/(float)windH), 0xffffffff);
+		
+		
+		
+		
+		
+		// clear the old texture if it exists
+		if(networkSurface != NULL)SDL_FreeSurface(networkSurface);
+		
+		networkSurface = create_surface(windW, windH);
+		
+		// generate the network hierarchy
+		block_print_network_hierarchy(networkSurface, origin->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
+		// generate texture for the block network
+		networkTexture = SDL_CreateTextureFromSurface(networkRenderer, networkSurface);
+		// render the networkSurface to the networkWindow
+		SDL_RenderCopy(networkRenderer, networkTexture, NULL, NULL);
+		if(networkTexture != NULL)SDL_DestroyTexture(networkTexture);
+		
+		// display the renderer's result on the screen and clear it when done
+		SDL_RenderPresent(networkRenderer);
+		SDL_RenderClear(networkRenderer);
+		
+		
+		
+		// print the camera to screen
+		camera_render(myRenderer,camera);
+		// print the test sprite to the screen
 		SDL_RenderCopy(myRenderer, spriteTexture, NULL, NULL);
 		
-		// display the renderer's result on the screen
+		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
+		
 	}
+	
 	
 	//--------------------------------------------------
 	// clean up
 	//--------------------------------------------------
 	SDL_FreeSurface(mapSurface);
-	SDL_DestroyTexture(mapTexture);
+	if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);
+	if(networkTexture != NULL)SDL_DestroyTexture(networkTexture);
 	// clean up all SDL subsystems and other non-SDL systems and global memory.
 	clean_up();
 	

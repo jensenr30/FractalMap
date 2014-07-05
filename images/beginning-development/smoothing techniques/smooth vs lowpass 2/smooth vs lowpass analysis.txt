@@ -1,0 +1,7 @@
+to smooth the same input signal, block smooth needed nearly 100 times as more iterations as filter_lowpass did.
+
+They two filters achieved (visually) similar results.
+
+both filters look very symmetrical in their filtering.
+
+The obvious advantage of the low-pass filter is that it takes exponentially less time to achieve a (in my opinion) better result.

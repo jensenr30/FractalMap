@@ -1,4 +1,5 @@
 #include "block.h"
+#include "camera.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "utilities.h"
@@ -6,57 +7,15 @@
 #include "rand.h"
 #include "graphics.h"
 
-/// print a blockData
-// returns 1 on successful print to file
-// this function is to print the data from a map in a readable format.
-// THIS IS NOT FOR SAVING MAP DATA
-short block_print_to_file(struct blockData *datBlock, char *fileName){
-	
-	// open a text file to write to and append (appending should never really happen though).
-	FILE *fp = fopen(fileName, "a");
-	
-	if(fp == NULL){
-		// create an error message to write to file.
-		char message[512];
-		strcpy(message, "block_print_to_file() could not open file \"");
-		strcat(message, fileName);
-		strcat(message, "\"");
-		error(message);
-		// return that the map_block_print_to_file() didn't get the job done.
-		return 0;
-	}
-	
-	if(datBlock == NULL){
-		error("block_random_fill() could not fill datBlock. datBlock = NULL.");
-		return 0;
-	}
-	
-	
-	// write all elevation data
-	int j, i;
-	for(j=0; j<BLOCK_HEIGHT; j++){
-		for(i=0; i<BLOCK_WIDTH; i++){
-			fprintf(fp, "%10.10f\t", datBlock->elevation[i][j]);
-		}
-		// new line
-		fprintf(fp, "\n");
-	}
-	
-	// wrote datBlock to file successfully.
-	return 1;
-}
-
-
-
 
 /// throws random data into blockData
 // returns 0 on success
-// returns 1 when the datBlock is a NULL pointer.
-short block_random_fill(struct blockData *datBlock, float range_low, float range_high){
+// returns 1 when the block is a NULL pointer.
+short block_random_fill(struct blockData *block, float range_low, float range_high){
 	
-	// check for datBlock pointer being NULL.
-	if(datBlock == NULL){
-		error("block_random_fill() could not fill datBlock. datBlock = NULL.");
+	// check for block pointer being NULL.
+	if(block == NULL){
+		error("block_random_fill() could not fill block. block = NULL.");
 		return 1;
 	}
 	
@@ -74,113 +33,108 @@ short block_random_fill(struct blockData *datBlock, float range_low, float range
 	for(i=0; i<BLOCK_WIDTH; i++){
 		for(j=0; j<BLOCK_HEIGHT; j++){
 			// generate a random number between range_low and range_high.
-			datBlock->elevation[i][j] = ((genrand()%100001)/100000.0)*(range_high-range_low) + range_low;//((rand()%100001)/100000.0)*(range_higher-range_lower)-((range_higher+range_lower)/2);
+			block->elevation[i][j] = ((genrand()%100001)/100000.0)*(range_high-range_low) + range_low;//((rand()%100001)/100000.0)*(range_higher-range_lower)-((range_higher+range_lower)/2);
 		}
 	}
 	
-	// generated random data in datBlock successfully.
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
+	// generated random data in block successfully.
 	return 0;
 }
 
 
 
 
-// returns 0 on success
-// returns -1 when datBlock == NULL
-short block_create_children(struct blockData *source){
+
+/// print a blockData
+// returns 1 on successful print to file
+// this function is to print the data from a map in a readable format.
+// THIS IS NOT FOR SAVING MAP DATA
+short block_print_to_file(struct blockData *block, char *fileName){
 	
-	// check for source pointer being NULL.
-	if(source == NULL){
-		error("block_create_children() could not create children. source = NULL.");
-		return -1;
+	// open a text file to write to and append (appending should never really happen though).
+	FILE *fp = fopen(fileName, "a");
+	
+	if(fp == NULL){
+		// create an error message to write to file.
+		char message[512];
+		strcpy(message, "block_print_to_file() could not open file \"");
+		strcat(message, fileName);
+		strcat(message, "\"");
+		error(message);
+		// return that the map_block_print_to_file() didn't get the job done.
+		return 0;
 	}
 	
-	int child;
-	for(child=0; child<BLOCK_CHILDREN; child++){
-		
-		// allocate space for the child in memory.
-		source->children[child] = ((struct blockData *)malloc(sizeof(struct blockData)));
-		
-		// check for NULL pointer (make sure the child was not stillborn)
-		if(source->children[child] == NULL){
-			error("block_create_children() could not create child. malloc returned NULL pointer. Out of memory?");
-			return child;
-		}
-		// if the child pointer was created correctly
-		else{
-			// make the child point to its parent.
-			(source->children[child])->parent = source;
-			// record the block in the block collection index.
-			block_collector(source->children[child], bc_collect);
-		}
+	if(block == NULL){
+		error("block_random_fill() could not fill block. block = NULL.");
+		return 0;
 	}
-	// generated children successfully.
-	return 0;
+	
+	
+	// write all elevation data
+	int j, i;
+	for(j=0; j<BLOCK_HEIGHT; j++){
+		for(i=0; i<BLOCK_WIDTH; i++){
+			fprintf(fp, "%10.10f\t", block->elevation[i][j]);
+		}
+		// new line
+		fprintf(fp, "\n");
+	}
+	
+	// wrote block to file successfully.
+	return 1;
 }
 
 
-
-/// this function will generate a parent when given a pointer to a block that is to be taken as the child.
-	// when any parent is generated, all of its children are automatically generated as well.
-	// the reason for this is the following: Every block will either have all of its children or none of its children.
-	// this should simplify things considerably in the future.
+/// this will render a block and store a pointer to the rendered texture in the blockData itself.
+// this is useful when you don't want to render a block every time you print the screen.
+// this can be used to only re-render the block when a change in the block elevation occurs.
 // returns 0 on success
-// returns 1 on NULL oneChild pointer.
-// returns 2 when the parent already exists.
-// returns 3 if the 
-short block_generate_parent(struct blockData *oneChild){
+// returns 1 on invalid block
+// returns 2 if blockRenderer is NULL
+short block_render(struct blockData *block, SDL_Renderer *blockRenderer){
 	
-	// check to see if a NULL pointer was passed.
-	if(oneChild == NULL){
-		error("block_generate_parent() was sent NULL pointer. oneChild = NULL.");
+	// quit and report error if you were given a bad block.
+	if(block == NULL){
+		error("block_render() was sent NULL block.");
 		return 1;
 	}
-	
-	// check to see if the function is being asked to re-generate parent.
-	if(oneChild->parent != NULL){
-		error("block_generate_parent() was asked to regenerate parent. Child verification will still occur.");
-		block_generate_children((oneChild->parent));
+	// quit and report error if you were given a bad block.
+	if(blockRenderer == NULL){
+		error("block_render() was sent invalid blockRenderer. blockRenderer = NULL");
 		return 2;
 	}
-	// otherwise, the parent needs to be generated
-	else{
-		
-		// try to allocate memory for the parent block
-		oneChild->parent = malloc(sizeof(struct blockData));
-		
-		// if the parent was not allocated properly, log an error and return 2
-		if(oneChild->parent == NULL){
-			error("block_generate_parent() cannot allocate data for a parent. oneChild->parent = NULL");
-			return 3;
-		}
-		
-		// set elevation to default
-		int i, j;
-		for(i=0; i<BLOCK_WIDTH; i++){
-			for(j=0; j<BLOCK_HEIGHT; j++){
-				(oneChild->parent)->elevation[i][j] = BLOCK_DEFAULT_ELEVATION;
-			}
-		}
-		// the level of the parent is one above the level of the child.
-		(oneChild->parent)->level = oneChild->level + 1;
-		
-		// this sets the parent of this block to NULL.
-		(oneChild->parent)->parent = NULL;
-		// because of how block generation is performed, when generating a parent, both the child AND the parent AND the parent's parent AND the parent's parent's parent (etc...) will be concentric.
-		// so parentView for all NEW parents and the children that are generating those new parents will be BLOCK_CHILD_CENTER_CENTER.
-		// This property of the block network is explained in some detail in block.h under "RYAN'S BLOCK NETWORK GENERATION PROTOCOL"
-		(oneChild->parent)->parentView = BLOCK_CHILD_CENTER_CENTER;
-		oneChild->parentView = BLOCK_CHILD_CENTER_CENTER;
+	
+	// this is a pointer to where surface data is stored.
+	// the data will stay here (we can use the same surface data over and over again to render any block, because the surface is only needed temporarily.
+	static SDL_Surface *blockSurface;
+	static int firstTimeThrough = 1;
+	if(firstTimeThrough) {
+		blockSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+		firstTimeThrough = 0;
 	}
 	
-	// successfully generated a parent and verified all children exist or have been created.
+	// if the block texture is valid, destroy it. This frees up the memory that was used to render the last texture. We no longer need it.
+	if(block->texture != NULL) SDL_DestroyTexture(block->texture);
+	
+	int i, j;
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			set_pixel(blockSurface, i, j, ((int)(block->elevation[i][j])) | 0xff000000);
+		}
+	}
+	
+	// copy surface to texture
+	block->texture = SDL_CreateTextureFromSurface(blockRenderer, blockSurface);
+	
+	// success!
 	return 0;
 }
 
 
-
-
-
+/* OLD PRINTING FUNCTION
 /// this will print an image of a mapblock to a surface BLOCK_WIDTH x BLOCK_HEIGHT pixels
 // returns 0 on success
 // returns 1 on NULL dest surface
@@ -188,11 +142,11 @@ short block_generate_parent(struct blockData *oneChild){
 short map_print(SDL_Surface *dest, struct blockData *source){
 	
 	if(dest == NULL){
-		error("block_collector() could not print to dest. dest = NULL.");
+		error("map_print() could not print to dest. dest = NULL.");
 		return 1;
 	}
 	if(source == NULL){
-		error("block_collector() could not print source. source = NULL.");
+		error("map_print() could not print source. source = NULL.");
 		return 2;
 	}
 	
@@ -206,29 +160,66 @@ short map_print(SDL_Surface *dest, struct blockData *source){
 	return 0;
 }
 
+*/
+
+
+
+/// this function will print the given block and "childLevels" number of levels of its children under it.
+// this is a recursive function.
+// dest is the destination SDL_Surface that this will print to
+// focus is the "top" block. "childLevels" of its children will be printed.
+// through the recursiveness, only the valid children will be printed.
+short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, unsigned int childLevelsOrig, unsigned int childLevels, int x, int y, int size, Uint32 colorTop, Uint32 colorBot){
+	
+	if(dest == NULL) return 1;
+	if(focus == NULL) return 2;
+	// draw the focus block
+	draw_rect(dest, x, y, size, size, 1, 0xff000000, color_mix_weighted(colorTop, colorBot, childLevels, childLevelsOrig-childLevels), 1);
+	
+	// quit if you have printed all of the necessary children.
+	if(childLevels <= 0) return 0;
+	
+	int c;
+	
+	// print 9 more of this current block's children (if they exist)
+	for(c=0; c<BLOCK_CHILDREN; c++){
+		block_print_network_hierarchy(dest, focus->children[c], childLevelsOrig, childLevels-1, x + (c%((int)(BLOCK_LINEAR_SCALE_FACTOR)))*size/BLOCK_LINEAR_SCALE_FACTOR, y + (c/((int)(BLOCK_LINEAR_SCALE_FACTOR)))*size/BLOCK_LINEAR_SCALE_FACTOR, size/BLOCK_LINEAR_SCALE_FACTOR, colorTop, colorBot);																	
+	}
+	
+	
+	
+	return 0;
+}
+
+
 
 /// this function will smooth out a block (just the block it will not smooth with respect to its adjacent blocks).
 // smoothFactor is from 0 to 1. it describes how much averaging the function will perform.
 // smoothFactor = 1 => the smoothing will replace each element with the average of those around it.
 // smoothFactor = 0.5 => the smoothing will replace each elevation with the average of itself and the aaverage of those around it.
-short block_smooth(struct blockData *source, float smoothFactor){
+short block_smooth(struct blockData *block, float smoothFactor){
 	int i, j;
 	for(i=0; i<BLOCK_WIDTH; i++){
 		for(j=0; j<BLOCK_HEIGHT; j++){
-			source->elevation[i][j] = (1.0-smoothFactor)*source->elevation[i][j] + smoothFactor*block_surrounding_average(source, i, j);
+			block->elevation[i][j] = (1.0-smoothFactor)*block->elevation[i][j] + smoothFactor*block_surrounding_average(block, i, j);
 		}
 	}
+	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
+	// success
 	return 0;
 }
+
 
 
 // this calculates the average of the elevation values around some index (x,y) into the block data.
 // returns average in floating point number form
 // returns a floating point value of 0.0 if there is any problem computing the error.
-float block_surrounding_average(struct blockData *source, unsigned int x, unsigned int y){
+float block_surrounding_average(struct blockData *block, unsigned int x, unsigned int y){
 	
-	if(source == NULL){
-		error("block_surrounding_average() could not open source. source = NULL.");
+	if(block == NULL){
+		error("block_surrounding_average() could not open block. block = NULL.");
 		return 0.0;
 	}
 	
@@ -236,35 +227,42 @@ float block_surrounding_average(struct blockData *source, unsigned int x, unsign
 	int averageCount = 0;
 	
 	// add diagonal elevations to average
-	if(x>0 && y>0)							{average += source->elevation[x-1][y-1];	averageCount++;}
-	if(x>0 && y<BLOCK_HEIGHT-1)				{average += source->elevation[x-1][y+1];	averageCount++;}
-	if(x<BLOCK_WIDTH-1 && y>0)				{average += source->elevation[x+1][y-1];	averageCount++;}
-	if(x<BLOCK_WIDTH-1 && y<BLOCK_HEIGHT-1)	{average += source->elevation[x+1][y+1];	averageCount++;}
+	if(x>0 && y>0)							{average += block->elevation[x-1][y-1];	averageCount++;}
+	if(x>0 && y<BLOCK_HEIGHT-1)				{average += block->elevation[x-1][y+1];	averageCount++;}
+	if(x<BLOCK_WIDTH-1 && y>0)				{average += block->elevation[x+1][y-1];	averageCount++;}
+	if(x<BLOCK_WIDTH-1 && y<BLOCK_HEIGHT-1)	{average += 
+	block->elevation[x+1][y+1];	averageCount++;}
 	
 	// add adjacent elevations
-	if(x>0)					{average += source->elevation[x-1][y];	averageCount++; }
-	if(x<BLOCK_WIDTH-1)		{average += source->elevation[x+1][y];	averageCount++; }
-	if(y>0)					{average += source->elevation[x][y-1];	averageCount++; }
-	if(y<BLOCK_HEIGHT-1)	{average += source->elevation[x][y+1];	averageCount++; }
+	if(x>0)					{average += block->elevation[x-1][y];	averageCount++; }
+	if(x<BLOCK_WIDTH-1)		{average += 
+	block->elevation[x+1][y];	averageCount++; }
+	if(y>0)					{average += block->elevation[x][y-1];	averageCount++; }
+	if(y<BLOCK_HEIGHT-1)	{average += block->elevation[x][y+1];	averageCount++; }
 	
 	if(averageCount < 1){
 		error_d("block_surrounding_average() had invalid averageCount! averageCount =", averageCount);
 		return 0.0;
 	}
 	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
 	// if everything went well, return the average of the surrounding elevations
 	return average/((float)averageCount);
 }
 
 
+
+
+
 /// this function will fill up the middle 9th of the block (from 1/3 to 2/3 of the block in both width and height)
 // the outer ring of 8/9ths of the will be filled with outVal
 // the inner 9th is filled with inVal.
-// returns 1 if dat was NULL.
-int block_fill_middle(struct blockData *dat, float inVal, float outVal){
+// returns 1 if block was NULL.
+int block_fill_middle(struct blockData *block, float inVal, float outVal){
 	
-	if(dat == NULL){
-		error("block_fill_middle() was sent NULL blockData pointer. dat = NULL");
+	if(block == NULL){
+		error("block_fill_middle() was sent NULL blockData pointer. block = NULL");
 		return 1;
 	}
 	
@@ -276,29 +274,33 @@ int block_fill_middle(struct blockData *dat, float inVal, float outVal){
 			// if the value is in the inner 9th,
 			if(i>=BLOCK_WIDTH_1_3 && i<BLOCK_WIDTH_2_3 && j>=BLOCK_WIDTH_1_3 && j<BLOCK_WIDTH_2_3){
 				// fill it with inVal
-				dat->elevation[i][j] = inVal;
+				block->elevation[i][j] = inVal;
 			}
 			// if  it is in the outer 9th, 
 			else{
 				// fill with outVal
-				dat->elevation[i][j] = outVal;
+				block->elevation[i][j] = outVal;
 			}
 			
 		}
 	}
+	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
 	// success
 	return 0;
 }
 
 
+
 /// This function makes a grid of 9 squares each with a different, but similar color to the color input
-// Block is a structure to the blockData struct used for printing
+// block is a structure to the blockData struct used for printing
 // color is the starting value for the color
-// return 1 is Block is NULL
+// return 1 is block is NULL
 // return 0 on success
-short block_fill_nine_squares(struct blockData *Block, int color) {
+short block_fill_nine_squares(struct blockData *block, int color) {
 	// if the blockData stucture is null, send an error
-	if(Block == NULL){
+	if(block == NULL){
 		error("block_fill_nine_squares() was sent NULL blockData pointer. blockData = NULL");
 		return 1;
 	}
@@ -310,21 +312,24 @@ short block_fill_nine_squares(struct blockData *Block, int color) {
 		for(j = 0; j < BLOCK_HEIGHT; j++) {
 			// if the j variable is below 81 (square one, two, and threee) then print a color
 			if(j < BLOCK_WIDTH_1_3)
-				Block->elevation[i][j] = color;
+				block->elevation[i][j] = color;
 			// if the j variable is above 81 and below 162 (square four, five, and six) then print a color
 			else if(j < BLOCK_WIDTH_2_3	&& j >= BLOCK_WIDTH_1_3)
-				Block->elevation[i][j] = color*2;
+				block->elevation[i][j] = color*2;
 			// if the j variable is above 162 (square four, five, and six) then print a color
 			else if(j >= BLOCK_WIDTH_2_3)
-				Block->elevation[i][j] = color*3;
+				block->elevation[i][j] = color*3;
 		}
 		// if the mod of i is 81 (1/3 of the screen) then change the variable and multiply it by two
 		if(i%81 == 0 && i != 0)
 			color*=2;
 	}
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
 	// success
 	return 0;
 }
+
 
 
 /// This function fills in a certain square with a color that are specified
@@ -335,11 +340,11 @@ short block_fill_nine_squares(struct blockData *Block, int color) {
 // 4 5 6
 // 7 8 9
 // note: prints black if it function didnt fucntion properly
-// return 1 is Block is NULL
+// return 1 is block is NULL
 // return 0 on success
-short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine) {
+short block_fill_nine_squares_own_color(struct blockData *block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine) {
 	// if the blockData stucture is null, send an error
-	if(Block == NULL){
+	if(block == NULL){
 		error("block_fill_nine_squares() was sent NULL blockData pointer. blockData = NULL");
 		return 1;
 	}
@@ -356,23 +361,23 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 					//first block
 					case 1:
 						//print color from argument provided
-						Block->elevation[i][j] = one;
+						block->elevation[i][j] = one;
 						break;
 					//second block
 					case 2:
 						//print color from argument provided
-						Block->elevation[i][j] = two;
+						block->elevation[i][j] = two;
 						break;
 					//third block
 					case 3:
 						//print color from argument provided
-						Block->elevation[i][j] = three;
+						block->elevation[i][j] = three;
 						break;
 					//debuging
 					default:
 						// What? how did you get here?
 						// if it gets here, prints black
-						Block->elevation[i][j] = 0;
+						block->elevation[i][j] = 0;
 						break;
 				}
 			}
@@ -383,23 +388,23 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 					// fourth block
 					case 1:
 						//print color from argument provided
-						Block->elevation[i][j] = four;
+						block->elevation[i][j] = four;
 						break;
 					// fifth block
 					case 2:
 						//print color from argument provided
-						Block->elevation[i][j] = five;
+						block->elevation[i][j] = five;
 						break;
 					// sixth block
 					case 3:
 						//print color from argument provided
-						Block->elevation[i][j] = six;
+						block->elevation[i][j] = six;
 						break;
 					//debuging
 					default:
 						// What? how did you get here?
 						// if it gets here, prints black
-						Block->elevation[i][j] = 0;
+						block->elevation[i][j] = 0;
 						break;
 				}
 				
@@ -411,23 +416,23 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 					// seventh block
 					case 1:
 						//print color from argument provided
-						Block->elevation[i][j] = seven;
+						block->elevation[i][j] = seven;
 						break;
 					// eighth block
 					case 2:
 						//print color from argument provided
-						Block->elevation[i][j] = eight;
+						block->elevation[i][j] = eight;
 						break;
 					// ninth block
 					case 3:
 						//print color from argument provided
-						Block->elevation[i][j] = nine;
+						block->elevation[i][j] = nine;
 						break;
 					//debuging
 					default:
 						// What? how did you get here?
 						// if it gets here, prints black
-						Block->elevation[i][j] = 0;
+						block->elevation[i][j] = 0;
 						break;
 				}
 			}
@@ -442,9 +447,42 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 				column = 1;
 		}
 	}
+	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
 	// success
 	return 0;
 }
+
+
+
+/// this function will fill up the left half of the blockData with elevationLeft, and the right half of the blockData with elevationRight 
+short block_fill_half_vert(struct blockData *block, float elevationLeft, float elevationRight){
+	
+	if(block == NULL){
+		error("block_fill_half_vert() was sent NULL block pointer.");
+		return 1;
+	}
+	
+	int i,j;
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			if(i <BLOCK_WIDTH/2){
+				block->elevation[i][j] = elevationLeft;
+			}
+			else{
+				block->elevation[i][j] = elevationRight;
+			}
+		}
+	}
+	
+	// render the block next time it needs to be printed
+	block->renderMe = 1;
+	return 0;
+}
+
+
+
 
 
 /// this function will create a new origin block in memory and add that origin block to the block list using block_collector.
@@ -458,12 +496,12 @@ short block_fill_nine_squares_own_color(struct blockData *Block, int one, int tw
 	// set level to 0 (origin level)
 // returns a pointer to the origin on success
 // returns NULL when allocation of memory fails
-struct blockData *block_create_origin(){
+struct blockData *block_generate_origin(){
 	
 	struct blockData *newOrigin = malloc(sizeof(struct blockData));
 	
 	if(newOrigin == NULL){
-		error("block_create_origin() was sent NULL newOrigin pointer.");
+		error("block_generate_origin() was sent NULL newOrigin pointer.");
 		return NULL;
 	}
 	
@@ -480,25 +518,111 @@ struct blockData *block_create_origin(){
 	
 	// set parent to NULL;
 	newOrigin->parent = NULL;
-	// set parentView to BLOCK_CHILD_CENTER_CENTER.
-	newOrigin->parentView = BLOCK_CHILD_CENTER_CENTER;
-	
-	// make all elevations equal to the default elevation.
-	int i, j;
-	for(i=0; i<BLOCK_WIDTH; i++){
-		for(j=0; j<BLOCK_HEIGHT; j++){
-			newOrigin->elevation[i][j] = BLOCK_DEFAULT_ELEVATION;
-		}
-	}
+	// set the texture to NULL
+	newOrigin->texture = NULL;
+	// render the new origin the next time through the graphics functions.
+	newOrigin->renderMe = 1;
 	
 	// set the level to the default level.
 	newOrigin->level = BLOCK_ORIGIN_LEVEL;
+	
+	// set parentView to BLOCK_CHILD_CENTER_CENTER.
+	newOrigin->parentView = BLOCK_CHILD_CENTER_CENTER;
+	
+	// randomize the origin
+	block_random_fill(newOrigin, 0x00000000, 0xffffffff);
+	
+	
+	
 	
 	// add origin to the block index.
 	block_collector(newOrigin, bc_collect);
 	
 	return newOrigin;
 }
+
+
+
+/// this function will generate a parent when given a pointer to a block that is to be taken as the child.
+	// when any parent is generated, all of its children are automatically generated as well.
+	// the reason for this is the following: Every block will either have all of its children or none of its children.
+	// this should simplify things considerably in the future.
+// returns 0 on success
+// returns 1 on NULL centerChild pointer.
+// returns 2 when the parent already exists.
+// returns 3 if the 
+short block_generate_parent(struct blockData *centerChild){
+	
+	// check to see if a NULL pointer was passed.
+	if(centerChild == NULL){
+		error("block_generate_parent() was sent NULL pointer. centerChild = NULL.");
+		return 1;
+	}
+	
+	// check to see if the function is being asked to re-generate parent.
+	if(centerChild->parent != NULL){
+		error("block_generate_parent() was asked to regenerate parent.");
+		return 2;
+	}
+	// otherwise, the parent needs to be generated
+	else{
+		
+		// try to allocate memory for the parent block
+		centerChild->parent = malloc(sizeof(struct blockData));
+		
+		// if the parent was not allocated properly, log an error and return 2
+		if(centerChild->parent == NULL){
+			error("block_generate_parent() cannot allocate data for a parent. centerChild->parent = NULL");
+			return 3;
+		}
+		
+		// because the parent was successfully added to memory, we will add it to the block collector's list.
+		block_collector(centerChild->parent, bc_collect);
+		
+		// set elevation to default
+		/*
+		int i, j;
+		for(i=0; i<BLOCK_WIDTH; i++){
+			for(j=0; j<BLOCK_HEIGHT; j++){
+				(centerChild->parent)->elevation[i][j] = BLOCK_DEFAULT_ELEVATION;
+			}
+		}
+		*/
+		block_random_fill(centerChild->parent, 0,0xffffff);
+		
+		// make all of the children NULL
+		int c;
+		for(c=0; c<BLOCK_CHILDREN; c++){
+				(centerChild->parent)->children[c] = NULL;
+		}
+		// make the middle child of the parent point to the centerChild pointer
+		(centerChild->parent)->children[BLOCK_CHILD_CENTER_CENTER] = centerChild;
+		
+		// create any children that have not been generated already.
+		block_generate_children(centerChild->parent);
+		
+		// the level of the parent is one above the level of the child.
+		(centerChild->parent)->level = centerChild->level + 1;
+		
+		// the parent has not been rendered yet.
+		centerChild->parent->texture = NULL;
+		// render the parent next time through the graphics functions.
+		centerChild->parent->renderMe = 1;
+		
+		// this sets the parent of this block to NULL.
+		(centerChild->parent)->parent = NULL;
+		// because of how block generation is performed, when generating a parent, both the child AND the parent AND the parent's parent AND the parent's parent's parent (etc...) will be concentric.
+		// so parentView for all NEW parents and the children that are generating those new parents will be BLOCK_CHILD_CENTER_CENTER.
+		// This property of the block network is explained in some detail in block.h under "RYAN'S BLOCK NETWORK GENERATION PROTOCOL"
+		(centerChild->parent)->parentView = BLOCK_CHILD_CENTER_CENTER;
+		centerChild->parentView = BLOCK_CHILD_CENTER_CENTER;
+		
+	}
+	
+	// successfully generated a parent and verified all children exist or have been created.
+	return 0;
+}
+
 
 
 /// creates all three children for the passed blockData, parent
@@ -547,12 +671,18 @@ short block_generate_children(struct blockData *datParent){
 				for(cc=0; cc<BLOCK_CHILDREN; cc++){
 					(datParent->children[c])->children[cc] = NULL;
 				}
+				// the child has not been rendered yet
+				(datParent->children[c])->texture = NULL;
+				// render the child next time through the graphics functions.
+				(datParent->children[c])->renderMe = 1;
 				// the level of the child is the level of the parent minus 1.
 				(datParent->children[c])->level = datParent->level - 1;
 				
-				// calculate the child's neighbors.
-				block_calculate_neighbors(datParent->children[c]);
-			
+				// this is the child's default elevation data
+				block_random_fill(datParent->children[c], 0,0xffffff);
+				
+				
+				
 			}
 		}
 	}
@@ -561,20 +691,178 @@ short block_generate_children(struct blockData *datParent){
 }
 
 
-/// this function will calculate all of the neighboring blocks of the "dat" block sent to the function.
+
+/// this function will calculate neighbor block(s) of the "dat" block sent to the function.
+// this function IS ONLY GUARANTEED TO WORK FOR A 3x3 BLOCK CHILDREN LAYOUT.
 // returns 0 on success.
 // returns 1 on NULL dat block pointer.
-short block_calculate_neighbors(struct blockData *dat){
+// returns 2 when it cannot allocate memory for the first stepLink.
+// returns 3 when it cannot allocate memory for the second, third, fourth, (etc...) stepLink in the list.
+// returns 4 if, when counting down, stepLink->prev is null BEFORE ascend = 0.
+short block_generate_neighbor(struct blockData *dat, short neighbor){
 	
 	if(dat == NULL){
-		error("block_calculate_neighbors() was sent NULL blockData pointer. dat = NULL");
+		error("block_generate_neighbor() was sent NULL blockData pointer. dat = NULL");
 		return 1;
 	}
 	
-	// TODO: write function to find neighbors of a block.
+	// this is a pointer than we will use to navigate the block matrix.
+	// it will be used as a sort of probe.
+	// it starts out pointing to the original block that is sent.
+	struct blockData *probe = dat;
+	// this keeps track of how many ascensions from child to parent were made (and therefore, how many should be made from parent back down to child)
+	// this tells you what level you are currently on relative to the original block (dat)
+	int ascend = 0;
 	
+	// allocate a chunk of block steps.
+	struct blockStep *stepLink = malloc(sizeof(struct blockStep));
+	// verify that stepLink was allocated properly.
+	if(stepLink == NULL){
+		error("block_generate_neighbor() could not allocate memory for stepLink. stepLink = NULL");
+		return 2;
+	}
+	// this indicates that there is no stepLink before this one. This is the beginning of the linked list of blockSteps.
+	stepLink->prev = NULL;
+	
+	// this variable is used to calculate what the last step was. (this is a number that indicates the relationship between the current block (probe) and the previous probe (one of current probe's children)
+	char lastStep;
+	
+	
+	// the way this checks if the parent has its neighbors is through
+	switch(neighbor){
+		
+		case BLOCK_NEIGHBOR_UP:
+			
+			// exiting the loop is done inside the loop
+			while(1){
+				// record the child's relation to the parent so that we can know how to get back down to it when we reach the highest nevessary parent.
+				lastStep = stepLink->steps[ascend%BLOCK_STEP_SIZE] = probe->parentView;
+				// make sure the parent is generated first
+				block_generate_parent(probe);
+				// move up a level to the next parent
+				probe = probe->parent;
+				
+				// increment the counter
+				ascend++;
+				
+				// if we just filled up the current stepLink, then we need to allocate memory for the next
+				if(ascend%BLOCK_STEP_SIZE == 0 && ascend != 0){
+					// allocate more memory to hold more steps
+					stepLink->next = malloc(sizeof(struct blockStep));
+					// check if the memory allocated incorrectly.
+					if(stepLink->next == NULL){
+						// if the memory did not allocate right, report an error.
+						error_d("block_generate_neighbor() could not allocate memory for new stepLink->next. stepLink = NULL. ascend =",ascend);
+						// and return an error.
+						return 3;
+					}
+					// otherwise, we will assume the memory was allocated correctly.
+					// record that the previous stepLink (from the next stepLink's point of view) is just the current stepLink.
+					(stepLink->next)->prev = stepLink;
+					// switch to the next stepLink
+					stepLink = stepLink->next;
+				}
+				
+				// check to see if the last step taken will allow us to zoom into a block that is above target.
+				// if we can start zooming back in now, exit the loop
+				if(lastStep >= 3){
+					break;	// break out of the while(1) loop.
+				}
+			}
+			
+			// we are now at a block that has a parent that contains the neighbor of the original block
+			// we may now zoom to the neighbor of the original block.
+			
+			// decrement ascend once at the beginning (to get back to the last step that was taken)
+			ascend--;
+			// check to see if you need to step down to the previous stepLink
+			if(ascend%BLOCK_STEP_SIZE == BLOCK_STEP_SIZE-1){
+				// check to make sure the previous stepLink is valid.
+				// this should never EVER be
+				if(stepLink->prev != NULL){
+					// This shouldn't happen because ascend should run to 0, and then exit before any stepLink->prev can be NULL. Nevertheless, it has somehow happened. 
+					error_d("block_generate_neighbor() somehow has a NULL stepLink->prev. THIS SHOULD NEVER HAPPEN. ascend =",ascend);
+					return 4;
+				}
+				// if the previous stepLink is valid (as it should be) then switch to it.
+				stepLink = stepLink->prev;
+				// free the "next" step link (the one that we just came from).
+				// This is like closing the door on the way out of a building.
+				// If you enter a house, then the bathroom, you close the bathroom door on your way out of the bathroom, then you close the house door on your way out of the house.
+				// everything is reverse on the way out.
+				if(stepLink->next != NULL) free(stepLink->next);
+			}
+			// zoom in once from the highest-level parent to child of that highest-level parent.
+			// the first step of descending is a special case. all the steps after this one are the same.
+			probe = probe->children[stepLink->steps[ascend%BLOCK_STEP_SIZE]-3];
+			
+			// go all the way back down to the upward neighbor of the original block.
+			for(ascend--;ascend>=0; ascend--){
+				
+				// check to see if you need to switch to the previous stepLink
+				if(ascend%BLOCK_STEP_SIZE == BLOCK_STEP_SIZE-1){
+					// check to make sure the previous stepLink is valid.
+					// this should never EVER be
+					if(stepLink->prev != NULL){
+						// This shouldn't happen because ascend should run to 0, and then exit before any stepLink->prev can be NULL. Nevertheless, it has somehow happened. 
+						error_d("block_generate_neighbor() somehow has a NULL stepLink->prev. THIS SHOULD NEVER HAPPEN. ascend =",ascend);
+						return 4;
+					}
+					// if the previous stepLink is valid (as it should be) then switch to it.
+					stepLink = stepLink->prev;
+					// free the "next" step link (the one that we just came from).
+					// This is like closing the door on the way out of a building.
+					// If you enter a house, then the bathroom, you close the bathroom door on your way out of the bathroom, then you close the house door on your way out of the house.
+					// everything is reverse on the way out.
+					if(stepLink->next != NULL) free(stepLink->next);
+				}
+				
+				// make sure all children of the current probe block exist
+				block_generate_children(probe);
+				// then move to the right child
+				probe = probe->children[stepLink->steps[ascend] + 6];
+			}
+			
+			// store the pointer to the right block in the neighbor pointer array of the block that we initially wanted to know the upwards neighbor of.
+			dat->neighbors[BLOCK_NEIGHBOR_UP] = probe;
+			// our work here is done. whew!
+			break;
+		
+		case BLOCK_NEIGHBOR_DOWN:
+			
+			/// TODO: write find neighbor down
+			
+			break;
+		
+		case BLOCK_NEIGHBOR_LEFT:
+			
+			/// TODO: write find neighbor left
+			
+			break;
+		
+		case BLOCK_NEIGHBOR_RIGHT:
+			
+			/// TODO: write find neighbor right
+			
+			break;
+		
+		case BLOCK_NEIGHBOR_ALL:
+		default:
+			
+			// calculate all four neighbors.
+			block_generate_neighbor(dat, BLOCK_NEIGHBOR_UP);
+			block_generate_neighbor(dat, BLOCK_NEIGHBOR_DOWN);
+			block_generate_neighbor(dat, BLOCK_NEIGHBOR_LEFT);
+			block_generate_neighbor(dat, BLOCK_NEIGHBOR_RIGHT);
+			
+			break;
+		
+	}
+	
+	// successfully generated/verified all neighbors.
 	return 0;
 }
+
 
 
 
@@ -667,6 +955,8 @@ short block_collector(struct blockData *source, short operation){
 			// and return an error
 			return 5;
 		}
+		
+		gamelog_d("block_collector() cleaning up blocks. blockCount =", blockCount);
 		
 		// decrement to the last valid block
 		blockCount--;

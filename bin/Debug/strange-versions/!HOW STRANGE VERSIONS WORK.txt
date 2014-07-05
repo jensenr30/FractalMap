@@ -1,3 +1,0 @@
-strange versions are versions of the game that are particularly neat.
-
-the keys that you should use to activate things (like low pass filters or averaging filters) should be in the filename.

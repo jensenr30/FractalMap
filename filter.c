@@ -38,7 +38,7 @@
 // returns 4 if height is invalid 
 // returns 5 if tao is too small 
 	// the function will still filter and output the filtered signal as normal, but it will filter with the minimum tau value (FILTER_TAU_MINIMUM)
-short filter_lowpass_2D_f(float *x, float *y, unsigned long long int width, unsigned long long int height, float tau){
+short filter_lowpass_2D_f(float *x, float *y, long long int width, long long int height, float tau){
 	
 	//--------------------------------------------------
 	// checking for errors
@@ -86,7 +86,7 @@ short filter_lowpass_2D_f(float *x, float *y, unsigned long long int width, unsi
 	// filter in bidirectionally x dimension
 	//--------------------------------------------------
 	
-	int i,j;
+	long long int i,j;
 	// smooth 
 	for(j=0; j<height; j++){
 		

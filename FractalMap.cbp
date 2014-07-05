@@ -6,10 +6,48 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
-				<Option output="bin/Debug/FractalMap" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin/Debug/" />
-				<Option object_output="obj/Debug/" />
+			<Target title="DebugWin">
+				<Option output="bin/DebugWin/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/DebugWin/" />
+				<Option object_output="obj/DebugWin/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wunreachable-code" />
+					<Add option="-Wmissing-include-dirs" />
+					<Add option="-Wswitch-default" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-lmingw32 -lSDL2main -lSDL2 -lwinmm -lSDL2_image" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseWin">
+				<Option output="bin/ReleaseWin/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/ReleaseWin/" />
+				<Option object_output="obj/ReleaseWin/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lmingw32 -lSDL2main -lSDL2 -lwinmm -lSDL2_image" />
+				</Linker>
+			</Target>
+			<Target title="DebugLinux">
+				<Option output="bin/DebugLinux/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/DebugLinux/" />
+				<Option object_output="obj/DebugLinux/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -25,10 +63,10 @@
 					<Add option="-lSDL2_image" />
 				</Linker>
 			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/FractalMap" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin/Release/" />
-				<Option object_output="obj/Release/" />
+			<Target title="ReleaseLinux">
+				<Option output="bin/ReleaseLinux/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/ReleaseLinux/" />
+				<Option object_output="obj/ReleaseLinux/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -42,12 +80,14 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lSDL2" />
+					<Add option="-lSDL2_image" />
 				</Linker>
 			</Target>
-			<Target title="Windows32">
-				<Option output="bin/Debug/FractalMap" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin/Debug/" />
-				<Option object_output="obj/Debug/" />
+			<Target title="DebugCrossWin32">
+				<Option output="bin/DebugCrossWin32/FractalMap" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/DebugCrossWin32/" />
+				<Option object_output="obj/DebugCrossWin32/" />
 				<Option type="0" />
 				<Option compiler="windows32" />
 				<Compiler>
@@ -67,13 +107,14 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-		</Compiler>
 		<Unit filename="block.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="block.h" />
+		<Unit filename="camera.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="camera.h" />
 		<Unit filename="filter.c">
 			<Option compilerVar="CC" />
 		</Unit>

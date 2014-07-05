@@ -119,3 +119,39 @@ The units should be fully autonomous.
 They should be able to learn how to do things.
 Also, maybe they will try to do things on their own.
 Like find food?
+
+
+================================================
+== HEIGHT vs WIDTH
+================================================
+because the blocks are going to be symmetrical (for ease of programming), the height and width will be the same.
+So why have height and width?
+It would make more sense to have, BLOCK_SIZE, BLOCK_SIZE_1_3.
+There would be less definitions and it would make the code more elegant.
+Implement this sometime.
+
+
+================================================
+== RENDER EACH BLOCK INDEPENDENTLY
+================================================
+Render each block independently to a surface, then convert to a texture (in graphics)
+Then rendering the world would be a simple task of sticking the pre-rendered blocks where they need to go.
+Because the textures exist in graphics memory, the graphics card would handle the scaling of all the textures.
+This would reduce the strain on the CPU.
+Only when there is an change to the elevation of a block does that block need to be re-rendered.
+
+This same technique could be applied to animals/creatures.
+They could all be rendered in some base resolution, then when the time comes to print them to the screen, the textures could be applied by the graphics card.
+This would be much faster than the alternative of making the CPU render each animal every single frame (which would be really taxing on the processor)
+
+>>>>>>>>>> UPDATE <<<<<<<<<<<<<<<
+
+this has now been implemented, however, there is one crucial thing that needs to be considered:
+How many textures do I want to have floating around?
+maybe once the game reaches a certain number of textures floating around, it will just delete all of them (or maybe half of them).
+it should delete the oldest half of the textures (not all of them).
+
+
+
+
+
