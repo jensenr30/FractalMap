@@ -190,6 +190,20 @@ int main(int argc, char *argv[]){
 			}
 		}
 		
+		// the wasd keys are used currently for testing the generation of neighbors.
+		if(keys['w']){
+			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
+		}
+		if(keys['a']){
+			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_LEFT);
+		}
+		if(keys['s']){
+			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_DOWN);
+		}
+		if(keys['d']){
+			block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_RIGHT);
+		}
+		
 		// if the user pressed the r key
 		if(keys['r']){
 			// generate random noise in the block
@@ -212,8 +226,8 @@ int main(int argc, char *argv[]){
 			block_generate_parent(camera->target);
 		}
 		
-		// if either the s or g keys were just stroked.
-		if(keys['s'] || keys['g']){
+		// if either the f or g keys were just stroked.
+		if(keys['f'] || keys['g']){
 			// generate new map in camera->target if the g key was pressed
 			if(keys['g']){
 				//block_random_fill(camera->target, 0, 0xff);
@@ -222,7 +236,8 @@ int main(int argc, char *argv[]){
 				block_fill_nine_squares_own_color(camera->target, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
 			}
 			
-			if(keys['s']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3); // using the low-pass filter
+			// the f key is for filtering
+			if(keys['f']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3); // using the low-pass filter
 		}
 		
 		

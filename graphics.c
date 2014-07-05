@@ -70,7 +70,8 @@ Uint32 color_mix_weighted(Uint32 color1, Uint32 color2, Uint32 weight1, Uint32 w
 // dest is the destination SDL_Surface that the image will be printed to.
 // colorBorder is the color of the border of the rectangle (inside the bounds of x,y w,h)
 // colorFill is the color of the rectangle inside the border.
-// if doFill is 0, then this function will only print the border
+// colorBorder and colorFill are interpreted as 32-bit colors (0xAARRGGBB) where A = alpha, R = red, B = blue, G = green.
+// if doFill is 0, then this function will only print the border. if doFill is any non-zero number, then the rectangle will be filled with the "colorFill" color.
 // returns 0 success.
 // returns 1 on invalid dest
 short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickness, Uint32 colorBorder, Uint32 colorFill, char doFill){

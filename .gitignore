@@ -5,8 +5,13 @@ FractalMap.depend
 
 bin/Debug/FractalMap
 bin/Release/FractalMap
-bin/Debug/FractalMap.exe
-bin/Release/FractalMap.exe
+bin/DebugWin/FractalMap.exe
+bin/ReleaseLin/FractalMap.exe
+bin/DebugWin/error.txt
+bin/DebugWin/gamelog.txt
+bin/ReleaseWin/error.txt
+bin/ReleaseWin/gamelog.txt
+
 *.o
 
 *stderr.txt
