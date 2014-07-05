@@ -168,13 +168,17 @@ short map_print(SDL_Surface *dest, struct blockData *source){
 // this is a recursive function.
 // dest is the destination SDL_Surface that this will print to
 // focus is the "top" block. "childLevels" of its children will be printed.
+// highlight is the "selected" block or the "current" block.
 // through the recursiveness, only the valid children will be printed.
-short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, unsigned int childLevelsOrig, unsigned int childLevels, int x, int y, int size, Uint32 colorTop, Uint32 colorBot){
+short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, struct blockData *highlight, unsigned int childLevelsOrig, unsigned int childLevels, int x, int y, int size, Uint32 colorTop, Uint32 colorBot, Uint32 colorHighlight){
+	
+	static SDL_Rect highLightRect;
 	
 	if(dest == NULL) return 1;
 	if(focus == NULL) return 2;
 	// draw the focus block
 	draw_rect(dest, x, y, size, size, 1, 0xff000000, color_mix_weighted(colorTop, colorBot, childLevels, childLevelsOrig-childLevels), 1);
+	
 	
 	// quit if you have printed all of the necessary children.
 	if(childLevels <= 0) return 0;
@@ -183,9 +187,10 @@ short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, 
 	
 	// print 9 more of this current block's children (if they exist)
 	for(c=0; c<BLOCK_CHILDREN; c++){
-		block_print_network_hierarchy(dest, focus->children[c], childLevelsOrig, childLevels-1, x + (c%((int)(BLOCK_LINEAR_SCALE_FACTOR)))*size/BLOCK_LINEAR_SCALE_FACTOR, y + (c/((int)(BLOCK_LINEAR_SCALE_FACTOR)))*size/BLOCK_LINEAR_SCALE_FACTOR, size/BLOCK_LINEAR_SCALE_FACTOR, colorTop, colorBot);																	
+		block_print_network_hierarchy(dest, focus->children[c], highlight, childLevelsOrig, childLevels-1, x + (c%((int)(BLOCK_LINEAR_SCALE_FACTOR)))*size/BLOCK_LINEAR_SCALE_FACTOR, y + (c/((int)(BLOCK_LINEAR_SCALE_FACTOR)))*size/BLOCK_LINEAR_SCALE_FACTOR, size/BLOCK_LINEAR_SCALE_FACTOR, colorTop, colorBot, colorHighlight);									
 	}
 	
+	if(focus == highlight) draw_rect(dest, x, y, size, size, 1, colorHighlight, 0x00000000, 0);
 	
 	
 	return 0;

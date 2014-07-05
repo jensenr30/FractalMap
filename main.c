@@ -294,7 +294,7 @@ int main(int argc, char *argv[]){
 		networkSurface = create_surface(windW, windH);
 		
 		// generate the network hierarchy
-		block_print_network_hierarchy(networkSurface, origin->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
+		block_print_network_hierarchy(networkSurface, origin->parent, camera->target, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff, 0xffff0000);
 		// generate texture for the block network
 		networkTexture = SDL_CreateTextureFromSurface(networkRenderer, networkSurface);
 		// render the networkSurface to the networkWindow
