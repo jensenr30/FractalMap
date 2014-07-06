@@ -120,6 +120,10 @@
 		</Unit>
 		<Unit filename="filter.h" />
 		<Unit filename="fractile.h" />
+		<Unit filename="generation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="generation.h" />
 		<Unit filename="globals.h" />
 		<Unit filename="graphics.c">
 			<Option compilerVar="CC" />
@@ -136,6 +140,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="rand.h" />
+		<Unit filename="tree_generation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tree_generation.h" />
 		<Unit filename="utilities.c">
 			<Option compilerVar="CC" />
 		</Unit>
