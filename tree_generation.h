@@ -60,3 +60,7 @@ struct tree {
 	// the color value of the trunk
 	Uint32 trunkColor;
 };
+
+// function prototypes
+
+short generateTree(SDL_Surface *dest, struct tree *theTree);
