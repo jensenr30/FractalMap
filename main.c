@@ -139,8 +139,6 @@ int main(int argc, char *argv[]){
 	// these keep track of where the mouse is
 	int x, y;
 	
-	// these keep track of whether or not the user wants to draw a rectangle
-	int printNetwork=0;
 	
 	while(quit == 0){
 		
@@ -192,6 +190,24 @@ int main(int argc, char *argv[]){
 			}
 		}
 		
+		// the wasd keys are used currently for testing the generation of neighbors.
+		if(keys['w']){
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
+			camera_pan(camera, CAMERA_PAN_UP);
+		}
+		if(keys['s']){
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_DOWN);
+			camera_pan(camera, CAMERA_PAN_DOWN);
+		}
+		if(keys['a']){
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_LEFT);
+			camera_pan(camera, CAMERA_PAN_LEFT);
+		}
+		if(keys['d']){
+			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_RIGHT);
+			camera_pan(camera, CAMERA_PAN_RIGHT);
+		}
+		
 		// if the user pressed the r key
 		if(keys['r']){
 			// generate random noise in the block
@@ -214,8 +230,8 @@ int main(int argc, char *argv[]){
 			block_generate_parent(camera->target);
 		}
 		
-		// if either the s or g keys were just stroked.
-		if(keys['s'] || keys['g']){
+		// if either the f or g keys were just stroked.
+		if(keys['f'] || keys['g']){
 			// generate new map in camera->target if the g key was pressed
 			if(keys['g']){
 				//block_random_fill(camera->target, 0, 0xff);
@@ -224,7 +240,8 @@ int main(int argc, char *argv[]){
 				block_fill_nine_squares_own_color(camera->target, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
 			}
 			
-			if(keys['s']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3); // using the low-pass filter
+			// the f key is for filtering
+			if(keys['f']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3); // using the low-pass filter
 		}
 		
 		
@@ -295,7 +312,7 @@ int main(int argc, char *argv[]){
 		networkSurface = create_surface(windW, windH);
 		
 		// generate the network hierarchy
-		block_print_network_hierarchy(networkSurface, origin->parent, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff);
+		block_print_network_hierarchy(networkSurface, origin->parent, camera->target, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff, 0xffff0000);
 		// generate texture for the block network
 		networkTexture = SDL_CreateTextureFromSurface(networkRenderer, networkSurface);
 		// render the networkSurface to the networkWindow

@@ -272,26 +272,31 @@ short camera_pan(struct cameraData *cam, short panDir){
 		return 1;
 	}
 	
+	
 	switch(panDir){
 		case CAMERA_PAN_UP:
-			// verify that THE neighbor exists. If it doesn't exist, this function will create it.
+			// verify that the neighbor exists. If it doesn't exist, this function will create it.
 			block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_UP);
-			/// TODO: write pan down
+			// move the neighbor
+			cam->target = (cam->target)->neighbors[BLOCK_NEIGHBOR_UP];
 			break;
 		case CAMERA_PAN_DOWN:
-			// verify that THE neighbor exists. If it doesn't exist, this function will create it.
+			// verify that the neighbor exists. If it doesn't exist, this function will create it.
 			block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_DOWN);
-			/// TODO: write pan down
+			// move the neighbor
+			cam->target = (cam->target)->neighbors[BLOCK_NEIGHBOR_DOWN];
 			break;
 		case CAMERA_PAN_LEFT:
-			// verify that THE neighbor exists. If it doesn't exist, this function will create it.
+			// verify that the neighbor exists. If it doesn't exist, this function will create it.
 			block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_LEFT);
-			/// TODO: write pan left
+			// move the neighbor
+			cam->target = (cam->target)->neighbors[BLOCK_NEIGHBOR_LEFT];
 			break;
 		case CAMERA_PAN_RIGHT:
-			// verify that THE neighbor exists. If it doesn't exist, this function will create it.
+			// verify that the neighbor exists. If it doesn't exist, this function will create it.
 			block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_RIGHT);
-			/// TODO: write pan right
+			// move the neighbor
+			cam->target = (cam->target)->neighbors[BLOCK_NEIGHBOR_RIGHT];
 			break;
 		default:
 			// report error
@@ -309,22 +314,28 @@ short camera_pan(struct cameraData *cam, short panDir){
 
 
 /// this will render the "cam" cameraData to the "dest" renderer.
-// returns 0 on successful rendering
-// returns 1 if the dest pointer is NULL
-// returns 2 if the cam pointer is NULL
+// returns 0 on successful rendering.
+// returns 1 if the dest pointer is NULL.
+// returns 2 if the cam pointer is NULL.
+// returns 3 if cam->target is NULL.
 short camera_render(SDL_Renderer *dest, struct cameraData *cam){
 	
 	// check to see if dest is invalid
 	if(dest == NULL){
 		//report the error
-		error("print_camera_view() was sent an invalid renderer. dest = NULL");
+		error("camera_render() was sent an invalid renderer. dest = NULL");
 		return 1;
 	}
 	// check to see if cam is invalid
 	if(cam == NULL){
 		//report the error
-		error("print_camera_view() was sent an invalid cam value. cam = NULL");
+		error("camera_render() was sent an invalid cam value. cam = NULL");
 		return 2;
+	}
+	
+	if(cam->target == NULL){
+		error("camera_render() was sent a valid camera with an invalid target blockData pointer. cam->target = NULL");
+		return 3;
 	}
 	
 	/* OLD PRINTING CODE
@@ -352,7 +363,7 @@ short camera_render(SDL_Renderer *dest, struct cameraData *cam){
 	
 	// if the target block has not been rendered, render it now.
 	if(cam->target->texture == NULL || cam->target->renderMe)
-	block_render(cam->target, dest);
+		block_render(cam->target, dest);
 	
 	SDL_RenderCopy(dest, cam->target->texture, NULL, NULL);
 	

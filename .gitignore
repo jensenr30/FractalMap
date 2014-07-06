@@ -6,8 +6,24 @@ FractalMap.depend
 bin/DebugLinux/FractalMap
 bin/ReleaseLinux/FractalMap
 bin/DebugCrossWin32/FractalMap
-bin/Debug/FractalMap.exe
-bin/Release/FractalMap.exe
+
+bin/DebugLinux/error.txt
+bin/DebugLinux/gamelog.txt
+bin/ReleaseLinux/error.txt
+bin/ReleaseLinux/gamelog.txt
+bin/DebugCrossWin32/error.txt
+bin/DebugCrossWin32/gamelog.txt
+
+
+
+bin/DebugWin/FractalMap.exe
+bin/ReleaseWin/FractalMap.exe
+
+bin/DebugWin/error.txt
+bin/DebugWin/gamelog.txt
+bin/ReleaseWin/error.txt
+bin/ReleaseWin/gamelog.txt
+
 *.o
 
 *stderr.txt

@@ -225,7 +225,7 @@ short block_print_to_file(struct blockData *block, char *fileName);
 #define BLOCK_PNH_COLOR_BORDER 0x00000000
 
 
-short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, unsigned int childLevelsOrig, unsigned int childLevels, int x, int y, int size, Uint32 colorTop, Uint32 colorBot);
+short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, struct blockData *highlight, unsigned int childLevelsOrig, unsigned int childLevels, int x, int y, int size, Uint32 colorTop, Uint32 colorBot, Uint32 colorHighlight);
 short block_render(struct blockData *block, SDL_Renderer *blockRenderer);
 
 short block_smooth(struct blockData *block, float smoothFactor);
