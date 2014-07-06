@@ -20,6 +20,6 @@ short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickne
 
 //#define color_mix_weighted(color1, color2, weight1, weight2) (  ((((color1>>24)*weight1 + (color2>>24)*weight2)/(weight1 + weight2))<<24)  |  (((((color1>>16)&0xff)*weight1 + ((color2>>16)&0xff)*weight2)/(weight1 + weight2))<<16)  |  (((((color1>>8)&0xff)*weight1 + ((color2>>8)&0xff)*weight2)/(weight1 + weight2))<<8)  |  (((color1&0xff)*weight1 + (color2&0xff)*weight2)/(weight1 + weight2))  )
 Uint32 color_mix_weighted(unsigned int color1, unsigned int color2, unsigned int weight1, unsigned int weight2);
-
+Uint32 color_mix_weighted_f(unsigned int color1, unsigned int color2, float weight1, float weight2);
 
 short print_camera_view(SDL_Surface *dest, struct cameraData *cam);

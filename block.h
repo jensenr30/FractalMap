@@ -54,6 +54,10 @@
 //	3 4 5
 //	6 7 8
 
+#define BLOCK_ELEVATION_BOUND_LOWER 0.0f
+#define BLOCK_ELEVATION_BOUND_UPPER 1.0f
+#define BLOCK_ELEVATION_COLOR_LOWER 0xff000000
+#define BLOCK_ELEVATION_COLOR_UPPER 0xffffffff
 
 // each block can have 9 children.
 // each block can have one parent.

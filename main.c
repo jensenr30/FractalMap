@@ -211,7 +211,9 @@ int main(int argc, char *argv[]){
 		// if the user pressed the r key
 		if(keys['r']){
 			// generate random noise in the block
-			block_random_fill(camera->target, 0, 0xffffff);
+			block_random_fill(camera->target, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER );
+			//block_print_to_file(camera->target, "camera target.txt");
+			//color_mix_weighted_f(0xff000000, 0xffffffff, 0.667, 0.333);
 		}
 		
 		// if the user pressed the c key

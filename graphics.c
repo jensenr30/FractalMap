@@ -63,6 +63,22 @@ Uint32 color_mix_weighted(Uint32 color1, Uint32 color2, Uint32 weight1, Uint32 w
 	return (alpha<<24) | (red<<16) | (green<<8) | blue;
 }
 
+Uint32 color_mix_weighted_f(unsigned int color1, unsigned int color2, float weight1, float weight2){
+	
+	// calculate total weight
+	float weight = weight1 + weight2;
+	
+	// calculate individual values for all three color bytes (and the alpha byte)
+	Uint32 alpha =		( ((color1>>24)&0xff)*weight1 + ((color2>>24)&0xff)*weight2 ) / (weight);
+	Uint32 red =		( ((color1>>16)&0xff)*weight1 + ((color2>>16)&0xff)*weight2 ) / (weight);
+	Uint32 green =		( ((color1>>8 )&0xff)*weight1 + ((color2>>8 )&0xff)*weight2 ) / (weight);
+	Uint32 blue =		( ((color1    )&0xff)*weight1 + ((color2    )&0xff)*weight2 ) / (weight);
+	
+	// return the weighted, mixed color.
+	return (alpha<<24) | (red<<16) | (green<<8) | blue;
+	
+}
+
 
 /// this function will draw a rectangle at (x,y) with width, w, and height, h.
 // this function is bounded (meaning it will not accidentally draw outside of the surface).

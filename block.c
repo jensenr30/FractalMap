@@ -122,7 +122,7 @@ short block_render(struct blockData *block, SDL_Renderer *blockRenderer){
 	int i, j;
 	for(i=0; i<BLOCK_WIDTH; i++){
 		for(j=0; j<BLOCK_HEIGHT; j++){
-			set_pixel(blockSurface, i, j, ((int)(block->elevation[i][j])) | 0xff000000);
+			set_pixel(blockSurface, i, j, color_mix_weighted_f(BLOCK_ELEVATION_COLOR_LOWER, BLOCK_ELEVATION_COLOR_UPPER, 1 - block->elevation[i][j], block->elevation[i][j]) );
 		}
 	}
 	
@@ -133,34 +133,6 @@ short block_render(struct blockData *block, SDL_Renderer *blockRenderer){
 	return 0;
 }
 
-
-/* OLD PRINTING FUNCTION
-/// this will print an image of a mapblock to a surface BLOCK_WIDTH x BLOCK_HEIGHT pixels
-// returns 0 on success
-// returns 1 on NULL dest surface
-// returns 2 on NULL datBlock
-short map_print(SDL_Surface *dest, struct blockData *source){
-	
-	if(dest == NULL){
-		error("map_print() could not print to dest. dest = NULL.");
-		return 1;
-	}
-	if(source == NULL){
-		error("map_print() could not print source. source = NULL.");
-		return 2;
-	}
-	
-	int i, j;
-	for(i=0; i<BLOCK_WIDTH; i++){
-		for(j=0; j<BLOCK_HEIGHT; j++){
-			set_pixel(dest, i, j, 0xff000000|((int)(source->elevation[i][j])));
-		}
-	}
-	
-	return 0;
-}
-
-*/
 
 
 
@@ -503,8 +475,9 @@ short block_fill_half_vert(struct blockData *block, float elevationLeft, float e
 // returns NULL when allocation of memory fails
 struct blockData *block_generate_origin(){
 	
+	// attempt to allocate memory for a new origin block
 	struct blockData *newOrigin = malloc(sizeof(struct blockData));
-	
+	// if allocation failed, return NULL.
 	if(newOrigin == NULL){
 		error("block_generate_origin() was sent NULL newOrigin pointer.");
 		return NULL;
@@ -535,7 +508,7 @@ struct blockData *block_generate_origin(){
 	newOrigin->parentView = BLOCK_CHILD_CENTER_CENTER;
 	
 	// randomize the origin
-	block_random_fill(newOrigin, 0x00000000, 0xffffffff);
+	block_random_fill(newOrigin, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 	
 	
 	
@@ -593,7 +566,7 @@ short block_generate_parent(struct blockData *centerChild){
 			}
 		}
 		*/
-		block_random_fill(centerChild->parent, 0,0xffffff);
+		block_random_fill(centerChild->parent, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 		
 		// make all of the children NULL
 		int c;
@@ -684,7 +657,7 @@ short block_generate_children(struct blockData *datParent){
 				(datParent->children[c])->level = datParent->level - 1;
 				
 				// this is the child's default elevation data
-				block_random_fill(datParent->children[c], 0,0xffffff);
+				block_random_fill(datParent->children[c], BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 				
 				
 				
