@@ -3,8 +3,9 @@
 FractalMap.layout
 FractalMap.depend
 
-bin/Debug/FractalMap
-bin/Release/FractalMap
+bin/DebugLinux/FractalMap
+bin/ReleaseLinux/FractalMap
+bin/DebugCrossWin32/FractalMap
 bin/Debug/FractalMap.exe
 bin/Release/FractalMap.exe
 *.o

@@ -11,8 +11,8 @@
 #include "filter.h"
 #include <time.h>
 #include "sprites.h"
-
-
+#include "generation.h"
+#include "tree_generation.h"
 
 
 
@@ -59,6 +59,20 @@ int main(int argc, char *argv[]){
 	
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
 	
+		// set network window
+	networkWindow = SDL_CreateWindow("FractalMap - Network Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
+	networkRenderer = SDL_CreateRenderer(networkWindow, -1, 0);
+	
+	if(networkWindow == NULL){
+		error("main() could not create networkWindow using SDL_CreateWindow");
+		return -1;
+	}
+	if(networkRenderer == NULL){
+		error("main() could not create networkRenderer using SDL_CreateRenderer");
+		return -2;
+	}
+	
+	
 	myWindow = SDL_CreateWindow("FractalMap - Map", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 	
@@ -71,18 +85,6 @@ int main(int argc, char *argv[]){
 		return -2;
 	}
 	
-	// set network window
-	networkWindow = SDL_CreateWindow("FractalMap - Network Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
-	networkRenderer = SDL_CreateRenderer(networkWindow, -1, 0);
-	
-	if(networkWindow == NULL){
-		error("main() could not create networkWindow using SDL_CreateWindow");
-		return -1;
-	}
-	if(networkRenderer == NULL){
-		error("main() could not create networkRenderer using SDL_CreateRenderer");
-		return -2;
-	}
 	
 	SDL_SetRenderDrawColor(networkRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(networkRenderer);
@@ -237,13 +239,27 @@ int main(int argc, char *argv[]){
 		// print map to mapSurface
 		// map_print(mapSurface, camera->target);
 		
-		if(spriteSurface != NULL)
-			SDL_FreeSurface(spriteSurface);
-			
-		spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
-		
 		if(keys['u']){
-			
+			if(spriteSurface != NULL)
+				SDL_FreeSurface(spriteSurface);
+			spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+		
+			struct treeData myTree;
+			myTree.leafColor = 0xff088c05;
+			myTree.trunkColor = 0xffc66505;
+			myTree.leavesNumbers = 150;
+			myTree.leavesSize = 3;
+			myTree.leavesGenerationRadiusX = 20;
+			myTree.leavesGenerationRadiusY = 10;
+			myTree.leavesDistribution = 5;
+			myTree.trunkHeight = 15;
+			myTree.trunkIncrement = 5;
+			myTree.trunkNegativeLow = -1;
+			myTree.trunkNegativeHigh = -10;
+			myTree.trunkPositiveLow = 1;
+			myTree.trunkPositiveHigh = 10;
+			generateTree(spriteSurface, &myTree);
+			/*
 			draw_line(spriteSurface, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, 1, 0xff00ff00);
 			draw_line(spriteSurface, BLOCK_WIDTH, 0, 0, BLOCK_HEIGHT, 1, 0xff00ff00);
 			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 120, 0xff000000);
@@ -254,8 +270,10 @@ int main(int argc, char *argv[]){
 			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 40, 0xffffff00);
 			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 20, 0xff00ffff);
 			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 10, 0xffffffff);
-			
-			
+			*/
+			//SDL_RenderCopy(myRenderer, spriteSurface, NULL, NULL);
+			//SDL_RenderPresent(myRenderer);
+			//SDL_RenderClear(myRenderer);
 			spriteTexture = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
 		}
 		
