@@ -245,15 +245,20 @@ int main(int argc, char *argv[]){
 			spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
 		
 			struct tree myTree;
-			myTree.leafColor = 0xff000000;
-			myTree.trunkColor = 0xff00ffff;
+			myTree.leafColor = 0xff088c05;
+			myTree.trunkColor = 0xffc66505;
 			myTree.leavesNumbers = 500;
 			myTree.leavesSize = 5;
 			myTree.trunkHeight = 40;
-			myTree.trunkWidth = 10;
 			myTree.leavesGenerationRadiusX = 20;
 			myTree.leavesGenerationRadiusY = 10;
 			myTree.leavesDistribution = 5;
+			myTree.trunkHeight = 15;
+			myTree.trunkIncrement = 5;
+			myTree.trunkNegativeLow = -1;
+			myTree.trunkNegativeHigh = -10;
+			myTree.trunkPositiveLow = 1;
+			myTree.trunkPositiveHigh = 10;
 			generateTree(spriteSurface, &myTree);
 			/*
 			draw_line(spriteSurface, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, 1, 0xff00ff00);
