@@ -44,3 +44,42 @@ short generateTree(SDL_Surface *dest, struct treeData *theTree) {
 		draw_circle(dest, (dest->h/2.0) + randNumberX, (dest->w/2.0) + randNumberY, leafSize, theTree->leafColor);
 	}
 }
+
+
+struct treeData *randomizeTreeSpecies(char* name) {
+		// make a blank tree structure
+		struct treeData *myTree = malloc(sizeof(struct treeData));
+		
+		if(myTree == NULL) {
+			error("randomizeTreeSpecies() was sent NULL treeData pointer.");
+			return NULL;
+		}
+		// gives the name of the tree
+		// used as a paramter since random names are unimplemented
+		myTree->name = name;
+		
+		float treeSpecies = rand_get_check(0xff000000, 0xffffffff);
+		
+		myTree->leafColor = rand_get_check(1, treeSpecies) | 0xff000000;
+		myTree->trunkColor = rand_get_check(1, treeSpecies) | 0xff000000;
+		
+		
+		myTree->leavesNumbers = 150;
+		myTree->leavesSize = 3;
+		myTree->leavesGenerationRadiusX = 20;
+		myTree->leavesGenerationRadiusY = 10;
+		myTree->leavesDistribution = 5;
+		myTree->trunkHeight = 15;
+		myTree->trunkIncrement = 5;
+		myTree->trunkNegativeLow = -1;
+		myTree->trunkNegativeHigh = -10;
+		myTree->trunkPositiveLow = 1;
+		myTree->trunkPositiveHigh = 10;
+		
+}
+
+
+short makeTree() {
+	
+	
+}

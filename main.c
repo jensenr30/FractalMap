@@ -36,6 +36,8 @@ int main(int argc, char *argv[]){
 	
 	windW = BLOCK_WIDTH*3;
 	windH = BLOCK_HEIGHT*3;
+	
+	int i;
 	//--------------------------------------------------
 	// set up surfaces, textures, renderers, windows,
 	//--------------------------------------------------
@@ -53,6 +55,14 @@ int main(int argc, char *argv[]){
 	SDL_Renderer *networkRenderer = NULL;
 	SDL_Texture *networkTexture = NULL;
 	SDL_Surface *networkSurface = NULL;
+	
+	SDL_Rect treeRect[9];
+	for(i = 0; i < 9; i++) {
+		treeRect[i].x = 0;
+		treeRect[i].y = 0;
+		treeRect[i].w = windW/3;
+		treeRect[i].h = windW/3;
+	}
 	
 	sgenrand(time(NULL));
 	
@@ -135,7 +145,7 @@ int main(int argc, char *argv[]){
 	// A value of 1 will be set to keys that were just stroked.
 	// after an iteration through the loop, all keys are reset to 0.
 	byte keys[keysSize];
-	int i;
+	
 	// these keep track of where the mouse is
 	int x, y;
 	
@@ -256,44 +266,6 @@ int main(int argc, char *argv[]){
 		// print map to mapSurface
 		// map_print(mapSurface, camera->target);
 		
-		if(keys['u']){
-			if(spriteSurface != NULL)
-				SDL_FreeSurface(spriteSurface);
-			spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
-		
-			struct treeData myTree;
-			myTree.leafColor = 0xff088c05;
-			myTree.trunkColor = 0xffc66505;
-			myTree.leavesNumbers = 150;
-			myTree.leavesSize = 3;
-			myTree.leavesGenerationRadiusX = 20;
-			myTree.leavesGenerationRadiusY = 10;
-			myTree.leavesDistribution = 5;
-			myTree.trunkHeight = 15;
-			myTree.trunkIncrement = 5;
-			myTree.trunkNegativeLow = -1;
-			myTree.trunkNegativeHigh = -10;
-			myTree.trunkPositiveLow = 1;
-			myTree.trunkPositiveHigh = 10;
-			generateTree(spriteSurface, &myTree);
-			/*
-			draw_line(spriteSurface, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, 1, 0xff00ff00);
-			draw_line(spriteSurface, BLOCK_WIDTH, 0, 0, BLOCK_HEIGHT, 1, 0xff00ff00);
-			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 120, 0xff000000);
-			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 100, 0xffff0000);
-			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 80, 0xff00ff00);
-			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 60, 0xff0000ff);
-			
-			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 40, 0xffffff00);
-			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 20, 0xff00ffff);
-			draw_circle(spriteSurface, BLOCK_WIDTH/2.0, BLOCK_WIDTH/2.0, 10, 0xffffffff);
-			*/
-			//SDL_RenderCopy(myRenderer, spriteSurface, NULL, NULL);
-			//SDL_RenderPresent(myRenderer);
-			//SDL_RenderClear(myRenderer);
-			spriteTexture = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
-		}
-		
 		
 		//draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix_weighted(0xff00ff00,0xff0000ff,1,1), 0, 0);
 		// block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
@@ -323,13 +295,33 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(networkRenderer);
 		SDL_RenderClear(networkRenderer);
 		
-		
-		
 		// print the camera to screen
 		camera_render(myRenderer,camera);
-		// print the test sprite to the screen
-		SDL_RenderCopy(myRenderer, spriteTexture, NULL, NULL);
 		
+		if(keys['u']){
+			if(spriteSurface != NULL)
+				SDL_FreeSurface(spriteSurface);
+			spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+			
+			if(spriteTexture != NULL)
+				SDL_DestroyTexture(spriteTexture);
+			
+			for(i = 0; i < 9; i++) {
+				generateTree(spriteSurface, randomizeTreeSpecies("generic"));
+				treeRect[i].x = (windW/3)*(i%3);
+				treeRect[i].y = (windH/3)*(i/3);
+				treeRect[i].w = windW/3;
+				treeRect[i].h = windH/3;
+				SDL_RenderCopy(myRenderer, spriteTexture, NULL, &treeRect[i]);
+			}
+			
+			spriteTexture = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
+		}
+		
+		// print the test sprite to the screen
+		for(i = 0; i < 9; i++)
+			SDL_RenderCopy(myRenderer, spriteTexture, NULL, &treeRect[i]);
+
 		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
