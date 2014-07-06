@@ -244,12 +244,11 @@ int main(int argc, char *argv[]){
 				SDL_FreeSurface(spriteSurface);
 			spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
 		
-			struct tree myTree;
+			struct treeData myTree;
 			myTree.leafColor = 0xff088c05;
 			myTree.trunkColor = 0xffc66505;
-			myTree.leavesNumbers = 500;
-			myTree.leavesSize = 5;
-			myTree.trunkHeight = 40;
+			myTree.leavesNumbers = 150;
+			myTree.leavesSize = 3;
 			myTree.leavesGenerationRadiusX = 20;
 			myTree.leavesGenerationRadiusY = 10;
 			myTree.leavesDistribution = 5;

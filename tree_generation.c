@@ -4,11 +4,11 @@
 /// this function will generate a random tree
 // dest is the surface that the tree will be applied too
 // theTree is the tree structure that will cantain all the information about the tree
-short generateTree(SDL_Surface *dest, struct tree *theTree) {
+short generateTree(SDL_Surface *dest, struct treeData *theTree) {
 	// used in for loops
 	int i, j;
 	// place holder varibles for the random numbers generated
-	float randNumberX, randNumberY, leafSize, trunkPositive, trunkNegative;
+	float randNumberX = 0, randNumberY = 0, leafSize = 0, trunkPositive = 0, trunkNegative = 0;
 	
 	// generates the truck of the tree
 	// tells how many lines will be generated and the height of the tree
@@ -19,8 +19,8 @@ short generateTree(SDL_Surface *dest, struct tree *theTree) {
 		trunkNegative = rand_get_check(theTree->trunkNegativeLow, theTree->trunkNegativeHigh);
 		// draws the line in the positive direction.
 		draw_line(dest, (dest->w/2.0), (dest->w/2.0)+theTree->trunkHeight+i+trunkPositive, (dest->w/2.0)+trunkPositive, (dest->w/2.0)+trunkPositive, 1, theTree->trunkColor);
-		// draws the line in the negative direction. 
-		draw_line(dest, (dest->w/2.0), (dest->w/2.0)+theTree->trunkHeight+i+trunkNegative, (dest->w/2.0)+trunkNegative, (dest->w/2.0)-trunkNegative, 1, theTree->trunkColor);
+		// draws the line in the negative direction.
+		draw_line(dest, (dest->w/2.0), (dest->w/2.0)+theTree->trunkHeight+i-trunkNegative, (dest->w/2.0)+trunkNegative, (dest->w/2.0)-trunkNegative, 1, theTree->trunkColor);
 	}
 	
 	// generates the leaves of the tree

@@ -6,7 +6,7 @@
 // struct tree myTree;
 // myTree.leafColor = 0xff088c05;
 // myTree.trunkColor = 0xffc66505;
-// myTree.leavesNumbers = 500;
+// myTree.leavesNumbers = 50;
 // myTree.leavesSize = 5;
 // myTree.trunkHeight = 40;
 // myTree.leavesGenerationRadiusX = 20;
@@ -18,12 +18,12 @@
 // myTree.trunkNegativeHigh = -10;
 // myTree.trunkPositiveLow = 1;
 // myTree.trunkPositiveHigh = 10;
-struct tree {
+struct treeData {
 	// these variables are used to define the leaves
 	// the amount of leaves that this tree will have
 	short leavesNumbers;
 	
-	// the size of the leaves
+	// the maximum size of the leaves that will be generated
 	short leavesSize;
 	
 	// the radius of the leaves from the center on the x axis
@@ -63,4 +63,4 @@ struct tree {
 
 // function prototypes
 
-short generateTree(SDL_Surface *dest, struct tree *theTree);
+short generateTree(SDL_Surface *dest, struct treeData *theTree);
