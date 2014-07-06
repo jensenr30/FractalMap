@@ -8,6 +8,11 @@
 #define CAMERA_PAN_LEFT		3
 #define CAMERA_PAN_RIGHT	5
 
+// these are the maximum and minimum values for the scale of a camera. 
+// if the camera goes above or below these values, it will zoom out and zoom in respectively.
+#define CAMERA_SCALE_MAX 1.0f
+#define CAMERA_SCALE_MIN (1/BLOCK_LINEAR_SCALE_FACTOR)
+
 /// this describes where the user is looking in the fractal block network.
 // This holds data that describes what the user wants to see.
 // Camera functions will be used to translate what the user wants to see into which blocks the program has to render.
@@ -61,6 +66,6 @@ short camera_zoom_in(struct cameraData *cam);
 short camera_zoom_out(struct cameraData *cam);
 
 // this will render the camera to an SDL_Renderer
-short camera_render(SDL_Renderer *dest, struct cameraData *cam);
+short camera_render(SDL_Renderer *dest, struct cameraData *cam, int width, int height);
 
 

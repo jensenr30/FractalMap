@@ -76,6 +76,7 @@ struct cameraData *camera_create(struct blockData *block){
 // returns 1 on null cam pointer
 short camera_check(struct cameraData *cam){
 	
+	// if the camera pointer is invalid,
 	if(cam == NULL){
 		// report error
 		error("camera_check() was sent invalid cam. cam = NULL");
@@ -83,7 +84,9 @@ short camera_check(struct cameraData *cam){
 		return 1;
 	}
 	
+	// this keeps track of whether or not we want to keep checking
 	short check;
+	// this is where we check to make sure the scale and x and y position of the camera is valid.
 	do{
 		
 		// check is initially set to 0 at the start of each loop.
@@ -94,15 +97,19 @@ short camera_check(struct cameraData *cam){
 		//--------------------------------------------------
 		// check to see if x is out of the bounds of the target block
 		//--------------------------------------------------
-		if(cam->x < 0){
+		if(cam->x < -BLOCK_WIDTH_1_2){
 			// pan the camera appropriately
 			camera_pan(cam, CAMERA_PAN_LEFT);
+			// add BLOCK_WIDTH to x
+			cam->x += BLOCK_WIDTH;
 			// record that a single check was made.
 			check = 1;
 		}
-		else if(cam->x >= BLOCK_WIDTH){
+		else if(cam->x > BLOCK_WIDTH_1_2){
 			// pan the camera appropriately
 			camera_pan(cam, CAMERA_PAN_RIGHT);
+			// subtract BLOCK_WIDTH from x
+			cam->x -= BLOCK_WIDTH;
 			// record that a single check was made.
 			check = 1;
 		}
@@ -110,15 +117,19 @@ short camera_check(struct cameraData *cam){
 		//--------------------------------------------------
 		// check if y is out of bounds of the target block
 		//--------------------------------------------------
-		if(cam->y < 0){
+		if(cam->y < -BLOCK_HEIGHT_1_2){
 			// pan the camera appropriately
 			camera_pan(cam, CAMERA_PAN_UP);
+			// add BLOCK_HEIGHT to y
+			cam->y += BLOCK_HEIGHT;
 			// record that a single check was made.
 			check = 1;
 		}
-		else if(cam->y >= BLOCK_HEIGHT){
+		else if(cam->y > BLOCK_HEIGHT_1_2){
 			// pan the camera appropriately
 			camera_pan(cam, CAMERA_PAN_DOWN);
+			// subtract BLOCK_HEIGHT from y
+			cam->y -= BLOCK_HEIGHT;
 			// record that a single check was made.
 			check = 1;
 		}
@@ -127,9 +138,11 @@ short camera_check(struct cameraData *cam){
 		//--------------------------------------------------
 		// check for scale being too large
 		//--------------------------------------------------
-		if(cam->scale >= BLOCK_LINEAR_SCALE_FACTOR){
+		if(cam->scale > CAMERA_SCALE_MAX){
 			// zoom out once
 			camera_zoom_out(cam);
+			// update scale.
+			cam->scale /= BLOCK_LINEAR_SCALE_FACTOR;
 			// record that a single check was made
 			check = 1;
 		}
@@ -137,9 +150,11 @@ short camera_check(struct cameraData *cam){
 		//--------------------------------------------------
 		// check for scale being too small
 		//--------------------------------------------------
-		if(cam->scale <= 1/BLOCK_LINEAR_SCALE_FACTOR){
+		if(cam->scale <= CAMERA_SCALE_MIN){
 			// zoom in once
 			camera_zoom_in(cam);
+			// update scale
+			cam->scale *= BLOCK_LINEAR_SCALE_FACTOR;
 			// record that a single check was made.
 			check = 1;
 		}
@@ -147,6 +162,25 @@ short camera_check(struct cameraData *cam){
 		
 		
 	}while(check);	// loop again if a modification was made to the camera
+	
+	
+	// this generates all the neighbors that will be necessary to render images
+	// it ensures that the 8 blocks immediately around the target block exist
+	block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_ALL);										// UP, DOWN, LEFT, RIGHT
+	block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_UP], BLOCK_NEIGHBOR_LEFT);		// UP+LEFT
+	block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_UP], BLOCK_NEIGHBOR_RIGHT);		// UP+RIGHT
+	block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN], BLOCK_NEIGHBOR_LEFT);		// DOWN+LEFT
+	block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN], BLOCK_NEIGHBOR_RIGHT);		// DOWN+RIGHT
+	// this sets all of the renderMe flags to 1 initially
+	cam->target->renderMe = 1;																		// CENTER
+	cam->target->neighbors[BLOCK_NEIGHBOR_UP]->renderMe = 1;										// UP
+	cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->renderMe = 1;										// DOWN
+	cam->target->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;										// LEFT
+	cam->target->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;										// RIGHT
+	cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;		// UP+LEFT
+	cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;		// UP+RIGHT
+	cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;		// DOWN+LEFT
+	cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;		// DOWN+RIGHT
 	
 	
 	return 0;
@@ -159,6 +193,8 @@ short camera_check(struct cameraData *cam){
 /// this function zooms cam in once.
 /// this function is meant to be used by camera_check().
 /// It is discouraged to call this function from any place other than camera_check()
+/// this will automatically generation children of the target block if they do not yet exist
+/// this will NOT affect the scale variable in the camera structure.
 // this function will adjust the target, scale, and x, y variables of the camera.
 // returns 0 on success
 // returns 1 on invalid cameraData pointer
@@ -209,8 +245,6 @@ short camera_zoom_in(struct cameraData *cam){
 	
 	// update target to proper child
 	cam->target = cam->target->children[xcenter/BLOCK_WIDTH_1_3 + 3*(ycenter/BLOCK_WIDTH_1_3)];
-	// update the scale of the camera now that it is pointing at the child of the previous block
-	cam->scale *= BLOCK_LINEAR_SCALE_FACTOR;
 	
 	// success
 	return 0;
@@ -221,6 +255,7 @@ short camera_zoom_in(struct cameraData *cam){
 /// this function zooms camera out once.
 /// this function is meant to be used by camera_check().
 /// It is discouraged to call this function from any place other than camera_check()
+/// this will automatically generation the parent of the target block if it does not yet exist
 // returns 0 on success
 // returns 1 on invalid cameraData pointer
 short camera_zoom_out(struct cameraData *cam){
@@ -246,9 +281,6 @@ short camera_zoom_out(struct cameraData *cam){
 	// move to the parent
 	cam->target = cam->target->parent;
 	
-	// reset scale.
-	cam->scale /= BLOCK_LINEAR_SCALE_FACTOR;
-	
 	// success
 	return 0;
 }
@@ -261,6 +293,7 @@ short camera_zoom_out(struct cameraData *cam){
 /// this function pans cam in the specified direction once.
 /// this function is meant to be used by camera_check().
 /// It is discouraged to call this function from any place other than camera_check()
+/// this will automatically generate neighbors of the target block if they do not yet exist.
 // returns 0 on success
 // returns 1 on invalid cameraData pointer
 // returns 2 on invalid pan direction
@@ -318,7 +351,7 @@ short camera_pan(struct cameraData *cam, short panDir){
 // returns 1 if the dest pointer is NULL.
 // returns 2 if the cam pointer is NULL.
 // returns 3 if cam->target is NULL.
-short camera_render(SDL_Renderer *dest, struct cameraData *cam){
+short camera_render(SDL_Renderer *dest, struct cameraData *cam, int width, int height){
 	
 	// check to see if dest is invalid
 	if(dest == NULL){
@@ -338,36 +371,102 @@ short camera_render(SDL_Renderer *dest, struct cameraData *cam){
 		return 3;
 	}
 	
-	/* OLD PRINTING CODE
-	// i and j index into the surface pixel array.
-	// iElevation and jElevation index into the blockData's elevation array.
-	int i, j, iElevation, jElevation;
-	// these store the constant scaling factors used to scale the i and j variables into the iElevation and jElevation variables.
-	float iScale = cam->scale*BLOCK_WIDTH /(float)dest->w;
-	float jScale = cam->scale*BLOCK_HEIGHT/(float)dest->h;
 	
-	// calculate the color for every pixel on the destination surface
-	for(i=0; i<dest->w; i++){
-		for(j=0; j<dest->h; j++){
-			// calculate the x and y indexes for the elevation array
-			iElevation = (int)(cam->x + i*iScale);
-			jElevation = (int)(cam->y + j*jScale);
-			// make sure the elevation index is in between
-			if(iElevation>=0 && iElevation<BLOCK_WIDTH && jElevation >= 0 && jElevation < BLOCK_HEIGHT){
-				set_pixel(dest, i, j, (0xff000000|(int)(cam->target->elevation[iElevation][jElevation]))&(0xff00f000) );
-			}
-		}
-	}
-	*/
+	camera_check(cam);
+	//------------------------------------------------------------
+	// update all textures that need updating
+	//------------------------------------------------------------
+	// TARGET (CENTER)
+	if(cam->target->renderMe || cam->target->texture == NULL) block_render(cam->target, dest);
+	// NEIGHBORS
+	if(cam->target->neighbors[BLOCK_NEIGHBOR_UP]->renderMe    || cam->target->neighbors[BLOCK_NEIGHBOR_UP]->texture    == NULL) block_render(cam->target->neighbors[BLOCK_NEIGHBOR_UP],    dest);
+	if(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->renderMe  || cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->texture  == NULL) block_render(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN],  dest);
+	if(cam->target->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe  || cam->target->neighbors[BLOCK_NEIGHBOR_LEFT]->texture  == NULL) block_render(cam->target->neighbors[BLOCK_NEIGHBOR_LEFT],  dest);
+	if(cam->target->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe || cam->target->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture == NULL) block_render(cam->target->neighbors[BLOCK_NEIGHBOR_RIGHT], dest);
+	// NEIGHBOR'S NEIGHBORS
+	if(cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe    || cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_LEFT]->texture    == NULL) block_render(cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_LEFT],    dest);
+	if(cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe    || cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture    == NULL) block_render(cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_RIGHT],    dest);
+	if(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe  || cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_LEFT]->texture  == NULL) block_render(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_LEFT],  dest);
+	if(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe  || cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture  == NULL) block_render(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_RIGHT],  dest);
 	
 	
-	// if the target block has not been rendered, render it now.
-	if(cam->target->texture == NULL || cam->target->renderMe)
-		block_render(cam->target, dest);
+	// create a rectangle the specifies the location on the window that the texture will be printed to
+	SDL_Rect dstrect;
+	// these values are the same for every texture
+	dstrect.w = (width)/(cam->scale);
+	dstrect.h = (height)/(cam->scale);
 	
-	SDL_RenderCopy(dest, cam->target->texture, NULL, NULL);
-	
-	
+	//------------------------------------------------------------
+	// render target
+	//------------------------------------------------------------
+	dstrect.x = -cam->x*width/BLOCK_WIDTH;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->texture, NULL, &dstrect);
+	//------------------------------------------------------------
+	// render neighbor UP
+	//------------------------------------------------------------
+	// set x y offsets
+	dstrect.x = -cam->x*width/BLOCK_WIDTH;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT - dstrect.h;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_UP]->texture, NULL, &dstrect);
+	//------------------------------------------------------------
+	// render neighbor DOWN
+	//------------------------------------------------------------
+	// set x y offsets
+	dstrect.x = -cam->x*width/BLOCK_WIDTH;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT + dstrect.h;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->texture, NULL, &dstrect);
+	//------------------------------------------------------------
+	// render neighbor LEFT
+	//------------------------------------------------------------
+	// set x y offsets
+	dstrect.x = -cam->x*width/BLOCK_WIDTH - dstrect.w;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_LEFT]->texture, NULL, &dstrect);
+	//------------------------------------------------------------
+	// render neighbor RIGHT
+	//------------------------------------------------------------
+	// set x y offsets
+	dstrect.x = -cam->x*width/BLOCK_WIDTH + dstrect.w;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture, NULL, &dstrect);
+	//------------------------------------------------------------
+	// render neighbor UP+LEFT
+	//------------------------------------------------------------
+	// set x y offsets
+	dstrect.x = -cam->x*width/BLOCK_WIDTH - dstrect.w;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT - dstrect.h;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_LEFT]->texture, NULL, &dstrect);
+	//------------------------------------------------------------
+	// render neighbor UP+RIGHT
+	//------------------------------------------------------------
+	// set x y offsets
+	dstrect.x = -cam->x*width/BLOCK_WIDTH + dstrect.w;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT - dstrect.h;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture, NULL, &dstrect);
+	//------------------------------------------------------------
+	// render neighbor DOWN+LEFT
+	//------------------------------------------------------------
+	// set x y offsets
+	dstrect.x = -cam->x*width/BLOCK_WIDTH - dstrect.w;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT + dstrect.h;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_LEFT]->texture, NULL, &dstrect);
+	//------------------------------------------------------------
+	// render neighbor DOWN+RIGHT
+	//------------------------------------------------------------
+	// set x y offsets
+	dstrect.x = -cam->x*width/BLOCK_WIDTH + dstrect.w;
+	dstrect.y = -cam->y*height/BLOCK_HEIGHT + dstrect.h;
+	// copy texture to screen.
+	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture, NULL, &dstrect);
 	
 	// successful print.
 	return 0;

@@ -16,6 +16,8 @@
 
 
 
+#define MOUSE_BUTTONS 5
+
 
 int main(int argc, char *argv[]){
 	
@@ -135,9 +137,22 @@ int main(int argc, char *argv[]){
 	// A value of 1 will be set to keys that were just stroked.
 	// after an iteration through the loop, all keys are reset to 0.
 	byte keys[keysSize];
+	// this keeps track of which keys are HELD DOWN
+	int_fast8_t keysHeld[keysSize];
 	int i;
 	// these keep track of where the mouse is
-	int x, y;
+	int x=0, y=0;
+	// these keep track of where the mouse was just moments ago.
+	int xlast=0, ylast=0;
+	
+	// these two 2-element arrays keep the data concerning the state of the right and left mouse buttons.
+	// EX:
+		// mouse[SDL_BUTTON_LEFT][0] is the CURRENT state of the LEFT mouse button
+		// mouse[SDL_BUTTON_LEFT][1] is the LAST    state of the LEFT mouse button
+		// mouse[SDL_BUTTON_RIGHT][0] is the CURRENT state of the RIGHT mouse button
+		// mouse[SDL_BUTTON_RIGHT][1] is the LAST    state of the RIGHT mouse button
+	int mouse[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
+	
 	
 	
 	while(quit == 0){
@@ -146,14 +161,19 @@ int main(int argc, char *argv[]){
 		for(i=0; i<keysSize; i++){
 			keys[i] = 0;
 		}
-		
 		while(SDL_PollEvent(&event)){
 			// if there is a mouse button down event,
-			if(event.type == SDL_MOUSEBUTTONDOWN){
-				//down++;
+			if(event.button.type == SDL_MOUSEBUTTONDOWN){
+				// set mouse button states
+				if(event.button.button == SDL_BUTTON_LEFT) mouse[SDL_BUTTON_LEFT][0] = 1;
+				if(event.button.button == SDL_BUTTON_RIGHT) mouse[SDL_BUTTON_RIGHT][0] = 1;
+				if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 1;
 			}
 			else if(event.type == SDL_MOUSEBUTTONUP){
-				//down--;
+				// set mouse button states
+				if(event.button.button == SDL_BUTTON_LEFT) mouse[SDL_BUTTON_LEFT][0] = 0;
+				if(event.button.button == SDL_BUTTON_RIGHT) mouse[SDL_BUTTON_RIGHT][0] = 0;
+				if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 0;
 			}
 			else if(event.type == SDL_MOUSEWHEEL){
 				// for each time the user scrolls in, increase the zoom by some factor
@@ -168,10 +188,17 @@ int main(int argc, char *argv[]){
 				y = event.motion.y;
 			}
 			else if(event.type == SDL_KEYDOWN){
-				// check if the key is greater than the 'a' character.
-				if(event.key.keysym.sym >= 0)
+				if(event.key.keysym.sym >= 0){
 					// set that character, number, or letter to 1.
 					keys[(event.key.keysym.sym)%keysSize] = 1;
+					keysHeld[(event.key.keysym.sym)%keysSize] = 1;
+				}
+			}
+			else if(event.type == SDL_KEYUP){
+				if(event.key.keysym.sym >= 0){
+					// set that character, number, or letter to 0.
+					keysHeld[(event.key.keysym.sym)%keysSize] = 0;
+				}
 			}
 			// check for window events
 			else if(event.type == SDL_WINDOWEVENT ){
@@ -190,22 +217,40 @@ int main(int argc, char *argv[]){
 			}
 		}
 		
+		// if the left mouse button is currently held
+		if(mouse[SDL_BUTTON_LEFT][0]){
+			// move the camera x and y based on the distance the user has move the mouse
+			camera->x -= x-xlast;
+			camera->y -= y-ylast;
+			// check the camera.
+			// if the user moved too far in some direction, the camera will pan the camera appropriately.
+			camera_check(camera);
+		}
+		
 		// the wasd keys are used currently for testing the generation of neighbors.
 		if(keys['w']){
 			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
 			camera_pan(camera, CAMERA_PAN_UP);
+			// check the camera to make sure everything is fine
+			camera_check(camera);
 		}
 		if(keys['s']){
 			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_DOWN);
 			camera_pan(camera, CAMERA_PAN_DOWN);
+			// check the camera to make sure everything is fine
+			camera_check(camera);
 		}
 		if(keys['a']){
 			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_LEFT);
 			camera_pan(camera, CAMERA_PAN_LEFT);
+			// check the camera to make sure everything is fine
+			camera_check(camera);
 		}
 		if(keys['d']){
 			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_RIGHT);
 			camera_pan(camera, CAMERA_PAN_RIGHT);
+			// check the camera to make sure everything is fine
+			camera_check(camera);
 		}
 		
 		// if the user pressed the r key
@@ -328,7 +373,7 @@ int main(int argc, char *argv[]){
 		
 		
 		// print the camera to screen
-		camera_render(myRenderer,camera);
+		camera_render(myRenderer, camera, windW, windH);
 		// print the test sprite to the screen
 		SDL_RenderCopy(myRenderer, spriteTexture, NULL, NULL);
 		
@@ -336,6 +381,15 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
 		
+		// store the current x and y values and use them as the "last" values in the next iteration of the loop
+		xlast = x;
+		ylast = y;
+		
+		// save all current mouse states.
+		for(i=0; i<MOUSE_BUTTONS; i++){
+			// set the last state of this mouse button to the current state (for the next loop iteration)
+			mouse[i][1] = mouse[i][0];
+		}
 	}
 	
 	
