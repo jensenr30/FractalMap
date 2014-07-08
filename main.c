@@ -153,6 +153,11 @@ int main(int argc, char *argv[]){
 		// mouse[SDL_BUTTON_RIGHT][1] is the LAST    state of the RIGHT mouse button
 	int mouse[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
 	
+	// these variables keep track of time and FPS
+	Uint32 ticksLast = 0;
+	Uint32 ticksNow = 0;
+	Uint32 frames = 0;
+	Uint32 FPS = 0;
 	
 	
 	while(quit == 0){
@@ -288,7 +293,11 @@ int main(int argc, char *argv[]){
 			}
 			
 			// the f key is for filtering
-			if(keys['f']) filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3); // using the low-pass filter
+			if(keys['f']){
+				// using the low-pass filter
+				filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3);
+				camera->target->renderMe = 1;
+			}
 		}
 		
 		
@@ -390,6 +399,21 @@ int main(int argc, char *argv[]){
 			// set the last state of this mouse button to the current state (for the next loop iteration)
 			mouse[i][1] = mouse[i][0];
 		}
+		
+		// increase the frame counter (as we have just successfully rendered a frame)
+		frames++;
+		// get the current value of ticks
+		ticksNow = SDL_GetTicks();
+		// if more than a second has passed since the last FPS calculation,
+		if(ticksNow - ticksLast >= 1000){
+			FPS = (int)(frames/(((float)(ticksNow-ticksLast))/1000.0f) + 0.5f );
+			// reset frame counter
+			frames = 0;
+			// set the last tick time to the current time (this will make the program wait 1 second until recalculating the FPS)
+			ticksLast = ticksNow;
+			gamelog_d("FPS =", FPS);
+		}
+		
 	}
 	
 	

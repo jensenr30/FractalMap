@@ -129,6 +129,10 @@ short block_render(struct blockData *block, SDL_Renderer *blockRenderer){
 	// copy surface to texture
 	block->texture = SDL_CreateTextureFromSurface(blockRenderer, blockSurface);
 	
+	// automatically reset the renderMe flag to 0 as the block as just been rendered.
+	// removing this one line of code will completely destroy the frame rate of the game.
+	block->renderMe = 0;
+	
 	// success!
 	return 0;
 }
@@ -522,6 +526,8 @@ struct blockData *block_generate_origin(){
 
 
 /// this function will generate a parent when given a pointer to a block that is to be taken as the child.
+	/// NOTE this function is also very handy to use as a way to VALIDATE that a parent exists.
+	/// (if the parent does exist, the function returns immediately. if the parent does not exist, the function will generate it)
 	// when any parent is generated, all of its children are automatically generated as well.
 	// the reason for this is the following: Every block will either have all of its children or none of its children.
 	// this should simplify things considerably in the future.
@@ -539,7 +545,8 @@ short block_generate_parent(struct blockData *centerChild){
 	
 	// check to see if the function is being asked to re-generate parent.
 	if(centerChild->parent != NULL){
-		error("block_generate_parent() was asked to regenerate parent.");
+		// this function is used frequently as a parent validator (see comments at the top of the function). don't write an error to file.
+		//error("block_generate_parent() was asked to regenerate parent.");
 		return 2;
 	}
 	// otherwise, the parent needs to be generated

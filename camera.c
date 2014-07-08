@@ -64,6 +64,7 @@ struct cameraData *camera_create(struct blockData *block){
 	cam->y = 0;
 	cam->scale = 1.0;
 	cam->target = block;
+	cam->changed = 1;
 	
 	// return a pointer to the camera.
 	return cam;
@@ -85,7 +86,7 @@ short camera_check(struct cameraData *cam){
 	}
 	
 	// this keeps track of whether or not we want to keep checking
-	short check;
+	static Uint32 check;
 	// this is where we check to make sure the scale and x and y position of the camera is valid.
 	do{
 		
@@ -103,7 +104,7 @@ short camera_check(struct cameraData *cam){
 			// add BLOCK_WIDTH to x
 			cam->x += BLOCK_WIDTH;
 			// record that a single check was made.
-			check = 1;
+			check++;
 		}
 		else if(cam->x > BLOCK_WIDTH_1_2){
 			// pan the camera appropriately
@@ -111,7 +112,7 @@ short camera_check(struct cameraData *cam){
 			// subtract BLOCK_WIDTH from x
 			cam->x -= BLOCK_WIDTH;
 			// record that a single check was made.
-			check = 1;
+			check++;
 		}
 		
 		//--------------------------------------------------
@@ -123,7 +124,7 @@ short camera_check(struct cameraData *cam){
 			// add BLOCK_HEIGHT to y
 			cam->y += BLOCK_HEIGHT;
 			// record that a single check was made.
-			check = 1;
+			check++;
 		}
 		else if(cam->y > BLOCK_HEIGHT_1_2){
 			// pan the camera appropriately
@@ -131,7 +132,7 @@ short camera_check(struct cameraData *cam){
 			// subtract BLOCK_HEIGHT from y
 			cam->y -= BLOCK_HEIGHT;
 			// record that a single check was made.
-			check = 1;
+			check++;
 		}
 		
 		
@@ -144,7 +145,7 @@ short camera_check(struct cameraData *cam){
 			// update scale.
 			cam->scale /= BLOCK_LINEAR_SCALE_FACTOR;
 			// record that a single check was made
-			check = 1;
+			check++;
 		}
 		
 		//--------------------------------------------------
@@ -156,32 +157,35 @@ short camera_check(struct cameraData *cam){
 			// update scale
 			cam->scale *= BLOCK_LINEAR_SCALE_FACTOR;
 			// record that a single check was made.
-			check = 1;
+			check++;
 		}
 		
-		
+		// if check was made to be nonzero at any point, that means the camera will need to be checked.
+		if(check) cam->changed = 1;
 		
 	}while(check);	// loop again if a modification was made to the camera
 	
-	
-	// this generates all the neighbors that will be necessary to render images
-	// it ensures that the 8 blocks immediately around the target block exist
-	block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_ALL);										// UP, DOWN, LEFT, RIGHT
-	block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_UP], BLOCK_NEIGHBOR_LEFT);		// UP+LEFT
-	block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_UP], BLOCK_NEIGHBOR_RIGHT);		// UP+RIGHT
-	block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN], BLOCK_NEIGHBOR_LEFT);		// DOWN+LEFT
-	block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN], BLOCK_NEIGHBOR_RIGHT);		// DOWN+RIGHT
-	// this sets all of the renderMe flags to 1 initially
-	cam->target->renderMe = 1;																		// CENTER
-	cam->target->neighbors[BLOCK_NEIGHBOR_UP]->renderMe = 1;										// UP
-	cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->renderMe = 1;										// DOWN
-	cam->target->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;										// LEFT
-	cam->target->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;										// RIGHT
-	cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;		// UP+LEFT
-	cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;		// UP+RIGHT
-	cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;		// DOWN+LEFT
-	cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;		// DOWN+RIGHT
-	
+	// this block of code is only executed if the camera changed positions.
+	// (this will be nonzero if any camera zooming/panning was necessary.
+	if(cam->changed){
+		// this generates all the neighbors that will be necessary to render images
+		// it ensures that the 8 blocks immediately around the target block exist
+		block_generate_neighbor(cam->target, BLOCK_NEIGHBOR_ALL);										// UP, DOWN, LEFT, RIGHT
+		block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_UP], BLOCK_NEIGHBOR_LEFT);		// UP+LEFT
+		block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_UP], BLOCK_NEIGHBOR_RIGHT);		// UP+RIGHT
+		block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN], BLOCK_NEIGHBOR_LEFT);		// DOWN+LEFT
+		block_generate_neighbor(cam->target->neighbors[BLOCK_NEIGHBOR_DOWN], BLOCK_NEIGHBOR_RIGHT);		// DOWN+RIGHT
+		// this sets all of the renderMe flags to 1 initially
+		//cam->target->renderMe = 1;																		// CENTER
+		//cam->target->neighbors[BLOCK_NEIGHBOR_UP]->renderMe = 1;										// UP
+		//cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->renderMe = 1;										// DOWN
+		//cam->target->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;										// LEFT
+		//cam->target->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;										// RIGHT
+		//cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;		// UP+LEFT
+		//cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;		// UP+RIGHT
+		//cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_LEFT]->renderMe = 1;		// DOWN+LEFT
+		//cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_RIGHT]->renderMe = 1;		// DOWN+RIGHT
+	}
 	
 	return 0;
 }
