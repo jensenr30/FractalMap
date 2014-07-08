@@ -38,18 +38,13 @@ bug fix  %
 
 
 
-JensenR30
-
-JensenR30@Gmail.com
+JensenR30 - JensenR30@Gmail.com
 
 + Fractal Block Data Architecture
 + Memory Management
 
 
-
-JPisaBrony
-
-jdpohl789@gmail.com
+JPisaBrony - jdpohl789@gmail.com
 
 + randomized graphics generation
 + Cross compilation with Linux
