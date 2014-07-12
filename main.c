@@ -153,6 +153,12 @@ int main(int argc, char *argv[]){
 		// mouse[SDL_BUTTON_RIGHT][1] is the LAST    state of the RIGHT mouse button
 	int mouse[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
 	
+	// this is similar to mouse. however, this is used to store where the user clicked when a particular mouse button was clicked.
+		// mouseClick[SDL_BUTTON_LEFT][0] is the x position where the user clicked the left  mouse button.
+		// mouseClick[SDL_BUTTON_LEFT][1] is the y position where the user clicked the left  mouse button.
+		// mouseClick[SDL_BUTTON_RIGHT][0] is the x position where the user clicked the RIGHT mouse button.
+	// etc...
+	int mouseClick[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
 	// these variables keep track of time and FPS
 	Uint32 ticksLast = 0;
 	Uint32 ticksNow = 0;
@@ -170,9 +176,27 @@ int main(int argc, char *argv[]){
 			// if there is a mouse button down event,
 			if(event.button.type == SDL_MOUSEBUTTONDOWN){
 				// set mouse button states
-				if(event.button.button == SDL_BUTTON_LEFT) mouse[SDL_BUTTON_LEFT][0] = 1;
-				if(event.button.button == SDL_BUTTON_RIGHT) mouse[SDL_BUTTON_RIGHT][0] = 1;
-				if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 1;
+				if(event.button.button == SDL_BUTTON_LEFT){
+					// record that the left mouse button is down
+					mouse[SDL_BUTTON_LEFT][0] = 1;
+					// record where the left mouse button was clicked
+					mouseClick[SDL_BUTTON_LEFT][0] = x;
+					mouseClick[SDL_BUTTON_LEFT][1] = y;
+				}
+				else if(event.button.button == SDL_BUTTON_RIGHT){
+					// record that the right mouse button is down
+					mouse[SDL_BUTTON_RIGHT][0] = 1;
+					// record where the right mouse button was clicked
+					mouseClick[SDL_BUTTON_RIGHT][0] = x;
+					mouseClick[SDL_BUTTON_RIGHT][1] = y;
+				}
+				else if(event.button.button == SDL_BUTTON_MIDDLE){
+					// record that the middle mouse button is down
+					mouse[SDL_BUTTON_MIDDLE][0] = 1;
+					// record where the middle mouse button was clicked
+					mouseClick[SDL_BUTTON_MIDDLE][0] = x;
+					mouseClick[SDL_BUTTON_MIDDLE][1] = y;
+				}
 			}
 			else if(event.type == SDL_MOUSEBUTTONUP){
 				// set mouse button states
@@ -224,9 +248,10 @@ int main(int argc, char *argv[]){
 		
 		// if the left mouse button is currently held
 		if(mouse[SDL_BUTTON_LEFT][0]){
+			
 			// move the camera x and y based on the distance the user has move the mouse
-			camera->x -= x-xlast;
-			camera->y -= y-ylast;
+			camera->x -= (x-xlast)/BLOCK_LINEAR_SCALE_FACTOR;
+			camera->y -= (y-ylast)/BLOCK_LINEAR_SCALE_FACTOR;
 			// check the camera.
 			// if the user moved too far in some direction, the camera will pan the camera appropriately.
 			camera_check(camera);

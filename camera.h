@@ -33,7 +33,7 @@ struct cameraData {
 	// if either x or y are greater than (BLOCK_WIDTH-1), the camera will have to pan right or down respectively.
 	// if either x or y are less than 0, the camera will have to pan left or up respectively.
 	// the camera is centered on [x][y] of the target block.
-	int x, y;
+	float x, y;
 	
 	// this records if a change was made to the camera.
 	// this is mainly used to tell the camera_render() function when it has to validate that neighbors exist.

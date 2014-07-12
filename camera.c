@@ -98,7 +98,7 @@ short camera_check(struct cameraData *cam){
 		//--------------------------------------------------
 		// check to see if x is out of the bounds of the target block
 		//--------------------------------------------------
-		if(cam->x < -BLOCK_WIDTH_1_2){
+		if(cam->x + BLOCK_WIDTH_1_2*cam->scale < 0){
 			// pan the camera appropriately
 			camera_pan(cam, CAMERA_PAN_LEFT);
 			// add BLOCK_WIDTH to x
@@ -106,7 +106,7 @@ short camera_check(struct cameraData *cam){
 			// record that a single check was made.
 			check++;
 		}
-		else if(cam->x > BLOCK_WIDTH_1_2){
+		else if(cam->x + BLOCK_WIDTH_1_2*cam->scale > BLOCK_WIDTH){
 			// pan the camera appropriately
 			camera_pan(cam, CAMERA_PAN_RIGHT);
 			// subtract BLOCK_WIDTH from x
@@ -118,7 +118,7 @@ short camera_check(struct cameraData *cam){
 		//--------------------------------------------------
 		// check if y is out of bounds of the target block
 		//--------------------------------------------------
-		if(cam->y < -BLOCK_HEIGHT_1_2){
+		if(cam->y + BLOCK_HEIGHT_1_2*cam->scale < 0){
 			// pan the camera appropriately
 			camera_pan(cam, CAMERA_PAN_UP);
 			// add BLOCK_HEIGHT to y
@@ -126,7 +126,7 @@ short camera_check(struct cameraData *cam){
 			// record that a single check was made.
 			check++;
 		}
-		else if(cam->y > BLOCK_HEIGHT_1_2){
+		else if(cam->y + BLOCK_HEIGHT_1_2*cam->scale > BLOCK_HEIGHT){
 			// pan the camera appropriately
 			camera_pan(cam, CAMERA_PAN_DOWN);
 			// subtract BLOCK_HEIGHT from y
@@ -226,8 +226,8 @@ short camera_zoom_in(struct cameraData *cam){
 	block_generate_children(cam->target);
 	// calculate which child to zoom in to.
 	// this calculates where the center of the camera is on the target block
-	int xcenter = cam->x + (BLOCK_WIDTH/2)*cam->scale + 0.5;
-	int ycenter = cam->y + (BLOCK_HEIGHT/2)*cam->scale + 0.5;
+	int xcenter = cam->x + (BLOCK_WIDTH/2.0)*cam->scale + 0.5;
+	int ycenter = cam->y + (BLOCK_HEIGHT/2.0)*cam->scale + 0.5;
 	
 	// test error conditions
 	if(xcenter < 0){
@@ -403,72 +403,72 @@ short camera_render(SDL_Renderer *dest, struct cameraData *cam, int width, int h
 	//------------------------------------------------------------
 	// render target
 	//------------------------------------------------------------
-	dstrect.x = -cam->x*width/BLOCK_WIDTH;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH);
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT);
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->texture, NULL, &dstrect);
 	//------------------------------------------------------------
 	// render neighbor UP
 	//------------------------------------------------------------
 	// set x y offsets
-	dstrect.x = -cam->x*width/BLOCK_WIDTH;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT - dstrect.h;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH);
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT) - dstrect.h;
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_UP]->texture, NULL, &dstrect);
 	//------------------------------------------------------------
 	// render neighbor DOWN
 	//------------------------------------------------------------
 	// set x y offsets
-	dstrect.x = -cam->x*width/BLOCK_WIDTH;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT + dstrect.h;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH);
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT) + dstrect.h;
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->texture, NULL, &dstrect);
 	//------------------------------------------------------------
 	// render neighbor LEFT
 	//------------------------------------------------------------
 	// set x y offsets
-	dstrect.x = -cam->x*width/BLOCK_WIDTH - dstrect.w;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH) - dstrect.w;
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT);
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_LEFT]->texture, NULL, &dstrect);
 	//------------------------------------------------------------
 	// render neighbor RIGHT
 	//------------------------------------------------------------
 	// set x y offsets
-	dstrect.x = -cam->x*width/BLOCK_WIDTH + dstrect.w;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH) + dstrect.w;
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT);
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture, NULL, &dstrect);
 	//------------------------------------------------------------
 	// render neighbor UP+LEFT
 	//------------------------------------------------------------
 	// set x y offsets
-	dstrect.x = -cam->x*width/BLOCK_WIDTH - dstrect.w;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT - dstrect.h;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH) - dstrect.w;
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT) - dstrect.h;
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_LEFT]->texture, NULL, &dstrect);
 	//------------------------------------------------------------
 	// render neighbor UP+RIGHT
 	//------------------------------------------------------------
 	// set x y offsets
-	dstrect.x = -cam->x*width/BLOCK_WIDTH + dstrect.w;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT - dstrect.h;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH) + dstrect.w;
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT) - dstrect.h;
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_UP]->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture, NULL, &dstrect);
 	//------------------------------------------------------------
 	// render neighbor DOWN+LEFT
 	//------------------------------------------------------------
 	// set x y offsets
-	dstrect.x = -cam->x*width/BLOCK_WIDTH - dstrect.w;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT + dstrect.h;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH) - dstrect.w;
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT) + dstrect.h;
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_LEFT]->texture, NULL, &dstrect);
 	//------------------------------------------------------------
 	// render neighbor DOWN+RIGHT
 	//------------------------------------------------------------
 	// set x y offsets
-	dstrect.x = -cam->x*width/BLOCK_WIDTH + dstrect.w;
-	dstrect.y = -cam->y*height/BLOCK_HEIGHT + dstrect.h;
+	dstrect.x = -cam->x*dstrect.w/((float)BLOCK_WIDTH) + dstrect.w;
+	dstrect.y = -cam->y*dstrect.h/((float)BLOCK_HEIGHT) + dstrect.h;
 	// copy texture to screen.
 	SDL_RenderCopy(dest, cam->target->neighbors[BLOCK_NEIGHBOR_DOWN]->neighbors[BLOCK_NEIGHBOR_RIGHT]->texture, NULL, &dstrect);
 	

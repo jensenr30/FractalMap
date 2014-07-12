@@ -1,0 +1,165 @@
+[10:28:03 PM] JensenR30: There are still so many things that I will need to add to FractalMap
+[10:28:55 PM] JensenR30: When I start to think of even a bare-bones genetic algorithm that fits into the design of the game, I think of...
+- working out the kinks in the camera rendering (and panning/zooming)
+- creating good terrain generation (not just white noise generation)
+- making the blocks continuous at their edges.
+- making the blocks depend on their children somehow...
+[10:29:01 PM] JensenR30: or making children look like their parents
+[10:29:19 PM] JensenR30: - implementing a generic "entity"
+[10:30:20 PM] JensenR30: - making the entitiy so generic that it can support anything from trees to animals to rocks to buildings to anything.
+[10:30:49 PM] JensenR30: and then AFTER ALL OF THAT comes programming the behavior of the entities
+[10:30:50 PM] JensenR30: xD
+[10:31:30 PM  10:31:33 PM] JPisaBrony: so it would basically be an entity structure, and then we would make things out of it?
+[10:31:33 PM] JensenR30: yes
+[10:31:38 PM] JensenR30: like, literally anything
+[10:31:45 PM] JensenR30: I was thinking that would be a good idea
+[10:31:52 PM] JensenR30: but at the same time, it might not be
+[10:32:05 PM] JensenR30: there would be the potential for a lot of wasted memory
+[10:32:32 PM] JensenR30: for example:
+an animal is a lot more complex than a tree.
+[10:32:55 PM] JensenR30: an animal needs to be programmed to
+- run
+- eat
+- kill?
+- gather resources
+- make a base? nest?
+[10:33:04 PM] JensenR30: a tree just needs to point to a texture that has a picture of a tree
+[10:33:23 PM] JensenR30: and maybe it needs to hold a value for how much wood it has in it (for gathering resources)
+[10:33:33 PM] JPisaBrony: the tree could always do that too, just like in street rat
+[10:33:44 PM] JensenR30: yeah
+[10:33:48 PM] JensenR30: that is a good point
+[10:34:16 PM] JPisaBrony: it would be wierd, but then again it would make the game more unique
+[10:34:16 PM] JensenR30: this game can be whatever the fuck we want to make it.
+[10:34:32 PM] JensenR30: it would be interesting if trees moved really slowly
+[10:34:42 PM] JensenR30: and they always kind of tried to get to a medium ground
+[10:34:50 PM] JensenR30: or a level that was slightly above sea level
+[10:35:13 PM] JensenR30: so you would see large "heards" of trees just slowly traversing a hillside and grouping around a lake
+[10:35:14 PM] JensenR30: xD
+[10:35:18 PM] JensenR30: that would be fucking awesome.
+[10:35:20 PM] JPisaBrony: xD
+[10:35:23 PM] JPisaBrony: yeah
+[10:35:40 PM] JensenR30: maybe there would just be some generic creature
+[10:35:46 PM] JensenR30: (entity)
+[10:35:53 PM] JensenR30: and it could move or not move
+[10:36:01 PM] JensenR30: and have a shit load of parameters
+[10:36:25 PM] JensenR30: it would make the programming more fluid
+[10:36:30 PM] JPisaBrony: well i already made tree's with a ton of parameters just to make it be generated randomly, lol
+[10:36:56 PM] JensenR30: the entities wouldn't have those parameters in them
+[10:37:10 PM] JensenR30: the tree entity doesn't need to know how it's picture was created
+[10:37:22 PM] JensenR30: it just needs to know where it's picture is so it can show up on the screen.
+[10:37:38 PM] JPisaBrony: ok
+[10:37:40 PM] JensenR30: or was that not what you meant?
+[10:38:02 PM  10:38:05 PM] JPisaBrony: i was just commenting on how i already made one thing with a ton of parameters, so why not make more? xD
+[10:38:06 PM] JensenR30: ok
+[10:38:10 PM] JensenR30: yeah
+[10:38:18 PM] JensenR30: here is one of my concerns:
+[10:38:27 PM  10:38:35 PM] JPisaBrony: dat memory?
+[10:38:34 PM] JensenR30: yes. that too
+[10:39:03 PM] JensenR30: grouping animals, plants, buildings, and other generic shit into one structure will not only add a lot of unnecessary memory to things, but it will slow down the program's evaluation
+[10:39:21 PM] JensenR30: if you are searching through all of the entities for plants, that will take time
+[10:39:36 PM] JensenR30: whereas if you just have a bunch of SEPARATE plant structures, you already know where all the plants are
+[10:39:42 PM] JensenR30: you don't need to search a list for them.
+[10:39:54 PM] JensenR30: tl;dr: less if() statements
+[10:40:48 PM] JensenR30: I don't know how big of an issue this would be
+[10:41:18 PM] JPisaBrony: right, one question though, how much do we actually need to keep in ram? like if it was just the current screen, that might help a bit, except one draw back that i can already think of is it would do a lot of reading and writing that would make it quite slow
+[10:41:32 PM  10:41:33 PM] JensenR30: that is a very good point
+[10:42:02 PM] JensenR30: I've noticed that when you try to read and write to disk (open and closing files frequently) the program slows down considerably.
+[10:42:20 PM] JensenR30: I'm thinking that we will keep about 500 MB of data in memory
+[10:42:30 PM] JensenR30: that is the celing that I want to shoot for
+[10:42:35 PM] JensenR30: or maybe a gig max
+[10:42:40 PM] JPisaBrony: that sounds like dwarf fortress, lol
+[10:42:57 PM] JPisaBrony: but yeah, its not a huge amount of ram
+[10:43:00 PM] JensenR30: ok
+[10:43:23 PM] JensenR30: and I was thinking that it might be nice to have an options menu (and an advanced options menu)
+[10:43:42 PM  10:43:44 PM] JensenR30: the advanced options menu would have options for changing the amount of RAM you allocate the program (and it would roughly follow that.)
+[10:43:44 PM] JPisaBrony: and an even more advanced option menu?
+jk xD
+[10:43:49 PM] JensenR30: yes
+[10:43:54 PM] JensenR30: advanced for game boy advance owners
+[10:44:02 PM] JPisaBrony: lol
+[10:44:16 PM] JensenR30: they can plug their advances into the USB port on their computer and we make their gameboy mine bitcoins for us.
+[10:44:26 PM] JPisaBrony: xD
+[10:44:31 PM] JensenR30: xD
+[10:44:31 PM] JensenR30: :P
+[10:44:38 PM] JPisaBrony: i would love to see THAT xD
+[10:44:39 PM] JensenR30: just brain storming
+[10:45:00 PM] JPisaBrony: more like being random xD
+[10:45:01 PM] JensenR30: and, to tell you the truth, having seperate structures for animals, plants, buildings, and other things might take more processing time too because there would be more lists of things.
+[10:45:10 PM] JensenR30: and more lists of things means more for loops
+[10:45:14 PM] JPisaBrony: yeah
+[10:45:17 PM] JensenR30: and more garbage collection
+[10:45:41 PM] JensenR30: for example: remember how I was talking about having a maximum number of blocks allocated?
+[10:45:54 PM] JensenR30: and then when we hit the maximum, we delete the old half?
+[10:45:56 PM  10:46:00 PM] JPisaBrony: yeah, and the bucket analogy
+[10:45:58 PM] JensenR30: yes
+[10:46:22 PM] JensenR30: well, that is going to need to be done for all other lists of things
+[10:47:00 PM] JensenR30: maps
+map textures (for pre-rendering)
+[10:47:03 PM] JensenR30: animals
+[10:47:04 PM] JensenR30: plants
+[10:47:05 PM] JensenR30: buildings
+[10:47:10 PM  10:47:12 PM] JensenR30: (pretty much everything)
+[10:47:26 PM] JensenR30: and storing all of this on the hard drive is going to be another... "interesting" challenge
+[10:47:40 PM] JPisaBrony: yeah
+[10:47:45 PM] JensenR30: I'm thinking about storing things by level
+[10:48:03 PM] JensenR30: for example: have a bunch of folders that all are named after the level they are one
+[10:48:17 PM] JensenR30: folder "0" has everything on the origin level
+[10:48:32 PM] JensenR30: folder "-1" has everything on the level below that
+[10:48:34 PM] JensenR30: etc...
+[10:48:41 PM] JensenR30: and then all blocks would have to have some kind of... name?
+[10:48:45 PM] JensenR30: an address maybe?
+[10:49:15 PM] JensenR30: yeah that is going to be difficult I think.
+[10:49:26 PM] JensenR30: I will have to spend some time thinking about how I want to lay it out.
+[10:50:06 PM] JensenR30: [10:44 PM] JensenR30: 
+
+<<< just brain storming[10:45:00 PM] JPisaBrony: more like being random xD
+
+yeah. I was trying to emulate shorty.
+[10:50:14 PM] JensenR30: :3
+[10:52:26 PM] JPisaBrony: yeah, here is my thoughts on this:
+have the world split up into some sort of "blocks" of data, like, after you zoom so far, it takes the last couple of zoom screens and saves that as a block of data
+[10:53:22 PM] JPisaBrony: the blocks would have a certain size, so that it doesnt take too long to save/load them
+[10:53:55 PM] JensenR30: so I would save large chunks consisting of multiple blocks?
+[10:54:05 PM] JPisaBrony: yes
+[10:54:07 PM] JensenR30: hmmm
+[10:54:15 PM] JensenR30: this is intriguing...
+[10:54:57 PM] JensenR30: save them all into the same txt file?
+[10:55:05 PM] JensenR30: (or binary file, as it is more likely to be?)
+[10:55:15 PM] JPisaBrony: like one problem that i see with the folder stucture is as soon as the player makes that layer really big, then it takes a really long time to save/load it
+[10:55:28 PM] JPisaBrony: yeah, the same file
+[10:55:42 PM] JensenR30: hmmm
+[10:55:52 PM] JensenR30: that sounds like an issue...
+[10:56:09 PM] JPisaBrony: but maby we could combind both ideas into one
+[10:56:13 PM] JensenR30: or, it would make it harder to index/address them.
+[10:56:19 PM] JPisaBrony: yeah
+[10:56:54 PM] JensenR30: ideally, I would like to just be able to store these blocks on the hard drive in the same way they are organized in memory so I don't need to do any extra "translation" of the addresses xD
+[10:57:27 PM] JPisaBrony: yeah that would be ideal, but the program's addresses always change
+[10:57:35 PM] JensenR30: yeah
+[10:57:44 PM] JensenR30: I don't mean literally printing out the address of memory
+[10:57:49 PM] JensenR30: because that wouldn't make any sense.
+[10:58:21 PM] JensenR30: but there is the important question that is, "What the hell are these txt documents going to be named?!"
+[10:59:08 PM] JensenR30: once they are properly named, then the text files will point to each other using paths on the file system (relative of course. absolute would be a bad idea...)
+[10:59:48 PM] JensenR30: also, I do a lot of checking for parents.
+[10:59:51 PM] JensenR30: like, a shit load
+[10:59:56 PM] JensenR30: it happens all of the time
+[10:59:59 PM] JensenR30: also checking for children
+[11:00:24 PM] JensenR30: so to check that children exist, I would probably need to create a flag in the structure that will be set when children are created
+[11:00:43 PM] JensenR30: because there is no way I can attempt to open up the child txt document every time I need to see if the child exists.
+[11:02:11 PM  11:02:37 PM] JPisaBrony: right
+
+for the naming of the documents, we could just user numbers starting at like 0 maby?
+
+if im remebering this right, the physical address is changing, but i think the actual programs addresses that it uses are the same, like the OS has its way of managing it, but then when the program runs it still starts at 0x00000 as like virtual memory space
+[11:02:34 PM] JensenR30: ok
+[11:02:39 PM] JensenR30: I can buy that
+[11:03:12 PM] JensenR30: [11:02 PM] JPisaBrony: 
+
+<<< for the naming of the documents, we could just user numbers starting at like 0 maby?that may be the most straight-forward solution.
+[11:03:51 PM] JensenR30: and then I would have to tell the parents what the name of their child is
+[11:04:07 PM] JensenR30: not just the address in memory, but the file name in disk space.
+[11:04:22 PM] JensenR30: interesting stuff.
+[11:04:26 PM] JensenR30: anyway, time for sleep
+[11:04:29 PM] JPisaBrony: lol, yeah
+[11:04:31 PM] JensenR30: this was a nice chat.
+[11:04:32 PM] JPisaBrony: alright, cya
+[11:04:33 PM] JPisaBrony: yep
