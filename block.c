@@ -311,7 +311,7 @@ short block_fill_nine_squares(struct blockData *block, int color) {
 	}
 	// variables for indexing through the arrays
 	// z variable is the color starting value which is then multiplied so that it changes
-	int i = 0, j = 0, z = 100;
+	int i = 0, j = 0;
 	// index through every row and column
 	for(i = 0; i < BLOCK_WIDTH; i++) {
 		for(j = 0; j < BLOCK_HEIGHT; j++) {

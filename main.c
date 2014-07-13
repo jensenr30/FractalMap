@@ -46,7 +46,6 @@ int main(int argc, char *argv[]){
 	SDL_Surface *mapSurface = NULL;
 	SDL_Surface *spriteSurface = NULL;
 	SDL_Texture *mapTexture = NULL;
-	SDL_Texture *spriteTexture = NULL;
 	myWindow = NULL;
 	myRenderer = NULL;
 	myTexture = NULL;
@@ -55,6 +54,10 @@ int main(int argc, char *argv[]){
 	SDL_Renderer *networkRenderer = NULL;
 	SDL_Texture *networkTexture = NULL;
 	SDL_Surface *networkSurface = NULL;
+	
+	SDL_Texture *spriteTexture[9];
+	for(i = 0; i < 9; i++)
+		spriteTexture[i] = NULL;
 	
 	SDL_Rect treeRect[9];
 	for(i = 0; i < 9; i++) {
@@ -299,29 +302,30 @@ int main(int argc, char *argv[]){
 		camera_render(myRenderer,camera);
 		
 		if(keys['u']){
-			if(spriteSurface != NULL)
-				SDL_FreeSurface(spriteSurface);
-			spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
-			
-			if(spriteTexture != NULL)
-				SDL_DestroyTexture(spriteTexture);
-			
 			for(i = 0; i < 9; i++) {
-				generateTree(spriteSurface, randomizeTreeSpecies("generic"));
+				if(spriteSurface != NULL)
+					SDL_FreeSurface(spriteSurface);
+				spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+				
+				if(spriteTexture[i] != NULL)
+					SDL_DestroyTexture(spriteTexture[i]);
+				
+				generateTree(spriteSurface, randomizeTreeSpecies("generic", 0xff000000, 0xffffffff));
 				treeRect[i].x = (windW/3)*(i%3);
 				treeRect[i].y = (windH/3)*(i/3);
 				treeRect[i].w = windW/3;
 				treeRect[i].h = windH/3;
-				SDL_RenderCopy(myRenderer, spriteTexture, NULL, &treeRect[i]);
+				//SDL_RenderCopy(myRenderer, spriteTexture, NULL, &treeRect[i]);
+				spriteTexture[i] = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
 			}
 			
-			spriteTexture = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
+			//spriteTexture = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
 		}
 		
 		// print the test sprite to the screen
 		for(i = 0; i < 9; i++)
-			SDL_RenderCopy(myRenderer, spriteTexture, NULL, &treeRect[i]);
-
+			SDL_RenderCopy(myRenderer, spriteTexture[i], NULL, &treeRect[i]);
+		
 		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);

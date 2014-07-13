@@ -4,7 +4,7 @@
 /// this function will generate a random tree
 // dest is the surface that the tree will be applied too
 // theTree is the tree structure that will cantain all the information about the tree
-short generateTree(SDL_Surface *dest, struct treeData *theTree) {
+void generateTree(SDL_Surface *dest, struct treeData *theTree) {
 	// used in for loops
 	int i, j;
 	// place holder varibles for the random numbers generated
@@ -46,36 +46,69 @@ short generateTree(SDL_Surface *dest, struct treeData *theTree) {
 }
 
 
-struct treeData *randomizeTreeSpecies(char* name) {
-		// make a blank tree structure
-		struct treeData *myTree = malloc(sizeof(struct treeData));
-		
-		if(myTree == NULL) {
-			error("randomizeTreeSpecies() was sent NULL treeData pointer.");
+struct treeData *randomizeTreeSpecies(char* name, int lowerBound, int upperBound) {
+	// make a blank tree structure
+	struct treeData *myTree = malloc(sizeof(struct treeData));
+	
+	if(myTree == NULL) {
+		error("randomizeTreeSpecies() was sent NULL treeData pointer.");
+		return NULL;
+	}
+	// gives the name of the tree
+	// used as a paramter since random names are unimplemented
+	myTree->name = name;
+	
+	//float treeSpecies = rand_get_check(0xff000000, 0xffffffff);
+	float treeSpecies = rand_get_check(lowerBound, upperBound);
+	
+	myTree->leafColor = rand_get_check(1, treeSpecies) | 0xff000000;
+	myTree->trunkColor = rand_get_check(1, treeSpecies) | 0xff000000;
+	
+	
+	myTree->leavesNumbers = 150;
+	myTree->leavesSize = 3;
+	myTree->leavesGenerationRadiusX = 20;
+	myTree->leavesGenerationRadiusY = 10;
+	myTree->leavesDistribution = 5;
+	myTree->trunkHeight = 15;
+	myTree->trunkIncrement = 5;
+	myTree->trunkNegativeLow = -1;
+	myTree->trunkNegativeHigh = -10;
+	myTree->trunkPositiveLow = 1;
+	myTree->trunkPositiveHigh = 10;
+	
+	return myTree;
+}
+/*
+struct treeData *generateTreeSpecies(int amount) {
+	int i;
+	
+	randomizeTreeSpecies("generic", 0xff000000, 0xffffffff);
+	
+	
+}
+*/
+/*
+struct treeData *generateTreeSpecies(int amount) {
+	int i;
+	// make a blank tree structure
+	struct treeData *myTree[amount];
+	
+	for(i = 0; i < amount; i++)
+		myTree[i] = malloc(sizeof(myTree));
+	
+	for(i = 0; i < amount; i++) {
+		if(myTree[i] == NULL) {
+			error("generateTreeSpecies() was sent NULL treeData pointer.");
 			return NULL;
 		}
-		// gives the name of the tree
-		// used as a paramter since random names are unimplemented
-		myTree->name = name;
-		
-		float treeSpecies = rand_get_check(0xff000000, 0xffffffff);
-		
-		myTree->leafColor = rand_get_check(1, treeSpecies) | 0xff000000;
-		myTree->trunkColor = rand_get_check(1, treeSpecies) | 0xff000000;
-		
-		
-		myTree->leavesNumbers = 150;
-		myTree->leavesSize = 3;
-		myTree->leavesGenerationRadiusX = 20;
-		myTree->leavesGenerationRadiusY = 10;
-		myTree->leavesDistribution = 5;
-		myTree->trunkHeight = 15;
-		myTree->trunkIncrement = 5;
-		myTree->trunkNegativeLow = -1;
-		myTree->trunkNegativeHigh = -10;
-		myTree->trunkPositiveLow = 1;
-		myTree->trunkPositiveHigh = 10;
-		
+	}
+	
+	for(i = 0; i < amount; i++) {
+		myTree[i] = randomizeTreeSpecies("generic");
+	}
+	
+	return myTree;
 }
 
 
@@ -83,3 +116,4 @@ short makeTree() {
 	
 	
 }
+*/

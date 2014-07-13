@@ -67,4 +67,4 @@ struct treeData {
 
 // function prototypes
 
-short generateTree(SDL_Surface *dest, struct treeData *theTree);
+void generateTree(SDL_Surface *dest, struct treeData *theTree);
