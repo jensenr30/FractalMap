@@ -54,10 +54,11 @@
 //	3 4 5
 //	6 7 8
 
-#define BLOCK_ELEVATION_BOUND_LOWER 0.0f
-#define BLOCK_ELEVATION_BOUND_UPPER 1.0f
-#define BLOCK_ELEVATION_COLOR_LOWER 0xff000000
-#define BLOCK_ELEVATION_COLOR_UPPER 0xffffffff
+#define BLOCK_ELEVATION_BOUND_LOWER 	0.0f	// this is the minimum height
+#define BLOCK_ELEVATION_BOUND_UPPER		1.0f	// this is the maximum height
+#define BLOCK_ELEVATION_INVALID			404.0f	// this is essentially a flag in the elevation data (used in terrain generation)
+#define BLOCK_ELEVATION_COLOR_LOWER 	0xff000000
+#define BLOCK_ELEVATION_COLOR_UPPER 	0xffffffff
 
 // each block can have 9 children.
 // each block can have one parent.
@@ -235,8 +236,8 @@ short block_render(struct blockData *block, SDL_Renderer *blockRenderer);
 short block_smooth(struct blockData *block, float smoothFactor);
 float block_surrounding_average(struct blockData *block, unsigned int x, unsigned int y);
 
-
-short block_random_fill(struct blockData *block, float range_lower, float range_higher);
+short block_generate_terrain(struct blockData *block, float slopeMax);
+short block_fill_random(struct blockData *block, float range_lower, float range_higher);
 int block_fill_middle(struct blockData *block, float inVal, float outVal);
 short block_fill_nine_squares(struct blockData *Block, int color);
 short block_fill_nine_squares_own_color(struct blockData *Block, int one, int two, int three, int four, int five, int six, int seven, int eight, int nine);

@@ -1,5 +1,6 @@
 #include "tree_generation.h"
 #include "block.h"
+#include "rand.h"
 
 /// this function will generate a random tree
 // dest is the surface that the tree will be applied too

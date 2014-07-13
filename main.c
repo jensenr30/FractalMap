@@ -250,8 +250,8 @@ int main(int argc, char *argv[]){
 		if(mouse[SDL_BUTTON_LEFT][0]){
 			
 			// move the camera x and y based on the distance the user has move the mouse
-			camera->x -= (x-xlast)/BLOCK_LINEAR_SCALE_FACTOR;
-			camera->y -= (y-ylast)/BLOCK_LINEAR_SCALE_FACTOR;
+			camera->x -= (x-xlast)*camera->scale/BLOCK_LINEAR_SCALE_FACTOR;
+			camera->y -= (y-ylast)*camera->scale/BLOCK_LINEAR_SCALE_FACTOR;
 			// check the camera.
 			// if the user moved too far in some direction, the camera will pan the camera appropriately.
 			camera_check(camera);
@@ -263,6 +263,9 @@ int main(int argc, char *argv[]){
 			camera_pan(camera, CAMERA_PAN_UP);
 			// check the camera to make sure everything is fine
 			camera_check(camera);
+		}
+		if(keys['q']){
+			block_generate_terrain(camera->target, 0.01);
 		}
 		if(keys['s']){
 			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_DOWN);
@@ -286,7 +289,7 @@ int main(int argc, char *argv[]){
 		// if the user pressed the r key
 		if(keys['r']){
 			// generate random noise in the block
-			block_random_fill(camera->target, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER );
+			block_fill_random(camera->target, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER );
 			//block_print_to_file(camera->target, "camera target.txt");
 			//color_mix_weighted_f(0xff000000, 0xffffffff, 0.667, 0.333);
 		}
@@ -299,7 +302,7 @@ int main(int argc, char *argv[]){
 		
 		// fill up the left half of the screen with a color
 		if(keys['v']){
-			block_fill_half_vert(camera->target, 0xffffffff, 0);
+			block_fill_half_vert(camera->target, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 		}
 		
 		// generate parent of camera->target if the p key is pressed
@@ -311,7 +314,7 @@ int main(int argc, char *argv[]){
 		if(keys['f'] || keys['g']){
 			// generate new map in camera->target if the g key was pressed
 			if(keys['g']){
-				//block_random_fill(camera->target, 0, 0xff);
+				//block_fill_random(camera->target, 0, 0xff);
 				//block_fill_middle(camera->target, 0xff, 0x00);
 				//block_fill_nine_squares(camera->target, 100);
 				block_fill_nine_squares_own_color(camera->target, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
@@ -320,7 +323,7 @@ int main(int argc, char *argv[]){
 			// the f key is for filtering
 			if(keys['f']){
 				// using the low-pass filter
-				filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 3);
+				filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 0.7);
 				camera->target->renderMe = 1;
 			}
 		}

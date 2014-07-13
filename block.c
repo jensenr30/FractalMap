@@ -11,11 +11,11 @@
 /// throws random data into blockData
 // returns 0 on success
 // returns 1 when the block is a NULL pointer.
-short block_random_fill(struct blockData *block, float range_low, float range_high){
+short block_fill_random(struct blockData *block, float range_low, float range_high){
 	
 	// check for block pointer being NULL.
 	if(block == NULL){
-		error("block_random_fill() could not fill block. block = NULL.");
+		error("block_fill_random() could not fill block. block = NULL.");
 		return 1;
 	}
 	
@@ -44,6 +44,181 @@ short block_random_fill(struct blockData *block, float range_low, float range_hi
 }
 
 
+/// this is a recursive function that will be called by block_generate_terrain().
+// this function will be called with the points [x1,y1] [x1,y2] [x2,y1] and [x2,y2] already set to their proper values.
+// this function will essentially interpolate (and add randomness) inner elements in the grid, interpolating off of those original four points.
+// this function will input elevation data that looks like this: (V = valid, . = not necessarily any data yet)
+	//	V . . . . . . . V
+	//	. . . . . . . . .
+	//	. . . . . . . . .
+	//	. . . . . . . . .
+	//	. . . . . . . . .
+	//	. . . . . . . . .
+	//	. . . . . . . . .
+	//	. . . . . . . . .
+	//	V . . . . . . . V
+// and it will create elevation data that looks like this: (C = created data)
+	//	V . C C . C C . V
+	//	. . . . . . . . .
+	//	C . C C . C C . C
+	//	C . C C . C C . C
+	//	. . . . . . . . .
+	//	C . C C . C C . C
+	//	C . C C . C C . C
+	//	. . . . . . . . .
+	//	V . C C . C C . V
+// note that, in general, it need not be a 9x9 input, but a 9x9 input is the smallest input that is valid.
+// the size of input area (as specified by x1,y1,x2,y2) must be a grid with width and length equal to a power of three greater than 3 (9, 27, 81, 243, etc...)
+// x1, y1, x2, y2 are the corners of the input grid area. the function will operate on the block elevation, but only within the square that x1,y1,x2,y2 describes.
+short block_generate_terrain_recursive_call(struct blockData *block, int x1, int y1, int x2, int y2, float slopeMax){
+	
+	// this function does not check to see if block is valid, because it should have already been checked in block_generate_terrain
+	
+	// calculate width and height (they should always be the same)
+	// width should also always be a power of 3
+	int width = x2-x1+1;
+	int height = y2-y1+1;
+	
+	// if the width is less than 9, then generate the last 5 elevations "manually".
+	if(width < 9 || height < 9){
+		// generate the four around the center based on the four corners
+		block->elevation[x1+1][y1] = rand_radius_retry((block->elevation[x1][y1]+block->elevation[x2][y1])/2.0, slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x1+1][y2] = rand_radius_retry((block->elevation[x1][y2]+block->elevation[x2][y2])/2.0, slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x1][y1+1] = rand_radius_retry((block->elevation[x1][y1]+block->elevation[x1][y2])/2.0, slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x2][y1+1] = rand_radius_retry((block->elevation[x2][y1]+block->elevation[x2][y2])/2.0, slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		// generate the center based on the four around the center
+		block->elevation[x1+1][y1+1] = rand_radius_retry(( block->elevation[x1+1][y1] +  block->elevation[x1+1][y2] + block->elevation[x1][y1+1] + block->elevation[x2][y1+1])/4.0, slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		// success;
+		return 0;
+	}
+	
+	// otherwise, generating elevation will need to be done the regular way.
+	
+	// calculate the two mid-values in between the four corners
+	int w1 = x1 + width/3;
+	int w2 = x1 + (2*width)/3;
+	int h1 = y1 + (height)/3;
+	int h2 = y1 + (2*height)/3;
+	
+	// generate the perimeter top and bottom side elevations first (V = valid, C = creating now)
+		//	V . C C . C C . V
+		//	. . . . . . . . .
+		//	. . . . . . . . .
+		//	. . . . . . . . .
+		//	. . . . . . . . .
+		//	. . . . . . . . .
+		//	. . . . . . . . .
+		//	. . . . . . . . .
+		//	V . C C . C C . V
+	// top four
+	block->elevation[w1-1][y1] = rand_radius_retry((block->elevation[x1][y1]  *(x2-(w1-1)) + block->elevation[x2][y1]*(w1-1-x1))/(x2-x1),   slopeMax*(w1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w1][y1]   = rand_radius_retry((block->elevation[w1-1][y1]*(x2-w1)     + block->elevation[x2][y1])          /(x2-w1+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w2-1][y1] = rand_radius_retry((block->elevation[w1][y1]  *(x2-(w2-1)) + block->elevation[x2][y1]*(w2-1-w1))/(x2-w1),   slopeMax*(w1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w2][y1]   = rand_radius_retry((block->elevation[w2-1][y1]*(x2-w2)     + block->elevation[x2][y1])          /(x2-w2+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	// bottom four
+	block->elevation[w1-1][y2] = rand_radius_retry((block->elevation[x1][y2]  *(x2-(w1-1)) + block->elevation[x2][y2]*(w1-1-x1))/(x2-x1),   slopeMax*(w1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w1][y2]   = rand_radius_retry((block->elevation[w1-1][y2]*(x2-w1)     + block->elevation[x2][y2])          /(x2-w1+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w2-1][y2] = rand_radius_retry((block->elevation[w1][y2]  *(x2-(w2-1)) + block->elevation[x2][y2]*(w2-1-w1))/(x2-w1),   slopeMax*(w1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w2][y2]   = rand_radius_retry((block->elevation[w2-1][y2]*(x2-w2)     + block->elevation[x2][y2])          /(x2-w2+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	
+	// generate the perimeter top and bottom side elevations first (V = valid, C = creating now)
+		//	V . . . . . . . V
+		//	. . . . . . . . .
+		//	C . . . . . . . C
+		//	C . . . . . . . C
+		//	. . . . . . . . .
+		//	C . . . . . . . C
+		//	C . . . . . . . C
+		//	. . . . . . . . .
+		//	V . . . . . . . V
+	// left four
+	block->elevation[x1][h1-1] = rand_radius_retry((block->elevation[x1][y1]  *(y2-(h1-1)) + block->elevation[x1][y2]*(h1-1-y1))/(y2-y1),   slopeMax*(h1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x1][h1]   = rand_radius_retry((block->elevation[x1][h1-1]*(y2-h1)     + block->elevation[x1][y2])          /(y2-h1+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x1][h2-1] = rand_radius_retry((block->elevation[x1][h1]  *(y2-(h2-1)) + block->elevation[x1][y2]*(h2-1-h1))/(y2-h1),   slopeMax*(h1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x1][h2]   = rand_radius_retry((block->elevation[x1][h2-1]*(y2-h2)     + block->elevation[x1][y2])          /(y2-h2+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	// right four
+	block->elevation[x2][h1-1] = rand_radius_retry((block->elevation[x2][y1]  *(y2-(h1-1)) + block->elevation[x2][y2]*(h1-1-y1))/(y2-y1),   slopeMax*(h1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x2][h1]   = rand_radius_retry((block->elevation[x2][h1-1]*(y2-h1)     + block->elevation[x2][y2])          /(y2-h1+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x2][h2-1] = rand_radius_retry((block->elevation[x2][h1]  *(y2-(h2-1)) + block->elevation[x2][y2]*(h2-1-h1))/(y2-h1),   slopeMax*(h1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x2][h2]   = rand_radius_retry((block->elevation[x2][h2-1]*(y2-h2)     + block->elevation[x2][y2])          /(y2-h2+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	
+	
+	/// TODO: write code for the 16 remaining elevation element calculations (the middle 16).
+	/// these lines will be much longer than the above 16. they will most likely require a little more thought as well.
+	
+	
+	/// TODO: write code to call 9 more of the same functions (to make this a recursive function).
+	/// this shouldn't be too hard. just kind of tedious.
+	
+	// success
+	return 0;
+}
+
+/// this will generate terrain for a new block.
+// this should be used when you are creating a new block
+// this will generate terrain inside the block that you send it.
+// if the block has parents, it will resemble its parents.
+// if the block has children (by definition, if a block is being created, it will only have a single child in the middle) then that child will be put in the center 1/9th area of the parent
+// slope max is the maximum slope in the per unit 
+// return 0 on success
+// return 1 on failure due to NULL block pointer.
+short block_generate_terrain(struct blockData *block, float slopeMax){
+	
+	// make sure block is valid
+	if(block == NULL){
+		error("block_generate_terrain() received block = NULL.");
+		return 1;
+	}
+	
+	// set the entire block to the BLOCK_INVALID_ELEVATION value.
+	/* TODO: UNCOMMENT THIS. I am commenting this temporarily to see the effects of this 
+	int i,j;
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			block->elevation[i][j] = BLOCK_ELEVATION_INVALID;
+		}
+	}
+	*/
+	
+	// check to see if we can pull data from the neighbors (in order to keep the block height continuous over block boundaries).
+	if(block->neighbors[BLOCK_NEIGHBOR_UP] != NULL){
+		/// TODO: import neighbor data
+	}
+	if(block->neighbors[BLOCK_NEIGHBOR_DOWN] != NULL){
+		/// TODO: import neighbor data
+	}
+	if(block->neighbors[BLOCK_NEIGHBOR_LEFT] != NULL){
+		/// TODO: import neighbor data
+	}
+	if(block->neighbors[BLOCK_NEIGHBOR_RIGHT] != NULL){
+		/// TODO: import neighbor data
+	}
+	
+	// generate the first four random points
+	if(block->elevation[0][0]							!= BLOCK_ELEVATION_INVALID){
+		block->elevation[0][0] = rand_range_f(BLOCK_ELEVATION_BOUND_LOWER,BLOCK_ELEVATION_BOUND_UPPER);
+	}
+	if(block->elevation[0][BLOCK_HEIGHT-1]				!= BLOCK_ELEVATION_INVALID){
+		block->elevation[0][BLOCK_HEIGHT-1] = rand_range_f(BLOCK_ELEVATION_BOUND_LOWER,BLOCK_ELEVATION_BOUND_UPPER);
+	}
+	if(block->elevation[BLOCK_WIDTH-1][0]				!= BLOCK_ELEVATION_INVALID){
+		block->elevation[BLOCK_WIDTH-1][0] = rand_range_f(BLOCK_ELEVATION_BOUND_LOWER,BLOCK_ELEVATION_BOUND_UPPER);
+	}
+	if(block->elevation[BLOCK_WIDTH-1][BLOCK_HEIGHT-1]	!= BLOCK_ELEVATION_INVALID){
+		block->elevation[BLOCK_WIDTH-1][BLOCK_HEIGHT-1] = rand_range_f(BLOCK_ELEVATION_BOUND_LOWER,BLOCK_ELEVATION_BOUND_UPPER);
+	}
+	
+	// this recursive function generates the terrain for the entire block.
+	block_generate_terrain_recursive_call(block, 0, 0, BLOCK_WIDTH-1, BLOCK_HEIGHT-1, slopeMax);
+	
+	// don't forget to update this block's texture the next time a frame is rendered.
+	block->renderMe = 1;
+	
+	// success
+	return 0;
+}
+
+
 
 
 
@@ -68,7 +243,7 @@ short block_print_to_file(struct blockData *block, char *fileName){
 	}
 	
 	if(block == NULL){
-		error("block_random_fill() could not fill block. block = NULL.");
+		error("block_fill_random() could not fill block. block = NULL.");
 		return 0;
 	}
 	
@@ -148,7 +323,7 @@ short block_render(struct blockData *block, SDL_Renderer *blockRenderer){
 // through the recursiveness, only the valid children will be printed.
 short block_print_network_hierarchy(SDL_Surface *dest, struct blockData *focus, struct blockData *highlight, unsigned int childLevelsOrig, unsigned int childLevels, int x, int y, int size, Uint32 colorTop, Uint32 colorBot, Uint32 colorHighlight){
 	
-	static SDL_Rect highLightRect;
+	//static SDL_Rect highLightRect;
 	
 	if(dest == NULL) return 1;
 	if(focus == NULL) return 2;
@@ -512,7 +687,7 @@ struct blockData *block_generate_origin(){
 	newOrigin->parentView = BLOCK_CHILD_CENTER_CENTER;
 	
 	// randomize the origin
-	block_random_fill(newOrigin, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block_fill_random(newOrigin, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 	
 	
 	
@@ -573,7 +748,7 @@ short block_generate_parent(struct blockData *centerChild){
 			}
 		}
 		*/
-		block_random_fill(centerChild->parent, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block_fill_random(centerChild->parent, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 		
 		// make all of the children NULL
 		int c;
@@ -664,7 +839,7 @@ short block_generate_children(struct blockData *datParent){
 				(datParent->children[c])->level = datParent->level - 1;
 				
 				// this is the child's default elevation data
-				block_random_fill(datParent->children[c], BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+				block_fill_random(datParent->children[c], BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 				
 				
 				
@@ -680,6 +855,7 @@ short block_generate_children(struct blockData *datParent){
 /// this function will calculate neighbor block(s) of the "dat" block sent to the function.
 // this function IS ONLY GUARANTEED TO WORK FOR A 3x3 BLOCK CHILDREN LAYOUT.
 // returns 0 on success.
+// returns -1 if the neighbor is invalid
 // returns 1 on NULL dat block pointer.
 // returns 2 when it cannot allocate memory for the first stepLink.
 // returns 3 when it cannot allocate memory for the second, third, fourth, (etc...) stepLink in the list.
@@ -791,6 +967,10 @@ short block_generate_neighbor(struct blockData *dat, short neighbor){
 		case BLOCK_NEIGHBOR_RIGHT:
 			if(lastStep%3 < 2) keepZoomingOut = 0;
 			break;
+		default:
+			error("block_generate_neighbor() neighbor was something other than expected... neighbor =");
+			return -1;	// something seriously fucked up has just happened
+			break;
 		}
 	}
 	
@@ -805,7 +985,7 @@ short block_generate_neighbor(struct blockData *dat, short neighbor){
 		// this should never EVER be
 		if(stepLink->prev != NULL){
 			// This shouldn't happen because ascend should run to 0, and then exit before any stepLink->prev can be NULL. Nevertheless, it has somehow happened. 
-			error_d("block_generate_neighbor() somehow has a NULL stepLink->prev. THIS SHOULD NEVER HAPPEN. ascend =",ascend);
+			error_d("block_generate_neighbor(): somehow has a NULL stepLink->prev. THIS SHOULD NEVER HAPPEN. ascend =",ascend);
 			return 4;
 		}
 		// if the previous stepLink is valid (as it should be) then switch to it.
@@ -833,7 +1013,9 @@ short block_generate_neighbor(struct blockData *dat, short neighbor){
 		probe = probe->children[stepLink->steps[ascend%BLOCK_STEP_SIZE]+1];
 		break;
 	default:
-		return -1; // something seriously fucked up has just happened
+		error("block_generate_neighbor(): neighbor was something other than expected... neighbor =");
+		return -1;	// something seriously fucked up has just happened
+		break;
 	}
 	
 	// go all the way back down to the upward neighbor of the original block.
@@ -874,7 +1056,9 @@ short block_generate_neighbor(struct blockData *dat, short neighbor){
 			probe = probe->children[stepLink->steps[ascend] - 2];
 			break;
 		default:
-			return -1; // something seriously fucked up has just happened
+			error("block_generate_neighbor(): neighbor was something other than expected... neighbor =");
+			return -1;	// something seriously fucked up has just happened
+			break;
 		}
 	}
 	
@@ -893,7 +1077,8 @@ short block_generate_neighbor(struct blockData *dat, short neighbor){
 		dat->neighbors[BLOCK_NEIGHBOR_RIGHT] = probe;
 		break;
 	default:
-		return -1; // something seriously fucked up has just happened
+		error("block_generate_neighbor(): neighbor was something other than expected... neighbor =");
+		return -1;	// something seriously fucked up has just happened
 	}
 	// our work here is done. whew!
 	

@@ -22,4 +22,4 @@ short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickne
 Uint32 color_mix_weighted(unsigned int color1, unsigned int color2, unsigned int weight1, unsigned int weight2);
 Uint32 color_mix_weighted_f(unsigned int color1, unsigned int color2, float weight1, float weight2);
 
-short print_camera_view(SDL_Surface *dest, struct cameraData *cam);
+//short print_camera_view(SDL_Surface *dest, struct cameraData *cam);

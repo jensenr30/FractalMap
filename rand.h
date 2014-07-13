@@ -8,9 +8,17 @@
 // use genrand() for generating a random number
 
 
-/// this returns a value between the boundary values lowBound and highBound (including boundary values) 
-#define rand_range(lowBound, highBound) (genrand()%(highBound-lowBound+1))+lowBound
+/// this returns a value between the lower and upper boundaries in floating point format
+// this is more useful for floating point numbers.
+// this does NOT check to make sure lowBound is higher than highBound
+#define rand_range_f(lowBound, highBound) (((genrand()%100001)/100000.0)*(highBound-lowBound) + lowBound)
 
+
+/// this returns a value between the boundary values lowBound and highBound (including boundary values) 
+#define rand_range(lowBound, highBound) ((genrand()%(highBound-lowBound+1))+lowBound)
+
+
+float rand_radius_retry(float average, float radius, float min, float max);
 
 
 
