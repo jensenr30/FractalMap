@@ -259,28 +259,24 @@ int main(int argc, char *argv[]){
 		
 		// the wasd keys are used currently for testing the generation of neighbors.
 		if(keys['w']){
-			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
 			camera_pan(camera, CAMERA_PAN_UP);
 			// check the camera to make sure everything is fine
 			camera_check(camera);
 		}
 		if(keys['q']){
-			block_generate_terrain(camera->target, 0.2);
+			block_generate_terrain(camera->target, 0.03);
 		}
 		if(keys['s']){
-			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_DOWN);
 			camera_pan(camera, CAMERA_PAN_DOWN);
 			// check the camera to make sure everything is fine
 			camera_check(camera);
 		}
 		if(keys['a']){
-			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_LEFT);
 			camera_pan(camera, CAMERA_PAN_LEFT);
 			// check the camera to make sure everything is fine
 			camera_check(camera);
 		}
 		if(keys['d']){
-			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_RIGHT);
 			camera_pan(camera, CAMERA_PAN_RIGHT);
 			// check the camera to make sure everything is fine
 			camera_check(camera);
