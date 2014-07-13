@@ -4,6 +4,7 @@
 // the paramters used are to randomize the trees
 // an example tree
 // struct tree myTree;
+// myTree.name = "generic";
 // myTree.leafColor = 0xff088c05;
 // myTree.trunkColor = 0xffc66505;
 // myTree.leavesNumbers = 50;
@@ -19,6 +20,9 @@
 // myTree.trunkPositiveLow = 1;
 // myTree.trunkPositiveHigh = 10;
 struct treeData {
+	// the name of the tree species
+	char *name;
+	
 	// these variables are used to define the leaves
 	// the amount of leaves that this tree will have
 	short leavesNumbers;
@@ -63,4 +67,4 @@ struct treeData {
 
 // function prototypes
 
-short generateTree(SDL_Surface *dest, struct treeData *theTree);
+void generateTree(SDL_Surface *dest, struct treeData *theTree);
