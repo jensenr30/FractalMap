@@ -136,6 +136,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="mt19937int.h" />
+		<Unit filename="my_math.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="my_math.h" />
 		<Unit filename="rand.c">
 			<Option compilerVar="CC" />
 		</Unit>

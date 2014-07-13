@@ -1,0 +1,137 @@
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\FractalMap\bin\DebugWin\strange-versions\_8_abstract_city_scape_f_q.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   1.009	FPS =	16
+Seconds =   2.013	FPS =	34
+Seconds =   3.016	FPS =	34
+Seconds =   4.018	FPS =	33
+Seconds =   5.038	FPS =	33
+Seconds =   6.058	FPS =	33
+Seconds =   7.067	FPS =	34
+Seconds =   8.075	FPS =	33
+Seconds =   9.107	FPS =	34
+Seconds =  10.135	FPS =	34
+Seconds =  10.602	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.001	A:\Programming\FractalMap\bin\DebugWin\strange-versions\_8_abstract_city_scape_f_r_q.exe
+Seconds =   0.001	END ARGV LIST
+Seconds =   1.022	FPS =	16
+Seconds =   2.035	FPS =	33
+Seconds =   3.041	FPS =	34
+Seconds =   4.058	FPS =	34
+Seconds =   5.066	FPS =	34
+Seconds =   6.083	FPS =	34
+Seconds =   7.087	FPS =	35
+Seconds =   8.087	FPS =	35
+Seconds =   9.110	FPS =	34
+Seconds =  10.117	FPS =	34
+Seconds =  11.141	FPS =	34
+Seconds =  12.142	FPS =	35
+Seconds =  13.161	FPS =	35
+Seconds =  14.174	FPS =	35
+Seconds =  15.200	FPS =	35
+Seconds =  16.217	FPS =	35
+Seconds =  17.224	FPS =	35
+Seconds =  18.268	FPS =	35
+Seconds =  19.286	FPS =	34
+Seconds =  20.297	FPS =	34
+Seconds =  21.305	FPS =	35
+Seconds =  22.315	FPS =	34
+Seconds =  23.341	FPS =	35
+Seconds =  24.367	FPS =	33
+Seconds =  25.388	FPS =	34
+Seconds =  26.405	FPS =	34
+Seconds =  27.424	FPS =	33
+Seconds =  28.448	FPS =	35
+Seconds =  29.451	FPS =	35
+Seconds =  30.451	FPS =	35
+Seconds =  31.451	FPS =	35
+Seconds =  32.477	FPS =	35
+Seconds =  33.486	FPS =	35
+Seconds =  34.508	FPS =	35
+Seconds =  35.514	FPS =	35
+Seconds =  36.515	FPS =	35
+Seconds =  37.535	FPS =	35
+Seconds =  38.535	FPS =	35
+Seconds =  39.542	FPS =	35
+Seconds =  40.556	FPS =	36
+Seconds =  41.557	FPS =	35
+Seconds =  42.586	FPS =	35
+Seconds =  43.587	FPS =	35
+Seconds =  44.610	FPS =	34
+Seconds =  45.625	FPS =	34
+Seconds =  46.636	FPS =	35
+Seconds =  47.652	FPS =	35
+Seconds =  48.657	FPS =	35
+Seconds =  49.681	FPS =	34
+Seconds =  50.685	FPS =	33
+Seconds =  51.703	FPS =	33
+Seconds =  52.725	FPS =	34
+Seconds =  53.734	FPS =	35
+Seconds =  54.746	FPS =	35
+Seconds =  55.753	FPS =	35
+Seconds =  56.782	FPS =	35
+Seconds =  57.782	FPS =	35
+Seconds =  58.806	FPS =	35
+Seconds =  59.829	FPS =	35
+Seconds =  60.832	FPS =	35
+Seconds =  61.857	FPS =	34
+Seconds =  62.874	FPS =	34
+Seconds =  63.883	FPS =	35
+Seconds =  64.888	FPS =	35
+Seconds =  65.902	FPS =	36
+Seconds =  66.930	FPS =	34
+Seconds =  67.946	FPS =	34
+Seconds =  68.968	FPS =	34
+Seconds =  69.990	FPS =	35
+Seconds =  70.993	FPS =	35
+Seconds =  72.020	FPS =	35
+Seconds =  73.027	FPS =	35
+Seconds =  74.044	FPS =	34
+Seconds =  75.057	FPS =	35
+Seconds =  76.079	FPS =	35
+Seconds =  77.097	FPS =	35
+Seconds =  78.103	FPS =	35
+Seconds =  79.119	FPS =	35
+Seconds =  80.146	FPS =	35
+Seconds =  81.156	FPS =	35
+Seconds =  82.173	FPS =	35
+Seconds =  83.184	FPS =	35
+Seconds =  84.210	FPS =	35
+Seconds =  85.215	FPS =	35
+Seconds =  86.227	FPS =	36
+Seconds =  87.234	FPS =	35
+Seconds =  88.258	FPS =	35
+Seconds =  89.275	FPS =	35
+Seconds =  90.289	FPS =	35
+Seconds =  91.291	FPS =	35
+Seconds =  92.308	FPS =	35
+Seconds =  93.312	FPS =	35
+Seconds =  94.314	FPS =	35
+Seconds =  95.329	FPS =	35
+Seconds =  96.330	FPS =	35
+Seconds =  97.336	FPS =	35
+Seconds =  98.359	FPS =	35
+Seconds =  99.367	FPS =	35
+Seconds = 100.367	FPS =	35
+Seconds = 100.637	block_collector() cleaning up blocks. blockCount =	19
