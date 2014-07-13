@@ -265,7 +265,7 @@ int main(int argc, char *argv[]){
 			camera_check(camera);
 		}
 		if(keys['q']){
-			block_generate_terrain(camera->target, 0.0009);
+			block_generate_terrain(camera->target, 0.2);
 		}
 		if(keys['s']){
 			//block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_DOWN);
@@ -323,7 +323,7 @@ int main(int argc, char *argv[]){
 			// the f key is for filtering
 			if(keys['f']){
 				// using the low-pass filter
-				filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 5);
+				filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 0.76);
 				camera->target->renderMe = 1;
 			}
 		}

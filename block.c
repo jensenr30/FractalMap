@@ -112,15 +112,23 @@ short block_generate_terrain_recursive_call(struct blockData *block, int x1, int
 		//	. . . . . . . . .
 		//	V . C C . C C . V
 	// top four
-	block->elevation[w1-1][y1] = rand_radius_retry((block->elevation[x1][y1]  *(x2-(w1-1)) + block->elevation[x2][y1]*(w1-1-x1))/(x2-x1),   slopeMax*(w1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[w1]  [y1] = rand_radius_retry((block->elevation[w1-1][y1]*(x2-w1)     + block->elevation[x2][y1])          /(x2-w1+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[w2-1][y1] = rand_radius_retry((block->elevation[w1][y1]  *(x2-(w2-1)) + block->elevation[x2][y1]*(w2-1-w1))/(x2-w1),   slopeMax*(w1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[w2]  [y1] = rand_radius_retry((block->elevation[w2-1][y1]*(x2-w2)     + block->elevation[x2][y1])          /(x2-w2+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	if(y1 == 0){
+		block->elevation[w1-1][y1] = rand_radius_retry((block->elevation[x1][y1]  *(x2-(w1-1)) + block->elevation[x2][y1]*(w1-1-x1))/(x2-x1),   slopeMax*(w1-1-x1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[w1]  [y1] = rand_radius_retry((block->elevation[w1-1][y1]*(x2-w1)     + block->elevation[x2][y1])          /(x2-w1+1), slopeMax          , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[w2-1][y1] = rand_radius_retry((block->elevation[w1][y1]  *(x2-(w2-1)) + block->elevation[x2][y1]*(w2-1-w1))/(x2-w1),   slopeMax*(w2-1-w1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[w2]  [y1] = rand_radius_retry((block->elevation[w2-1][y1]*(x2-w2)     + block->elevation[x2][y1])          /(x2-w2+1), slopeMax          , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	}
+	else{
+		block->elevation[w1-1][y1] = rand_radius_retry( weighted_ave_3_recip_f(block->elevation[x1]  [y1],block->elevation[x2][y1],block->elevation[w1-1][y1-1],w1-1-x1,x2-(w1-1),1),slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[w1]  [y1] = rand_radius_retry( weighted_ave_3_recip_f(block->elevation[w1-1][y1],block->elevation[x2][y1],block->elevation[w1]  [y1-1],1      ,x2-w1    ,1),slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[w2-1][y1] = rand_radius_retry( weighted_ave_3_recip_f(block->elevation[w1]  [y1],block->elevation[x2][y1],block->elevation[w2-1][y1-1],w2-1-w1,x2-(w2-1),1),slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[w2]  [y1] = rand_radius_retry( weighted_ave_3_recip_f(block->elevation[w2-1][y1],block->elevation[x2][y1],block->elevation[w2]  [y1-1],1      ,x2-w2    ,1),slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	}
 	// bottom four
-	block->elevation[w1-1][y2] = rand_radius_retry((block->elevation[x1][y2]  *(x2-(w1-1)) + block->elevation[x2][y2]*(w1-1-x1))/(x2-x1),   slopeMax*(w1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[w1]  [y2] = rand_radius_retry((block->elevation[w1-1][y2]*(x2-w1)     + block->elevation[x2][y2])          /(x2-w1+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[w2-1][y2] = rand_radius_retry((block->elevation[w1][y2]  *(x2-(w2-1)) + block->elevation[x2][y2]*(w2-1-w1))/(x2-w1),   slopeMax*(w1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[w2]  [y2] = rand_radius_retry((block->elevation[w2-1][y2]*(x2-w2)     + block->elevation[x2][y2])          /(x2-w2+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w1-1][y2] = rand_radius_retry((block->elevation[x1][y2]  *(x2-(w1-1)) + block->elevation[x2][y2]*(w1-1-x1))/(x2-x1),   slopeMax*(w1-1-x1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w1]  [y2] = rand_radius_retry((block->elevation[w1-1][y2]*(x2-w1)     + block->elevation[x2][y2])          /(x2-w1+1), slopeMax          , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w2-1][y2] = rand_radius_retry((block->elevation[w1][y2]  *(x2-(w2-1)) + block->elevation[x2][y2]*(w2-1-w1))/(x2-w1),   slopeMax*(w2-1-w1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[w2]  [y2] = rand_radius_retry((block->elevation[w2-1][y2]*(x2-w2)     + block->elevation[x2][y2])          /(x2-w2+1), slopeMax          , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 	
 	// generate the perimeter top and bottom side elevations first (V = valid, C = creating now)
 		//	V . . . . . . . V
@@ -132,16 +140,25 @@ short block_generate_terrain_recursive_call(struct blockData *block, int x1, int
 		//	C . . . . . . . C
 		//	. . . . . . . . .
 		//	V . . . . . . . V
+	
 	// left four
-	block->elevation[x1][h1-1] = rand_radius_retry((block->elevation[x1][y1]  *(y2-(h1-1)) + block->elevation[x1][y2]*(h1-1-y1))/(y2-y1),   slopeMax*(h1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[x1][h1]   = rand_radius_retry((block->elevation[x1][h1-1]*(y2-h1)     + block->elevation[x1][y2])          /(y2-h1+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[x1][h2-1] = rand_radius_retry((block->elevation[x1][h1]  *(y2-(h2-1)) + block->elevation[x1][y2]*(h2-1-h1))/(y2-h1),   slopeMax*(h1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[x1][h2]   = rand_radius_retry((block->elevation[x1][h2-1]*(y2-h2)     + block->elevation[x1][y2])          /(y2-h2+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	if(x1 == 0){
+		block->elevation[x1][h1-1] = rand_radius_retry((block->elevation[x1][y1]  *(y2-(h1-1)) + block->elevation[x1][y2]*(h1-1-y1))/(y2-y1),   slopeMax*(h1-1-y1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x1][h1]   = rand_radius_retry((block->elevation[x1][h1-1]*(y2-h1)     + block->elevation[x1][y2])          /(y2-h1+1), slopeMax          , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x1][h2-1] = rand_radius_retry((block->elevation[x1][h1]  *(y2-(h2-1)) + block->elevation[x1][y2]*(h2-1-h1))/(y2-h1),   slopeMax*(h2-1-h1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x1][h2]   = rand_radius_retry((block->elevation[x1][h2-1]*(y2-h2)     + block->elevation[x1][y2])          /(y2-h2+1), slopeMax          , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	}
+	else{
+		block->elevation[x1][h1-1] = rand_radius_retry( weighted_ave_3_recip_f(block->elevation[x1][y1]  ,block->elevation[x1][y2],block->elevation[x1-1][h1-1],h1-1-y1,y2-(h1-1),1), slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x1][h1]   = rand_radius_retry( weighted_ave_3_recip_f(block->elevation[x1][h1-1],block->elevation[x1][y2],block->elevation[x1-1][h1]  ,1      ,y2-h1    ,1), slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x1][h2-1] = rand_radius_retry( weighted_ave_3_recip_f(block->elevation[x1][h1]  ,block->elevation[x1][y2],block->elevation[x1-1][h2-1],h2-1-h1,y2-(h2-1),1), slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+		block->elevation[x1][h2]   = rand_radius_retry( weighted_ave_3_recip_f(block->elevation[x1][h2-1],block->elevation[x1][y2],block->elevation[x1-1][h2]  ,1      ,y2-h2    ,1), slopeMax, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	}
 	// right four
-	block->elevation[x2][h1-1] = rand_radius_retry((block->elevation[x2][y1]  *(y2-(h1-1)) + block->elevation[x2][y2]*(h1-1-y1))/(y2-y1),   slopeMax*(h1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[x2][h1]   = rand_radius_retry((block->elevation[x2][h1-1]*(y2-h1)     + block->elevation[x2][y2])          /(y2-h1+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[x2][h2-1] = rand_radius_retry((block->elevation[x2][h1]  *(y2-(h2-1)) + block->elevation[x2][y2]*(h2-1-h1))/(y2-h1),   slopeMax*(h1-1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-	block->elevation[x2][h2]   = rand_radius_retry((block->elevation[x2][h2-1]*(y2-h2)     + block->elevation[x2][y2])          /(y2-h2+1), slopeMax       , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x2][h1-1] = rand_radius_retry((block->elevation[x2][y1]  *(y2-(h1-1)) + block->elevation[x2][y2]*(h1-1-y1))/(y2-y1),   slopeMax*(h1-1-y1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x2][h1]   = rand_radius_retry((block->elevation[x2][h1-1]*(y2-h1)     + block->elevation[x2][y2])          /(y2-h1+1), slopeMax          , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x2][h2-1] = rand_radius_retry((block->elevation[x2][h1]  *(y2-(h2-1)) + block->elevation[x2][y2]*(h2-1-h1))/(y2-h1),   slopeMax*(h2-1-h1), BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
+	block->elevation[x2][h2]   = rand_radius_retry((block->elevation[x2][h2-1]*(y2-h2)     + block->elevation[x2][y2])          /(y2-h2+1), slopeMax          , BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
 	
 	
 	// calculate the middle 16 points based on the 16 edge points
@@ -168,6 +185,8 @@ short block_generate_terrain_recursive_call(struct blockData *block, int x1, int
 	
 	
 	// recursive calls to this function
+	// these NEED to stay in this particular order.
+	// The order that these occur in is very important to make sure this recursive function works as intended.
 	block_generate_terrain_recursive_call(block, x1, y1, w1-1, h1-1, slopeMax);	// TOP LEFT
 	block_generate_terrain_recursive_call(block, w1, y1, w2-1, h1-1, slopeMax);	// TOP CENTER
 	block_generate_terrain_recursive_call(block, w2, y1, x2,   h1-1, slopeMax);	// TOP RIGHT
