@@ -54,11 +54,13 @@
 //	3 4 5
 //	6 7 8
 
-#define BLOCK_ELEVATION_BOUND_LOWER 	0.0f	// this is the minimum height
-#define BLOCK_ELEVATION_BOUND_UPPER		1.0f	// this is the maximum height
-#define BLOCK_ELEVATION_INVALID			404.0f	// this is essentially a flag in the elevation data (used in terrain generation)
-#define BLOCK_ELEVATION_COLOR_LOWER 	0xff000000
-#define BLOCK_ELEVATION_COLOR_UPPER 	0xffffffff
+#define BLOCK_ELEVATION_BOUND_LOWER 		0.0f		// this is the minimum height
+#define BLOCK_ELEVATION_BOUND_UPPER			1.0f		// this is the maximum height
+#define BLOCK_ELEVATION_INVALID				404.0f		// this is essentially a flag in the elevation data (used in terrain generation)
+#define BLOCK_ELEVATION_SLOPE_MAX_DEFAULT	0.03f		// this is the default value of slopeMax in a block
+// at the present moment, the two following colors are mixed as you go from BLOCK_ELEVATION_BOUND_LOWER to BLOCK_ELEVATION_BOUND_UPPER.
+#define BLOCK_ELEVATION_COLOR_LOWER 		0xff000000	// this is the color of the map for BLOCK_ELEVATION_BOUND_LOWER
+#define BLOCK_ELEVATION_COLOR_UPPER 		0xffffffff	// this is the color of the map for BLOCK_ELEVATION_BOUND_UPPER
 
 // each block can have 9 children.
 // each block can have one parent.
@@ -114,6 +116,28 @@ struct blockData{
 	
 	// this is the two dimensional array of elevation values for each block.
 	float elevation[BLOCK_WIDTH][BLOCK_HEIGHT];
+	
+	// this describes how fast the elevation of the map can change. the higher the number, the higher the frequencies that can exist in the map.
+	// this relates to the frequency content of the map.
+	// technically, this is used as such:
+		// when interpolating between two elevation points, a first-order linear interpolation is done (establish a line between two points, and pick a point on the line as the new point of data).
+		// once you have done this, you then add some randomness to this point's elevation.
+		// the amount of randomness you add is directly proportional to this number.
+		// this number dictates how much randomness you can add per shortest interpolation distance
+		// for example:
+			// lets say your two interpolation elevation values are 0.67 and 0.98.
+			// lets say those two points are 8 cells away (8 elements in the elevation[][] array)
+			// if the point you with to interpolate is 2 cells away from 0.67 and 6 cells away from 0.98.
+			// lets also say your slope max is 0.1.
+			// then the middle of the range of possible values of that number is (0.67/2 + 0.98/6)/(1/2 + 1/6) = (0.498333)/(0.666667) = 0.7475
+			// the radius (the amount positive or negative) that the elevation can be randomly perturbed from that average is (slopeMax) * (minimum distance to known data point) = 0.1 * 2 = 0.2
+			// so the interpolated elevation would be 0.7475 plus or minus 0.2
+			// so it could be as low as 0.5475 or as high as 0.9475
+	// quick and dirty, slopeMax should be between 0.1 and 0.0001.
+	// anything in between there should be fine.
+	// 0.0001 gives you really REALLY gradual slopes.
+	// 0.1 gives you really jagged and crazy terrain.
+	float slopeMax;
 	
 };
 

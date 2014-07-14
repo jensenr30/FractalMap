@@ -276,7 +276,7 @@ int main(int argc, char *argv[]){
 			camera_check(camera);
 		}
 		if(keys['q']){
-			block_generate_terrain(camera->target, 0.03);
+			block_generate_terrain(camera->target, BLOCK_ELEVATION_SLOPE_MAX_DEFAULT);
 		}
 		if(keys['s']){
 			camera_pan(camera, CAMERA_PAN_DOWN);
