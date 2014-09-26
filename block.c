@@ -360,7 +360,7 @@ short block_render(struct blockData *block, SDL_Renderer *blockRenderer){
 	int i, j;
 	for(i=0; i<BLOCK_WIDTH; i++){
 		for(j=0; j<BLOCK_HEIGHT; j++){
-			set_pixel(blockSurface, i, j, color_mix_weighted_f(BLOCK_ELEVATION_COLOR_LOWER, BLOCK_ELEVATION_COLOR_UPPER, 1 - block->elevation[i][j], block->elevation[i][j]) );
+			set_pixel(blockSurface, i, j, color_mix_weighted_f(BLOCK_ELEVATION_COLOR_LOWER, BLOCK_ELEVATION_COLOR_UPPER, 1 - block->elevation[i][j], block->elevation[i][j])&0xffe0e0e0 );
 		}
 	}
 	
