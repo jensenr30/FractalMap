@@ -329,7 +329,7 @@ int main(int argc, char *argv[]){
 				cumulativeSin -= sin(theta*(float)i);
 			}
 			
-			if(logspace)	barHeighti = 90*log(barHeight*sqrt(cumulativeCos*cumulativeCos + cumulativeSin*cumulativeSin)/((float)steps));
+			if(logspace)	barHeighti = (barHeight/5.65) * log( 170*sqrt(cumulativeCos*cumulativeCos + cumulativeSin*cumulativeSin)/((float)steps) );
 			else 			barHeighti = 0.75*barHeight*sqrt(cumulativeCos*cumulativeCos + cumulativeSin*cumulativeSin)/((float)steps);
 			myRect.y = squareWaveSpace + spacing + barHeight - barHeighti;
 			myRect.h = barHeighti;
