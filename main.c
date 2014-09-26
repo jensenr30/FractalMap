@@ -36,8 +36,8 @@ int main(int argc, char *argv[]){
 	}
 	gamelog("END ARGV LIST");
 	
-	windW = BLOCK_WIDTH*3;
-	windH = BLOCK_HEIGHT*3;
+	windW = 1300;
+	windH = 731;
 	
 	int i;
 	//--------------------------------------------------
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]){
 		return -2;
 	}
 	
-	
+	/*
 	myWindow = SDL_CreateWindow("FractalMap - Map", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 	
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]){
 		error("main() could not create renderer using SDL_CreateRenderer");
 		return -2;
 	}
-	
+	*/
 	
 	SDL_SetRenderDrawColor(networkRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(networkRenderer);
@@ -112,20 +112,15 @@ int main(int argc, char *argv[]){
 	//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); // make the scaled rendering look smoother
 	//SDL_RenderSetLogicalSize(myRenderer, windW, windH);
 	
-	myTexture = SDL_CreateTexture(myRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windW, windH);
+	//myTexture = SDL_CreateTexture(myRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windW, windH);
 	
 	//SDL_Texture *glider = load_image_to_texture("glider.jpg");
-	
+	/*
 	if(myTexture == NULL){
 		error("main() could not create texture using SDL_CreateTexture");
 		return -2;
 	}
-	
-	if(myTexture == NULL){
-		error("main() could not create glider texture using SDL_CreateTexture");
-		return -2;
-	}
-	
+	*/
 	//--------------------------------------------------
 	// blocks and cameras
 	//--------------------------------------------------
@@ -176,6 +171,29 @@ int main(int argc, char *argv[]){
 	Uint32 ticksNow = 0;
 	Uint32 frames = 0;
 	Uint32 FPS = 0;
+	
+	float duty_cycle = 0.5f;
+	float barWidth = 200;
+	
+	int steps = 3000;
+	float angleIncrement = 3.1415926f/(float)steps;
+	float two_pi = 3.1415926f*2.0f;
+	int harmonics = 40;
+	float cumulativeCos;
+	float cumulativeSin;
+	float positiveAngle;
+	float theta;
+	
+	int spacing = 1;
+	int squareWaveSpace = 131;
+	int barHeight;
+	int barHeighti;
+	SDL_Rect myRect;
+	
+	int logspace = 0;
+	
+	int squareWavePeriod = 400; // (pixels)
+	
 	
 	
 	while(quit == 0){
@@ -258,156 +276,104 @@ int main(int argc, char *argv[]){
 			}
 		}
 		
-		// if the left mouse button is currently held
-		if(mouse[SDL_BUTTON_LEFT][0]){
-			
-			// move the camera x and y based on the distance the user has move the mouse
-			camera->x -= (x-xlast)*camera->scale/BLOCK_LINEAR_SCALE_FACTOR;
-			camera->y -= (y-ylast)*camera->scale/BLOCK_LINEAR_SCALE_FACTOR;
-			// check the camera.
-			// if the user moved too far in some direction, the camera will pan the camera appropriately.
-			camera_check(camera);
-		}
-		
-		// the wasd keys are used currently for testing the generation of neighbors.
-		if(keys['w']){
-			camera_pan(camera, CAMERA_PAN_UP);
-			// check the camera to make sure everything is fine
-			camera_check(camera);
-		}
-		if(keys['q']){
-			block_generate_terrain(camera->target, BLOCK_ELEVATION_SLOPE_MAX_DEFAULT);
-		}
-		if(keys['s']){
-			camera_pan(camera, CAMERA_PAN_DOWN);
-			// check the camera to make sure everything is fine
-			camera_check(camera);
-		}
-		if(keys['a']){
-			camera_pan(camera, CAMERA_PAN_LEFT);
-			// check the camera to make sure everything is fine
-			camera_check(camera);
-		}
-		if(keys['d']){
-			camera_pan(camera, CAMERA_PAN_RIGHT);
-			// check the camera to make sure everything is fine
-			camera_check(camera);
-		}
-		
-		// if the user pressed the r key
-		if(keys['r']){
-			// generate random noise in the block
-			block_fill_random(camera->target, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER );
-			//block_print_to_file(camera->target, "camera target.txt");
-			//color_mix_weighted_f(0xff000000, 0xffffffff, 0.667, 0.333);
-		}
-		
-		// if the user pressed the c key
-		if(keys['c']){
-			// generate children blocks
-			block_generate_children(camera->target);
-		}
-		
-		// fill up the left half of the screen with a color
-		if(keys['v']){
-			block_fill_half_vert(camera->target, BLOCK_ELEVATION_BOUND_LOWER, BLOCK_ELEVATION_BOUND_UPPER);
-		}
-		
-		// generate parent of camera->target if the p key is pressed
-		if(keys['p']){
-			block_generate_parent(camera->target);
-		}
-		
-		// if either the f or g keys were just stroked.
-		if(keys['f'] || keys['g']){
-			// generate new map in camera->target if the g key was pressed
-			if(keys['g']){
-				//block_fill_random(camera->target, 0, 0xff);
-				//block_fill_middle(camera->target, 0xff, 0x00);
-				//block_fill_nine_squares(camera->target, 100);
-				block_fill_nine_squares_own_color(camera->target, 10000, 20000, 50000, 20000, 10000, 20000, 50000, 20000, 10000);
-			}
-			
-			// the f key is for filtering
-			if(keys['f']){
-				// using the low-pass filter
-				filter_lowpass_2D_f((float *)((camera->target)->elevation), NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 0.76);
-				camera->target->renderMe = 1;
-			}
-		}
-		
-		
-		
-		
-		
-		// clear old surface
-		//if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
-		// generate image of map
-		//mapSurface = create_surface(windW, windH);
-
-		// print map to mapSurface
-		// map_print(mapSurface, camera->target);
-		
-		
-		//draw_rect(mapSurface, 243, 243, x-243, y-243, 9, color_mix_weighted(0xff00ff00,0xff0000ff,1,1), 0, 0);
-		// block_generate_neighbor(camera->target, BLOCK_NEIGHBOR_UP);
-		
-		//block_print_to_file(camera->target, "camera-target.txt");
-		// this test the frame-rate of the window by printing a single pixel under the mouse pointer tip
-		//set_pixel(mapSurface, mapSurface->w*((x%windW)/(float)windW), mapSurface->h*((y%windH)/(float)windH), 0xffffffff);
-		
-		
-		
 		
 		
 		// clear the old texture if it exists
 		if(networkSurface != NULL)SDL_FreeSurface(networkSurface);
-		
 		networkSurface = create_surface(windW, windH);
 		
+		
 		// generate the network hierarchy
-		block_print_network_hierarchy(networkSurface, origin->parent, camera->target, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff, 0xffff0000);
+		//block_print_network_hierarchy(networkSurface, origin->parent, camera->target, 5, 5, 0, 0, windW, 0xff00ff00, 0xff0000ff, 0xffff0000);
+		
+		// if the left mouse button is currently held
+		if(mouse[SDL_BUTTON_LEFT][0])
+		{
+			duty_cycle = x/((float)windW);
+		}
+		
+		if(mouse[SDL_BUTTON_RIGHT][0] && !mouse[SDL_BUTTON_RIGHT][1])
+		{
+			logspace = !logspace;
+		}
+		
+		barHeight = windH - squareWaveSpace - 2;
+		barWidth = windW/(float)4.35;
+		for(i=1; i<=harmonics; i++)
+		{
+			
+			// handle the x position and width of the bars
+			if(i==1)
+			{
+				myRect.x = spacing;
+				myRect.w = barWidth;
+			}
+			else
+			{
+				// move horizontally to next spot.
+				myRect.x += spacing + myRect.w;
+				myRect.w = barWidth/(float)i;
+			}
+			
+			cumulativeCos = 0;
+			cumulativeSin = 0;
+			positiveAngle = two_pi*duty_cycle;
+			for(theta=0; theta<positiveAngle; theta+= angleIncrement)
+			{
+				cumulativeCos += cos(theta*(float)i);
+				cumulativeSin += sin(theta*(float)i);
+			}
+			for(; theta<two_pi; theta+= angleIncrement)
+			{
+				cumulativeCos -= cos(theta*(float)i);
+				cumulativeSin -= sin(theta*(float)i);
+			}
+			
+			if(logspace)	barHeighti = 90*log(barHeight*sqrt(cumulativeCos*cumulativeCos + cumulativeSin*cumulativeSin)/((float)steps));
+			else 			barHeighti = 0.75*barHeight*sqrt(cumulativeCos*cumulativeCos + cumulativeSin*cumulativeSin)/((float)steps);
+			myRect.y = squareWaveSpace + spacing + barHeight - barHeighti;
+			myRect.h = barHeighti;
+			
+			SDL_FillRect(networkSurface, &myRect, 0xff00ef00);
+		}
+		
+		
+		for(i=0; i<windW; i++){
+			
+			if(duty_cycle*squareWavePeriod < i%squareWavePeriod)
+			{
+				set_pixel(networkSurface, i, 10, 0xff0000ff);
+				set_pixel(networkSurface, i, 11, 0xff0000ff);
+			}
+			else
+			{
+				set_pixel(networkSurface, i, squareWaveSpace, 0xff0000ff);
+				set_pixel(networkSurface, i, squareWaveSpace +1, 0xff0000ff);
+			}
+			
+		}
+		
+		
 		// generate texture for the block network
 		networkTexture = SDL_CreateTextureFromSurface(networkRenderer, networkSurface);
 		// render the networkSurface to the networkWindow
 		SDL_RenderCopy(networkRenderer, networkTexture, NULL, NULL);
 		if(networkTexture != NULL)SDL_DestroyTexture(networkTexture);
-		
 		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(networkRenderer);
 		SDL_RenderClear(networkRenderer);
 		
+			
+		
+		/*
 		// print the camera to screen
 		camera_render(myRenderer, camera, windW, windH);
-		
-		if(keys['u']){
-			for(i = 0; i < 9; i++) {
-				if(spriteSurface != NULL)
-					SDL_FreeSurface(spriteSurface);
-				spriteSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
-				
-				if(spriteTexture[i] != NULL)
-					SDL_DestroyTexture(spriteTexture[i]);
-				
-				generateTree(spriteSurface, randomizeTreeSpecies("generic", 0xff000000, 0xffffffff));
-				treeRect[i].x = (windW/3)*(i%3);
-				treeRect[i].y = (windH/3)*(i/3);
-				treeRect[i].w = windW/3;
-				treeRect[i].h = windH/3;
-				//SDL_RenderCopy(myRenderer, spriteTexture, NULL, &treeRect[i]);
-				spriteTexture[i] = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
-			}
-			
-			//spriteTexture = SDL_CreateTextureFromSurface(myRenderer, spriteSurface);
-		}
-		
-		// print the test sprite to the screen
-		for(i = 0; i < 9; i++)
-			SDL_RenderCopy(myRenderer, spriteTexture[i], NULL, &treeRect[i]);
 		
 		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
+		*/
+		
 		
 		// store the current x and y values and use them as the "last" values in the next iteration of the loop
 		xlast = x;
